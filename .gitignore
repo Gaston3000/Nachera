@@ -1,0 +1,14 @@
+# deps & build
+node_modules/
+dist/
+.vite/
+
+# brainstorming visual companion (local only)
+.superpowers/
+
+# os / editor
+.DS_Store
+Thumbs.db
+*.log
+.env
+.env.local
