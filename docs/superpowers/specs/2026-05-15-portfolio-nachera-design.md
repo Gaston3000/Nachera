@@ -28,7 +28,7 @@ estén cargados (placeholders elegantes y marcados).
 | Stack | **React + Vite + Framer Motion + Tailwind** | Animaciones premium limpias y mantenibles; deploy fácil (Vercel) |
 | Asset cara | **2.5D del PNG provisto** | No hay modelo 3D; 2.5D (recorte + halo + float + parallax) es premium y factible ya |
 | Identidad | **"Nachera" marca + "Ignacio Costa · Lic. en Cs. de la Comunicación" credencial** | Personalidad + autoridad |
-| Contacto | **Placeholders marcados y centralizados** | Avanzar sin frenar; editable en un solo lugar |
+| Contacto | **Datos reales centralizados** (del CV) | WhatsApp +54 9 11 4045-9532 · mail ignaciocosta.8@gmail.com · LinkedIn /in/ignacio-costa- |
 | Dirección de arte | **Tema B · Glass Cockpit** (base de trabajo) | Mejor comunica "marketing + datos + premium" sin caer en genérico |
 | Theming | **Tokens CSS + 3 temas A/B/C intercambiables + switcher opcional** | El cliente final decidirá la variante; cambiar = tocar tokens, no componentes |
 
@@ -72,7 +72,8 @@ meta-prueba de competencia para un profesional de marketing/comunicación.
 
 ### Sobre mí
 - Título: **Detrás de cada métrica, una estrategia.**
-- Cuerpo: *Soy Ignacio Costa —Nachera—, Licenciado en Ciencias de la Comunicación. Trabajo donde se cruzan la estrategia, la creatividad y los datos: ayudo a marcas y emprendimientos a comunicar con identidad y a tomar decisiones con información, no con intuición. Tengo formación en Google Ads, Google Analytics, Marketing Digital y edición de video, y experiencia fundando y haciendo crecer proyectos propios. No vendo humo: vendo criterio, ejecución y números que se pueden mirar.*
+- Cuerpo: *Soy Ignacio Costa —Nachera—, Licenciado en Ciencias de la Comunicación (UADE). Vengo del periodismo deportivo y la producción de radio, y ese origen me dejó algo que no se aprende en un curso: saber contar historias y escuchar de verdad. Hoy aplico eso al marketing digital —estrategia, branding, contenido y performance— para que marcas y emprendimientos comuniquen con identidad y decidan con datos, no con intuición. Fundé mi propia agencia (Sintonía Digital) y mi propio proyecto (Focaccheras), así que sé lo que es construir una marca desde cero. No vendo humo: vendo criterio, ejecución y números que se pueden mirar.*
+- Línea de cierre (chips): *Lic. en Cs. de la Comunicación · Google Ads & Analytics certificado · Inglés C1 · Pensamiento analítico + creativo*
 
 ### Servicios (8)
 1. **Estrategia de Marketing Digital** — Un plan con norte: objetivos, canales y prioridades según tu negocio, no plantillas.
@@ -96,19 +97,27 @@ meta-prueba de competencia para un profesional de marketing/comunicación.
 - *Gestión de contenido · redes sociales* — `+2.1x alcance` *(ej.)* — `Ver caso`
 - *Automatización de email marketing* — `+18% recompra` *(ej.)* — `Ver caso`
 
-### Experiencia (timeline)
-- **Founder — Sintonía Digital (Marketing Agency)**
-- **Founder — Focaccheras**
-- **Technical Sound & Lighting Operator — Pulso**
-- **Executive Producer — Fuego Sagrado Radio**
+### Experiencia (timeline · fechas reales del CV)
+- **Founder — Sintonía Digital · Agencia de Marketing** · Ene 2025 – Presente
+  *Estrategias de branding integrales, gestión de redes data-driven, campañas de email marketing y assets creativos a medida de cada cliente.*
+- **Founder — Focaccheras** · Ene 2024 – Presente
+  *Desarrollo de marca y crecimiento de identidad, automatización de email marketing, SEO y presencia multicanal (Instagram, Facebook).*
+- **Operador Técnico de Sonido e Iluminación — Pulso** · Ene 2024 – May 2025
+  *Coordinación y operación de equipos profesionales en eventos de gran escala.*
+- **Productor Ejecutivo — Fuego Sagrado Radio** · 2019 – 2021
+  *Distribución de contenido periodístico en digital, entrevistas con figuras del deporte y newsletters vía email marketing.*
 
-### Certificaciones y formación
-- Licenciatura en Ciencias de la Comunicación — UADE
-- Marketing Digital — Escuela Da Vinci
-- Video Editing — Escuela Da Vinci
-- Google Ads: Search, Display, Video & Measurement — Google Skillshop
-- Google Analytics — Google Skillshop
-- Sports Journalism — Deportea
+### Certificaciones y formación (años reales del CV)
+- **Licenciatura en Ciencias de la Comunicación** — UADE · 2020–2023
+- **Google Ads: Search, Display, Video & Measurement** — Google Skillshop · 2025
+- **Google Analytics** — Google Skillshop · 2025
+- **Marketing Digital** — Escuela Da Vinci · 2024
+- **Video Editing** — Escuela Da Vinci · 2024
+- **Tecnicatura en Periodismo Deportivo** — Deportea · 2015–2017
+- *(adicional)* **Google Ads** — Coderhouse · 2025
+
+Jerarquía visual sugerida: destacar Licenciatura + Google (Skillshop) como
+badges grandes; Da Vinci/Deportea/Coderhouse como badges secundarios.
 
 ### Herramientas
 Google Ads · Google Analytics · SEO · Metricool · Meta Business Suite · Adobe Premiere · Canva · CapCut · Sony Vegas · Trello · Brevo · Microsoft Office
@@ -116,7 +125,8 @@ Google Ads · Google Analytics · SEO · Metricool · Meta Business Suite · Ado
 ### CTA final
 - Título: **¿Querés que tu marca comunique mejor y venda más?**
 - Sub: *Una charla de 20 minutos y te digo, sin vueltas, qué haría con tu marca.*
-- Botones: `Agendar una reunión` *(placeholder link)* · `Escribirme por WhatsApp` *(primario)*
+- Botones: `Escribirme por WhatsApp` *(primario · `https://wa.me/5491140459532`)* · `Agendar una reunión` *(placeholder — falta link de agenda)*
+- Footer: mail `ignaciocosta.8@gmail.com` (mailto) · LinkedIn `/in/ignacio-costa-`
 
 ## 6. Dirección visual + sistema de theming
 
@@ -201,13 +211,29 @@ Diseño desktop-first, optimizado mobile:
 - **Autoridad sin soberbia:** especificidad > adjetivos; mostrar, no proclamar.
 - **Cómo contacta:** CTA persistente en nav + cierre baja fricción (WhatsApp 1 clic, sin formulario largo) + oferta concreta ("20 min y te digo qué haría con tu marca").
 
-## 12. Assets pendientes (del usuario)
+## 12. Estado de assets
 
-- PNG de la cara en alta resolución (para recorte 2.5D). Solo llegó la imagen base.
-- CV de Ignacio Costa (afinar fechas/detalles de experiencia).
-- Certificados: Da Vinci (Marketing Digital), Coderhouse (Google Ads), título UADE.
-- Datos reales de contacto: WhatsApp, mail (rutear al mail del cliente), link de agenda.
-- Casos reales con métricas verificadas (reemplazan placeholders).
+**Recibido y aplicado al spec:**
+- CV (inglés) → experiencia con fechas reales, skills, resumen profesional, contacto.
+- Certificados Da Vinci, UADE, Coderhouse → años/datos reales de formación.
+- Datos de contacto reales: WhatsApp +54 9 11 4045-9532 · mail
+  ignaciocosta.8@gmail.com · LinkedIn /in/ignacio-costa-.
+- Imagen base de la cara (render estilizado, fondo negro).
+
+**Todavía pendiente del usuario:**
+- **PNG de la cara como archivo en alta resolución** (con ruta en disco). La
+  imagen llegó pegada en el chat; para el recorte 2.5D necesito el archivo
+  fuente a la mayor resolución posible en `assets/raw/`.
+- **Link de agenda** (Calendly u otro) para el botón "Agendar una reunión".
+- **Casos reales** con métricas verificadas (reemplazan placeholders).
+
+**A confirmar con el usuario (discrepancias menores entre fuentes):**
+- Marketing Digital Da Vinci: el CV dice 2024; el certificado físico está
+  fechado 27/02/2025. Spec usa 2024 (canon del CV).
+- Google Ads aparece en dos fuentes: Google Skillshop (CV) y Coderhouse
+  (certificado). Spec prioriza Skillshop y suma Coderhouse como adicional.
+- ¿Mostrar el botón "Agendar reunión" desde ya (placeholder) o esconderlo
+  hasta tener link real?
 
 ## 13. Fuera de alcance (por ahora)
 
@@ -216,3 +242,19 @@ Diseño desktop-first, optimizado mobile:
 - Modelo 3D real WebGL de la cabeza (posible fase 2).
 - Páginas internas de detalle de cada caso (los "Ver caso" pueden quedar como ancla/placeholder hasta tener casos reales).
 - Multi-idioma (solo español).
+
+## 14. Privacidad y datos sensibles (PII)
+
+**Hallazgo:** los certificados de Da Vinci y UADE contienen el **DNI de Ignacio
+(39.184.470)**. Es dato personal sensible.
+
+Reglas duras:
+- El DNI **nunca** se publica en el sitio. Las certificaciones se muestran como
+  **badges de texto** (nombre del programa + institución + año), no como
+  escaneos de los certificados.
+- Los materiales crudos (CV, certificados con DNI) viven en `assets/raw/` que
+  está **gitignored** — nunca entran al control de versiones ni al deploy.
+- Si en el futuro se quiere mostrar la imagen de un certificado, primero hay que
+  **redactar el DNI** y guardar solo la versión censurada en `assets/` (no raw).
+- Datos de contacto que **sí** son públicos a propósito (es su portfolio, busca
+  leads): WhatsApp, mail e Instagram/LinkedIn profesionales.

@@ -6,6 +6,9 @@ dist/
 # brainstorming visual companion (local only)
 .superpowers/
 
+# raw source material — contains PII (DNI en certificados). NUNCA versionar.
+assets/raw/
+
 # os / editor
 .DS_Store
 Thumbs.db
