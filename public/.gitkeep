@@ -1,0 +1,3 @@
+# Colocar acá los assets estáticos.
+# Foto recortada del rostro del cliente: public/face.png
+# (luego setear FACE_SRC en src/components/AnimatedFace.tsx).

@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-ink text-white/90 antialiased;
+  /* Fondo con profundidad: gradientes sutiles superpuestos. */
+  background-image:
+    radial-gradient(60rem 60rem at 15% -10%, rgba(255, 106, 61, 0.14), transparent 60%),
+    radial-gradient(50rem 50rem at 100% 0%, rgba(167, 139, 250, 0.12), transparent 55%),
+    radial-gradient(40rem 40rem at 50% 120%, rgba(255, 138, 99, 0.1), transparent 60%);
+  background-attachment: fixed;
+}
+
+/* Respeta usuarios que prefieren menos movimiento. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-6xl px-5 sm:px-8;
+  }
+
+  .section-title {
+    @apply font-display text-3xl font-semibold tracking-tight sm:text-4xl;
+  }
+
+  .eyebrow {
+    @apply mb-3 inline-block text-xs font-semibold uppercase tracking-[0.2em] text-accent;
+  }
+
+  .card-surface {
+    @apply rounded-xl2 border border-white/5 bg-ink-card/70 shadow-card backdrop-blur-sm;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent;
+  }
+
+  .btn-primary {
+    @apply btn bg-accent text-ink hover:bg-accent-soft hover:shadow-glow;
+  }
+
+  .btn-secondary {
+    @apply btn border border-white/15 text-white/90 hover:border-white/40 hover:bg-white/5;
+  }
+}
