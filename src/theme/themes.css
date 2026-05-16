@@ -1,0 +1,33 @@
+:root,
+[data-theme='b'] {
+  --c-bg: #070912;
+  --c-bg2: #0e1326;
+  --c-fg: #eaf0ff;
+  --c-muted: #7c89a6;
+  --c-accent: #39e6ff;
+  --c-accent2: #7c5cff;
+  --c-glass: rgba(255, 255, 255, 0.05);
+  --c-glass-border: rgba(255, 255, 255, 0.12);
+}
+
+[data-theme='a'] {
+  --c-bg: #0a0a0b;
+  --c-bg2: #0a0a0b;
+  --c-fg: #f4f4f0;
+  --c-muted: #9b9b94;
+  --c-accent: #d6ff3e;
+  --c-accent2: #d6ff3e;
+  --c-glass: rgba(255, 255, 255, 0.04);
+  --c-glass-border: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='c'] {
+  --c-bg: #121110;
+  --c-bg2: #1c1611;
+  --c-fg: #f3ece3;
+  --c-muted: #9a8a78;
+  --c-accent: #ff8a4c;
+  --c-accent2: #e8b27a;
+  --c-glass: rgba(255, 255, 255, 0.05);
+  --c-glass-border: rgba(255, 255, 255, 0.12);
+}
