@@ -32,7 +32,6 @@ export function FinalCTA() {
               </Button>
             ) : (
               <Button
-                as="a"
                 href={`mailto:${siteConfig.email}`}
                 variant="ghost"
                 title="Link de agenda pendiente — por ahora, mail"

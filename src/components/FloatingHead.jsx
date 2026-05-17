@@ -50,7 +50,7 @@ export function FloatingHead() {
           className="h-full w-full object-contain drop-shadow-[0_30px_60px_rgba(0,0,0,0.5)]"
           onError={(e) => {
             e.currentTarget.style.display = 'none'
-            e.currentTarget.nextSibling.style.display = 'flex'
+            e.currentTarget.nextElementSibling.style.display = 'flex'
           }}
         />
         {/* fallback if PNG not yet provided */}
