@@ -28,4 +28,15 @@ describe('Reveal', () => {
     expect(el).toBeInTheDocument()
     expect(el).not.toHaveStyle({ opacity: 0 })
   })
+
+  it('forwards rest props (id/data) to the DOM in the reduced-motion branch', () => {
+    render(
+      <Reveal data-testid="rv" id="anchor">
+        x
+      </Reveal>
+    )
+    const el = screen.getByTestId('rv')
+    expect(el).toBeInTheDocument()
+    expect(el).toHaveAttribute('id', 'anchor')
+  })
 })
