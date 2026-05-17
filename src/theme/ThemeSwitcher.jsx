@@ -12,9 +12,11 @@ export function ThemeSwitcher() {
           key={t}
           onClick={() => setTheme(t)}
           aria-pressed={theme === t}
-          className={`h-7 w-7 rounded-full font-display text-xs font-semibold uppercase transition ${
-            theme === t ? 'bg-accent text-bg' : 'text-muted hover:text-fg'
-          }`}
+          className={[
+            'h-7 w-7 rounded-full font-display text-xs font-semibold uppercase transition',
+            theme === t ? 'bg-accent text-bg' : 'text-muted',
+            theme !== t ? 'hover:text-fg' : '',
+          ].join(' ')}
         >
           {t}
         </button>

@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { resolveInitialTheme, THEMES } from './themeController.js'
 
-const ThemeCtx = createContext({ theme: 'b', setTheme: () => {} })
+const ThemeCtx = createContext({ theme: 'b', setTheme: () => {}, themes: THEMES })
 const STORAGE_KEY = 'nachera-theme'
 
 export function ThemeProvider({ children }) {
