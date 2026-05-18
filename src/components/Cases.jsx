@@ -167,6 +167,7 @@ export function Cases() {
                   variant="ghost"
                   onClick={() => setActiveCase(featured)}
                   icon={<ArrowUpRight />}
+                  iconNudge="diag"
                 >
                   Ver caso completo
                 </Button>

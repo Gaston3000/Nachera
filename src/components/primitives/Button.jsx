@@ -9,27 +9,31 @@ export function Button({
 }) {
   const Tag = as
   const base =
-    'group inline-flex items-center gap-2 rounded-full px-6 py-3 font-display text-sm font-semibold transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent'
+    'btn-premium group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full px-6 py-3 font-display text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent'
   const variants = {
-    primary:
-      'bg-accent text-bg hover:shadow-[0_0_30px_-4px_var(--c-accent)] hover:-translate-y-0.5',
-    ghost:
-      'border border-glassborder bg-glass text-fg backdrop-blur-md hover:border-accent/60 hover:-translate-y-0.5',
+    primary: 'bg-accent text-bg',
+    ghost: 'border border-glassborder bg-glass text-fg backdrop-blur-md',
   }
-  const nudgeClass =
+  const launch =
     iconNudge === 'y'
-      ? 'group-hover:translate-y-0.5'
-      : iconNudge === 'none'
-        ? ''
-        : 'group-hover:translate-x-0.5'
+      ? 'btn-ico--y'
+      : iconNudge === 'diag'
+        ? 'btn-ico--diag'
+        : iconNudge === 'none'
+          ? ''
+          : 'btn-ico--x'
   return (
-    <Tag className={`${base} ${variants[variant]} ${className}`} {...props}>
-      {children}
+    <Tag
+      data-variant={variant}
+      className={`${base} ${variants[variant]} ${className}`}
+      {...props}
+    >
+      <span aria-hidden="true" className="btn-sheen" />
+      <span className="relative z-[1]">{children}</span>
       {icon != null && (
-        <span
-          className={`transition-transform duration-200 ease-out motion-reduce:transform-none ${nudgeClass}`}
-        >
-          {icon}
+        <span aria-hidden="true" className={`btn-ico relative z-[1] ${launch}`}>
+          <span className="btn-ico__main">{icon}</span>
+          <span className="btn-ico__ghost">{icon}</span>
         </span>
       )}
     </Tag>

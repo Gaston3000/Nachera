@@ -65,41 +65,57 @@ describe('Button icon API', () => {
     expect(btn.textContent).toBe('Hablemos')
   })
 
-  it('applies the default x nudge class on the icon wrapper', () => {
+  it('wraps the icon in the launch container with the default x modifier', () => {
     render(
       <Button as="button" icon={<ArrowUpRight />}>
         Ver caso
       </Button>
     )
-    const svg = screen
-      .getByRole('button', { name: 'Ver caso' })
-      .querySelector('svg')
-    const wrapper = svg.parentElement
-    expect(wrapper.className).toContain('group-hover:translate-x-0.5')
-    expect(wrapper.className).toContain('motion-reduce:transform-none')
+    const btn = screen.getByRole('button', { name: 'Ver caso' })
+    const ico = btn.querySelector('.btn-ico')
+    expect(ico).not.toBeNull()
+    expect(ico.className).toContain('btn-ico--x')
+    // wrapper is decorative; accessible name comes from the label only
+    expect(ico.getAttribute('aria-hidden')).toBe('true')
+    // two copies drive the launch/swap (main flies out, ghost flies in)
+    expect(ico.querySelector('.btn-ico__main svg')).not.toBeNull()
+    expect(ico.querySelector('.btn-ico__ghost svg')).not.toBeNull()
   })
 
-  it('uses the y nudge class when iconNudge="y"', () => {
+  it('uses the y modifier when iconNudge="y"', () => {
     render(
       <Button as="button" icon={<ArrowUpRight />} iconNudge="y">
         Ver servicios
       </Button>
     )
-    const wrapper = screen
+    const ico = screen
       .getByRole('button', { name: 'Ver servicios' })
-      .querySelector('svg').parentElement
-    expect(wrapper.className).toContain('group-hover:translate-y-0.5')
+      .querySelector('.btn-ico')
+    expect(ico.className).toContain('btn-ico--y')
   })
 
-  it('omits any nudge class when iconNudge="none"', () => {
+  it('uses the diagonal modifier when iconNudge="diag" (Ver caso signature)', () => {
+    render(
+      <Button as="button" icon={<ArrowUpRight />} iconNudge="diag">
+        Ver caso
+      </Button>
+    )
+    const ico = screen
+      .getByRole('button', { name: 'Ver caso' })
+      .querySelector('.btn-ico')
+    expect(ico.className).toContain('btn-ico--diag')
+  })
+
+  it('omits any directional modifier when iconNudge="none"', () => {
     render(
       <Button as="button" icon={<ArrowUpRight />} iconNudge="none">
         Plain
       </Button>
     )
-    const wrapper = screen
+    const ico = screen
       .getByRole('button', { name: 'Plain' })
-      .querySelector('svg').parentElement
-    expect(wrapper.className).not.toContain('group-hover:translate')
+      .querySelector('.btn-ico')
+    expect(ico).not.toBeNull()
+    expect(ico.className).not.toMatch(/btn-ico--/)
   })
 })

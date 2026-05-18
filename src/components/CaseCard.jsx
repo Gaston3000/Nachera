@@ -66,6 +66,7 @@ export function CaseCard({ caseData, index, onOpen }) {
             variant="ghost"
             onClick={() => onOpen(caseData)}
             icon={<ArrowUpRight />}
+            iconNudge="diag"
           >
             Ver caso
           </Button>
