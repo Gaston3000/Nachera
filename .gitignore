@@ -6,6 +6,9 @@ dist/
 # brainstorming visual companion (local only)
 .superpowers/
 
+# local tooling (claude preview/launch config)
+.claude/
+
 # raw source material — contains PII (DNI en certificados). NUNCA versionar.
 assets/raw/
 
