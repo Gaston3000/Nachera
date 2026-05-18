@@ -161,7 +161,7 @@ export function Cases() {
               </div>
 
               <div className="mt-8">
-                <Button as="button" onClick={() => setActiveCase(featured)}>
+                <Button as="button" variant="ghost" onClick={() => setActiveCase(featured)}>
                   Ver caso completo →
                 </Button>
               </div>

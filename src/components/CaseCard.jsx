@@ -63,7 +63,6 @@ export function CaseCard({ caseData, index, onOpen }) {
           <Button
             as="button"
             variant="ghost"
-            className="!px-4 !py-2 !text-xs"
             onClick={() => onOpen(caseData)}
           >
             Ver caso →

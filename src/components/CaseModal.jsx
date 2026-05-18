@@ -49,7 +49,7 @@ export function CaseModal({ caseData, onClose }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-bg/80 backdrop-blur-md"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-bg/80 p-4 backdrop-blur-md"
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"
@@ -57,19 +57,21 @@ export function CaseModal({ caseData, onClose }) {
     >
       <MotionDiv
         {...animProps}
-        ref={scrollRef}
-        className="relative my-8 w-full max-w-2xl rounded-2xl border border-glassborder bg-bg2 shadow-[0_32px_80px_-16px_rgba(0,0,0,0.6)] mx-4"
+        className="relative flex max-h-[88vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-glassborder bg-bg2 shadow-[0_32px_80px_-16px_rgba(0,0,0,0.6)]"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* close button */}
+        {/* close button — stays fixed over the scrolling content */}
         <button
           ref={closeRef}
           onClick={onClose}
-          className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-glassborder bg-glass text-muted transition hover:text-fg focus-visible:outline-2 focus-visible:outline-accent"
+          className="absolute right-4 top-4 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-glassborder bg-glass text-muted backdrop-blur-sm transition hover:text-fg focus-visible:outline-2 focus-visible:outline-accent"
           aria-label="Cerrar modal"
         >
           ✕
         </button>
+
+        {/* scrollable content — on-brand custom scrollbar */}
+        <div ref={scrollRef} className="modal-scroll min-h-0 flex-1 overflow-y-auto">
 
         {/* hero band */}
         <div className="relative overflow-hidden rounded-t-2xl border-b border-glassborder bg-glass/40 px-8 pt-10 pb-8">
@@ -156,6 +158,7 @@ export function CaseModal({ caseData, onClose }) {
               Escribirme por WhatsApp
             </Button>
           </div>
+        </div>
         </div>
       </MotionDiv>
     </div>
