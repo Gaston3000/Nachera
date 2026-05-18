@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import { Button } from './primitives/Button.jsx'
 import { MiniDashboard } from './MiniDashboard.jsx'
@@ -8,6 +8,32 @@ export function CaseModal({ caseData, onClose }) {
   const reduce = useReducedMotion()
   const closeRef = useRef(null)
   const scrollRef = useRef(null)
+
+  // Custom scrollbar metrics — a real element, so it stays visible on iOS
+  // Safari too (where ::-webkit-scrollbar is ignored and native overlay
+  // bars auto-hide, making it unclear the modal scrolls).
+  const [bar, setBar] = useState({
+    scrollable: false,
+    topPct: 0,
+    heightPct: 0,
+    atBottom: false,
+  })
+
+  const updateBar = useCallback(() => {
+    const el = scrollRef.current
+    if (!el) return
+    const { scrollTop, scrollHeight, clientHeight } = el
+    const scrollable = scrollHeight - clientHeight > 4
+    if (!scrollable) {
+      setBar({ scrollable: false, topPct: 0, heightPct: 0, atBottom: true })
+      return
+    }
+    const heightPct = Math.max((clientHeight / scrollHeight) * 100, 10)
+    const maxTop = 100 - heightPct
+    const topPct = Math.min((scrollTop / scrollHeight) * 100, maxTop)
+    const atBottom = scrollTop + clientHeight >= scrollHeight - 4
+    setBar({ scrollable: true, topPct, heightPct, atBottom })
+  }, [])
 
   // Lock body scroll
   useEffect(() => {
@@ -31,6 +57,30 @@ export function CaseModal({ caseData, onClose }) {
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
+
+  // Track scroll position for the custom scrollbar
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    updateBar()
+    const raf = requestAnimationFrame(updateBar)
+    const t = setTimeout(updateBar, 150) // after fonts / dashboard reflow
+    el.addEventListener('scroll', updateBar, { passive: true })
+    const ro =
+      typeof ResizeObserver !== 'undefined'
+        ? new ResizeObserver(updateBar)
+        : null
+    ro?.observe(el)
+    if (ro && el.firstElementChild) ro.observe(el.firstElementChild)
+    window.addEventListener('resize', updateBar)
+    return () => {
+      cancelAnimationFrame(raf)
+      clearTimeout(t)
+      el.removeEventListener('scroll', updateBar)
+      ro?.disconnect()
+      window.removeEventListener('resize', updateBar)
+    }
+  }, [updateBar])
 
   function handleBackdropClick(e) {
     if (e.target === e.currentTarget) onClose()
@@ -64,13 +114,13 @@ export function CaseModal({ caseData, onClose }) {
         <button
           ref={closeRef}
           onClick={onClose}
-          className="absolute right-4 top-4 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-glassborder bg-glass text-muted backdrop-blur-sm transition hover:text-fg focus-visible:outline-2 focus-visible:outline-accent"
+          className="absolute right-4 top-4 z-30 flex h-8 w-8 items-center justify-center rounded-full border border-glassborder bg-glass text-muted backdrop-blur-sm transition hover:text-fg focus-visible:outline-2 focus-visible:outline-accent"
           aria-label="Cerrar modal"
         >
           ✕
         </button>
 
-        {/* scrollable content — on-brand custom scrollbar */}
+        {/* scrollable content — native bar hidden via .modal-scroll */}
         <div ref={scrollRef} className="modal-scroll min-h-0 flex-1 overflow-y-auto">
 
         {/* hero band */}
@@ -160,6 +210,31 @@ export function CaseModal({ caseData, onClose }) {
           </div>
         </div>
         </div>
+
+        {/* custom cyan scrollbar — always visible while scrollable (iOS-safe) */}
+        {bar.scrollable && (
+          <div
+            className="pointer-events-none absolute right-1.5 top-16 bottom-4 w-1.5 rounded-full bg-white/[0.06]"
+            aria-hidden="true"
+          >
+            <div
+              className="absolute left-0 w-full rounded-full bg-accent shadow-[0_0_10px_rgba(57,230,255,0.7)] transition-[top] duration-100 ease-out"
+              style={{ top: `${bar.topPct}%`, height: `${bar.heightPct}%` }}
+            />
+          </div>
+        )}
+
+        {/* "hay más abajo" hint — fade + chevron, disappears at the end */}
+        {bar.scrollable && !bar.atBottom && (
+          <div
+            className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex h-20 items-end justify-center rounded-b-2xl bg-gradient-to-t from-bg2 via-bg2/80 to-transparent pb-3"
+            aria-hidden="true"
+          >
+            <span className="animate-pulse font-display text-base leading-none text-accent">
+              ⌄
+            </span>
+          </div>
+        )}
       </MotionDiv>
     </div>
   )

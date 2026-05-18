@@ -46,7 +46,7 @@ export function Hero() {
     <section
       id="hero"
       ref={heroRef}
-      className="relative mx-auto flex w-full max-w-6xl flex-col-reverse items-center gap-10 px-5 pb-16 pt-28 sm:px-8 md:min-h-screen md:flex-row md:justify-between md:gap-6 md:pb-0 md:pt-32"
+      className="relative mx-auto flex w-full max-w-6xl flex-col items-center gap-10 px-5 pb-16 pt-28 sm:px-8 md:min-h-screen md:flex-row md:justify-between md:gap-6 md:pb-0 md:pt-32"
     >
       {/* Text column — slides up very slightly as hero exits */}
       <motion.div
@@ -75,7 +75,7 @@ export function Hero() {
           {...fade(0.3)}
           className="mt-9 flex flex-wrap justify-center gap-3 md:justify-start"
         >
-          <Button href="#servicios">Ver servicios</Button>
+          <Button href="#soluciones">Ver servicios</Button>
           <Button href={siteConfig.whatsappUrlWithMsg} target="_blank" rel="noopener" variant="ghost">
             Hablemos →
           </Button>
