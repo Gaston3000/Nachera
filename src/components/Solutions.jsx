@@ -28,7 +28,10 @@ const itemVariantsLeft = {
 
 function useCountUp(target, { decimals = 0, suffix = '', duration = 1.2, inView = false } = {}) {
   const reduce = useReducedMotion()
-  const mv = useMotionValue(reduce || inView ? target : 0)
+  // Always start from 0 when motion is allowed (even if mounted already
+  // in-view) so the count-up animates on first reveal AND on replay remount;
+  // the effect below drives it to `target`. Reduced motion stays at target.
+  const mv = useMotionValue(reduce ? target : 0)
   const [display, setDisplay] = useState(() =>
     (reduce ? target : 0).toFixed(decimals) + suffix
   )
@@ -507,10 +510,16 @@ function DetailBlock({ detail }) {
 
 /* ─── single tile ────────────────────────────────────────────────────────── */
 
-function SolutionTile({ tile, index }) {
+function SolutionTile({ tile, index, active = false, onActivate }) {
   const reduce = useReducedMotion()
   const [inView, setInView] = useState(false)
+  // remount key: bumping it remounts the keyed inner wrapper (and its Viz +
+  // count-up children) so the entrance animation replays from zero.
+  const [replayKey, setReplayKey] = useState(0)
   const ref = useRef(null)
+  // rapid-tap guard: ignore taps for this tile while a replay is in flight.
+  const isReplaying = useRef(false)
+  const replayTimer = useRef(null)
 
   useEffect(() => {
     const el = ref.current
@@ -523,21 +532,70 @@ function SolutionTile({ tile, index }) {
     return () => observer.disconnect()
   }, [reduce])
 
+  // clear any pending replay timer on unmount
+  useEffect(() => () => clearTimeout(replayTimer.current), [])
+
   const { Viz } = tile
 
-  /* under reduced motion — render statically, nothing animated */
+  // shared activation handler (click + keyboard). Always moves the single-active
+  // highlight; under reduced motion that's ALL it does (no remount / no motion).
+  const handleActivate = () => {
+    onActivate?.(tile.id)
+    if (reduce) return
+    if (isReplaying.current) return
+    isReplaying.current = true
+    setReplayKey((k) => k + 1)
+    clearTimeout(replayTimer.current)
+    replayTimer.current = setTimeout(() => {
+      isReplaying.current = false
+    }, 850)
+  }
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+      e.preventDefault()
+      handleActivate()
+    }
+  }
+
+  const a11yProps = {
+    role: 'button',
+    tabIndex: 0,
+    'aria-label': `Reactivar la animación de ${tile.title}`,
+    'aria-pressed': active,
+    onClick: handleActivate,
+    onKeyDown: handleKeyDown,
+  }
+
+  /* under reduced motion — render statically, nothing animated. A tap only
+     toggles the active highlight (border/glow), never any transform/motion. */
   if (reduce) {
     return (
       <div className={tile.span}>
-        <GlassPanel className={`relative flex h-full flex-col overflow-hidden p-6 ${tile.accentBorder ? 'border-accent/30' : ''}`}>
+        <GlassPanel
+          className={`relative flex h-full flex-col overflow-hidden p-6 cursor-pointer select-none ${
+            tile.accentBorder ? 'border-accent/30' : ''
+          } ${active ? 'border-accent/60' : ''}`}
+          {...a11yProps}
+        >
+          {/* active highlight — static glow only, no transform under reduced motion */}
+          {active && (
+            <div
+              className="pointer-events-none absolute inset-0"
+              aria-hidden="true"
+              style={{
+                background: `radial-gradient(circle at 30% 20%, color-mix(in srgb, ${tile.glowColor} 14%, transparent), transparent 60%)`,
+              }}
+            />
+          )}
           {/* reserved visual area — same height across every card */}
-          <div className="flex h-44 shrink-0 items-center overflow-hidden md:h-52 [&>*]:w-full">
+          <div className="relative flex h-44 shrink-0 items-center overflow-hidden md:h-52 [&>*]:w-full">
             <Viz inView={true} />
           </div>
-          <h3 className="mt-5 font-display text-lg font-bold text-fg sm:text-xl">{tile.title}</h3>
-          <p className="mt-2 text-sm leading-relaxed text-muted">{tile.value}</p>
+          <h3 className="relative mt-5 font-display text-lg font-bold text-fg sm:text-xl">{tile.title}</h3>
+          <p className="relative mt-2 text-sm leading-relaxed text-muted">{tile.value}</p>
           {/* result box — pinned to the bottom, aligned across cards */}
-          <div className="mt-auto pt-6">
+          <div className="relative mt-auto pt-6">
             <div className="rounded-xl border border-glassborder bg-bg/60 p-3 text-xs leading-relaxed backdrop-blur-sm">
               <div className="mb-1">
                 <span className="font-semibold text-muted uppercase tracking-wider">Resuelve</span>{' '}
@@ -559,86 +617,101 @@ function SolutionTile({ tile, index }) {
   }
 
   return (
-    <motion.div
-      ref={ref}
-      className={`group ${tile.span}`}
-      variants={containerVariants}
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: true, amount: 0.25 }}
-    >
+    <div ref={ref} className={`group ${tile.span}`}>
       <GlassPanel
-        className={`relative flex h-full flex-col overflow-hidden p-6 transition-all duration-300 hover:-translate-y-1 ${
+        className={`relative flex h-full flex-col overflow-hidden p-6 cursor-pointer select-none transition-all duration-300 hover:-translate-y-1 hover:border-accent/50 ${
           tile.accentBorder ? 'border-accent/30' : ''
-        } hover:border-accent/50`}
+        } ${active ? 'border-accent/60 -translate-y-1 scale-[1.01]' : ''}`}
         style={{
           '--tile-glow': tile.glowColor,
         }}
+        {...a11yProps}
       >
-        {/* entry glow — animates in as card appears */}
+        {/* ── decorative glow layers — OUTSIDE the keyed wrapper so they
+              never remount on replay ───────────────────────────────────── */}
+        {/* entry glow — fades in once the card scrolls into view */}
         <motion.div
           className="pointer-events-none absolute inset-0"
           aria-hidden="true"
-          variants={{
-            hidden: { opacity: 0 },
-            show: { opacity: 1, transition: { duration: 0.8, ease: EASE } },
-          }}
+          initial={{ opacity: 0 }}
+          animate={inView ? { opacity: 1 } : { opacity: 0 }}
+          transition={{ duration: 0.8, ease: EASE }}
           style={{
             background: `radial-gradient(circle at 0% 0%, color-mix(in srgb, ${tile.glowColor} 6%, transparent), transparent 55%)`,
           }}
         />
-        {/* stronger glow on hover */}
+        {/* stronger glow on hover OR while active (persistent when active) */}
         <div
-          className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+          className={`pointer-events-none absolute inset-0 transition-opacity duration-300 group-hover:opacity-100 ${
+            active ? 'opacity-100' : 'opacity-0'
+          }`}
           style={{
             background: `radial-gradient(circle at 30% 20%, color-mix(in srgb, ${tile.glowColor} 14%, transparent), transparent 60%)`,
           }}
           aria-hidden="true"
         />
-        {/* hover lift shadow */}
-        <motion.div
-          className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        {/* lift shadow on hover OR while active (persistent accent ring when active) */}
+        <div
+          className={`pointer-events-none absolute inset-0 rounded-2xl transition-opacity duration-300 group-hover:opacity-100 ${
+            active ? 'opacity-100' : 'opacity-0'
+          }`}
           style={{ boxShadow: `0 0 48px -12px ${tile.glowColor}` }}
           aria-hidden="true"
         />
 
-        {/* reserved visual area — identical height on every card so the
-            title always starts at the same place; viz centered within it */}
+        {/* ── keyed inner wrapper — remounting it (replayKey bump) restarts
+              the staggered entrance of every itemVariants child below, and
+              remounts the Viz + count-ups so they re-run from zero. The
+              first run is viewport-gated via inView-driven `animate`. ───── */}
         <motion.div
-          className="flex h-44 shrink-0 items-center overflow-hidden md:h-52 [&>*]:w-full"
-          variants={itemVariants}
+          key={replayKey}
+          className="flex flex-1 flex-col"
+          variants={containerVariants}
+          initial="hidden"
+          animate={inView ? 'show' : 'hidden'}
         >
-          <Viz inView={inView} />
-        </motion.div>
+          {/* reserved visual area — identical height on every card so the
+              title always starts at the same place; viz centered within it */}
+          <motion.div
+            className="flex h-44 shrink-0 items-center overflow-hidden md:h-52 [&>*]:w-full"
+            variants={itemVariants}
+          >
+            <Viz inView={inView} />
+          </motion.div>
 
-        {/* title */}
-        <motion.h3
-          className="mt-5 font-display text-lg font-bold text-fg sm:text-xl"
-          variants={itemVariants}
-        >
-          {tile.title}
-        </motion.h3>
+          {/* title */}
+          <motion.h3
+            className="mt-5 font-display text-lg font-bold text-fg sm:text-xl"
+            variants={itemVariants}
+          >
+            {tile.title}
+          </motion.h3>
 
-        {/* value sentence */}
-        <motion.p
-          className="mt-2 text-sm leading-relaxed text-muted"
-          variants={itemVariants}
-        >
-          {tile.value}
-        </motion.p>
+          {/* value sentence */}
+          <motion.p
+            className="mt-2 text-sm leading-relaxed text-muted"
+            variants={itemVariants}
+          >
+            {tile.value}
+          </motion.p>
 
-        {/* result box — flexible spacer pushes it to the bottom, aligned across cards */}
-        <motion.div className="mt-auto pt-6" variants={itemVariants}>
-          <DetailBlock detail={tile.detail} />
+          {/* result box — flexible spacer pushes it to the bottom, aligned across cards */}
+          <motion.div className="mt-auto pt-6" variants={itemVariants}>
+            <DetailBlock detail={tile.detail} />
+          </motion.div>
         </motion.div>
       </GlassPanel>
-    </motion.div>
+    </div>
   )
 }
 
 /* ─── section ────────────────────────────────────────────────────────────── */
 
 export function Solutions() {
+  // single-active state lifted to the section: tapping one card activates it
+  // and any previously-active card returns to normal (only one at a time).
+  const [activeId, setActiveId] = useState(null)
+
   return (
     <section id="soluciones" className="relative mx-auto w-full max-w-6xl px-5 py-20 sm:px-8 md:py-28">
       {/* decorative parallax glow */}
@@ -654,7 +727,13 @@ export function Solutions() {
       </Reveal>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-6 md:auto-rows-[minmax(200px,auto)]">
         {tiles.map((tile, i) => (
-          <SolutionTile key={tile.id} tile={tile} index={i} />
+          <SolutionTile
+            key={tile.id}
+            tile={tile}
+            index={i}
+            active={activeId === tile.id}
+            onActivate={() => setActiveId(tile.id)}
+          />
         ))}
       </div>
     </section>
