@@ -62,14 +62,26 @@ describe('App smoke', () => {
     )
   })
 
-  it('wires WhatsApp links to the correct number', () => {
+  it('wires WhatsApp links correctly (Nachera CTAs + De Caso credit)', () => {
     const waLinks = screen
       .getAllByRole('link')
       .filter((a) => a.getAttribute('href')?.includes('wa.me'))
     expect(waLinks.length).toBeGreaterThan(0)
-    waLinks.forEach((a) =>
-      expect(a.getAttribute('href')).toContain('https://wa.me/5491140459532')
-    )
+    const NACHERA = 'https://wa.me/5491140459532'
+    const DECASO = 'https://wa.me/5491140486698'
+    // every wa.me link must be one of the two known numbers (catches typos)
+    waLinks.forEach((a) => {
+      const href = a.getAttribute('href')
+      expect(href.includes(NACHERA) || href.includes(DECASO)).toBe(true)
+    })
+    // Nachera's own CTAs exist
+    expect(
+      waLinks.some((a) => a.getAttribute('href').includes(NACHERA))
+    ).toBe(true)
+    // the "hecho por De Caso Marketing" footer credit links to De Caso's WhatsApp
+    expect(
+      waLinks.some((a) => a.getAttribute('href').includes(DECASO))
+    ).toBe(true)
   })
 
   it('renders all 5 solution tile titles', () => {
