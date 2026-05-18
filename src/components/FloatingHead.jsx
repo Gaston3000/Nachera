@@ -45,8 +45,11 @@ export function FloatingHead() {
         className="relative h-full w-full"
       >
         <img
-          src="/nachera-head.png"
+          src="/nachera-head.webp"
           alt="Ignacio Costa — Nachera"
+          width={730}
+          height={665}
+          decoding="async"
           className="h-full w-full object-contain drop-shadow-[0_30px_60px_rgba(0,0,0,0.5)]"
           onError={(e) => {
             e.currentTarget.style.display = 'none'
@@ -60,7 +63,7 @@ export function FloatingHead() {
         >
           Foto 2.5D de Nachera
           <br />
-          (reemplazar /public/nachera-head.png)
+          (reemplazar /public/nachera-head.webp)
         </div>
       </motion.div>
     </div>
