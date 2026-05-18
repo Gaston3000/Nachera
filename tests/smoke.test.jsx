@@ -130,6 +130,14 @@ describe('App smoke', () => {
     })
   })
 
+  it('clicking a case card surface triggers replay/active, not the modal', () => {
+    // The card surface is click-to-replay; only the "Ver caso" button opens
+    // the case modal (it stops propagation). Clicking the brand text inside
+    // the card must NOT open a dialog.
+    fireEvent.click(screen.getByText('Bruma Café'))
+    expect(screen.queryByRole('dialog')).toBeNull()
+  })
+
   it('renders solutions detail (Resuelve/Entrega/Resultado) in DOM without hover', () => {
     // Detail is now always in the DOM, not hidden behind hover
     const resolveLabels = screen.getAllByText(/Resuelve/i)
