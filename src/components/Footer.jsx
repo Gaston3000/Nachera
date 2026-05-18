@@ -33,6 +33,30 @@ export function Footer() {
           © {new Date().getFullYear()} Ignacio Costa
         </span>
       </div>
+
+      {/* Crédito del desarrollador — link a WhatsApp de De Caso Marketing */}
+      <div className="border-t border-glassborder/60">
+        <p className="mx-auto w-full max-w-6xl px-5 py-4 text-center text-xs text-muted sm:px-8">
+          Sitio web hecho por{' '}
+          <a
+            href="https://wa.me/5491140486698?text=Hola%20De%20Caso!%20Vi%20el%20sitio%20de%20Nachera%20y%20quiero%20consultar%20por%20un%20sitio%20web."
+            target="_blank"
+            rel="noopener"
+            className="font-semibold text-accent/85 transition hover:text-accent"
+          >
+            De Caso Marketing
+          </a>
+          <span className="px-1.5 text-muted/50">·</span>
+          <a
+            href="https://wa.me/5491140486698?text=Hola%20De%20Caso!%20Vi%20el%20sitio%20de%20Nachera%20y%20quiero%20consultar%20por%20un%20sitio%20web."
+            target="_blank"
+            rel="noopener"
+            className="transition hover:text-fg"
+          >
+            Contacto
+          </a>
+        </p>
+      </div>
     </footer>
   )
 }
