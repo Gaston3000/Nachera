@@ -15,9 +15,9 @@ export const siteConfig = {
   scheduleUrl: null,
   nav: [
     { label: 'Sobre mí', href: '#sobre-mi' },
-    { label: 'Servicios', href: '#servicios' },
+    { label: 'Soluciones', href: '#soluciones' },
     { label: 'Proceso', href: '#proceso' },
-    { label: 'Proyectos', href: '#proyectos' },
+    { label: 'Casos', href: '#casos' },
     { label: 'Contacto', href: '#contacto' },
   ],
 }
