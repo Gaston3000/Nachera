@@ -23,13 +23,25 @@ describe('siteConfig', () => {
 })
 
 describe('about', () => {
-  it('has pull, lead, beats and chips', () => {
+  it('has pull, lead, beats and credentials', () => {
     expect(about.pull).toBeTruthy()
     expect(about.lead).toBeTruthy()
     expect(Array.isArray(about.beats)).toBe(true)
     expect(about.beats).toHaveLength(3)
-    expect(Array.isArray(about.chips)).toBe(true)
-    expect(about.chips).toHaveLength(4)
+    expect(Array.isArray(about.credentials)).toBe(true)
+    expect(about.credentials).toHaveLength(4)
+    about.credentials.forEach((c) => {
+      expect(c.label).toBeTruthy()
+      expect(c.micro).toBeTruthy()
+      expect(c.icon).toBeTruthy()
+    })
+    // icon keys must map to the known in-house credential icon registry
+    expect(about.credentials.map((c) => c.icon)).toEqual([
+      'diploma',
+      'chartcheck',
+      'flagen',
+      'sparklogic',
+    ])
   })
   it('pull quote contains the key phrase', () => {
     expect(about.pull).toMatch(/vendo criterio/i)

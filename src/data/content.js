@@ -21,11 +21,33 @@ export const about = {
     'Aplico eso al marketing digital para que las marcas **comuniquen con identidad y decidan con datos, no con intuición**.',
     'Fundé mi agencia (**Sintonía Digital**) y mi proyecto (**Focaccheras**): **sé lo que es construir una marca desde cero**.',
   ],
-  chips: [
-    'Lic. en Cs. de la Comunicación',
-    'Google Ads & Analytics certificado',
-    'Inglés C1',
-    'Pensamiento analítico + creativo',
+  credentials: [
+    {
+      label: 'Formación universitaria',
+      micro: 'Lic. en Cs. de la Comunicación · UADE',
+      icon: 'diploma',
+      accent: 'accent',
+      verified: true,
+    },
+    {
+      label: 'Certificado en performance',
+      micro: 'Google Ads & Analytics · Skillshop',
+      icon: 'chartcheck',
+      accent: 'accent2',
+    },
+    {
+      label: 'Inglés avanzado',
+      micro: 'Nivel C1',
+      icon: 'flagen',
+      accent: 'accent2',
+      badge: 'C1',
+    },
+    {
+      label: 'Perfil analítico + creativo',
+      micro: 'Datos y criterio, no intuición',
+      icon: 'sparklogic',
+      accent: 'accent',
+    },
   ],
 }
 

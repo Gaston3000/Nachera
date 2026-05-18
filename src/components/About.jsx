@@ -1,6 +1,186 @@
+import { motion, useReducedMotion } from 'motion/react'
 import { Reveal } from './primitives/Reveal.jsx'
 import { SectionHeading } from './primitives/SectionHeading.jsx'
+import {
+  DiplomaIcon,
+  ChartCheckIcon,
+  FlagENIcon,
+  SparkLogicIcon,
+} from './primitives/icons.jsx'
 import { about } from '../data/content.js'
+
+/* premium ease — matches Solutions / Reveal */
+const EASE = [0.16, 1, 0.3, 1]
+
+/* maps the data `icon` key → in-house icon component */
+const CRED_ICONS = {
+  diploma: DiplomaIcon,
+  chartcheck: ChartCheckIcon,
+  flagen: FlagENIcon,
+  sparklogic: SparkLogicIcon,
+}
+
+const credGridVariants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.08 } },
+}
+
+const credCardVariants = {
+  hidden: { opacity: 0, y: 16, scale: 0.97 },
+  show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5, ease: EASE } },
+}
+
+/* one credential badge-card */
+function CredentialCard({ cred }) {
+  const reduce = useReducedMotion()
+  const Icon = CRED_ICONS[cred.icon]
+  const tint = cred.accent === 'accent2' ? 'var(--c-accent2)' : 'var(--c-accent)'
+
+  const card = (
+    <div
+      className="relative h-full overflow-hidden rounded-2xl border bg-glass p-4 backdrop-blur-md sm:p-5"
+      style={{
+        borderColor: `color-mix(in srgb, ${tint} 28%, transparent)`,
+        boxShadow: `inset 0 1px 0 0 rgba(255,255,255,0.06), 0 0 28px -16px ${tint}`,
+      }}
+    >
+      {/* permanent soft tint — active at rest, no hover needed */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        aria-hidden="true"
+        style={{
+          background: `radial-gradient(circle at 22% 0%, color-mix(in srgb, ${tint} 12%, transparent), transparent 62%)`,
+        }}
+      />
+
+      <div className="relative flex flex-col gap-2.5">
+        {/* icon + permanent halo (optional gentle pulse on the halo) */}
+        <div className="relative w-fit">
+          {reduce ? (
+            <span
+              className="pointer-events-none absolute -inset-2 rounded-full blur-md"
+              aria-hidden="true"
+              style={{ background: `color-mix(in srgb, ${tint} 22%, transparent)` }}
+            />
+          ) : (
+            <motion.span
+              className="pointer-events-none absolute -inset-2 rounded-full blur-md"
+              aria-hidden="true"
+              style={{ background: `color-mix(in srgb, ${tint} 22%, transparent)` }}
+              animate={{ opacity: [0.55, 0.9, 0.55], scale: [1, 1.06, 1] }}
+              transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
+            />
+          )}
+          <span
+            className="relative inline-flex h-10 w-10 items-center justify-center rounded-xl border"
+            style={{
+              color: tint,
+              borderColor: `color-mix(in srgb, ${tint} 32%, transparent)`,
+              background: `color-mix(in srgb, ${tint} 12%, transparent)`,
+            }}
+          >
+            <Icon className="h-6 w-6" />
+          </span>
+        </div>
+
+        {/* label + verified / badge details */}
+        <div className="flex items-center gap-1.5">
+          <h3 className="font-display text-sm font-bold leading-snug text-fg sm:text-base">
+            {cred.label}
+          </h3>
+          {cred.verified &&
+            (reduce ? (
+              <span
+                className="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full"
+                aria-hidden="true"
+                style={{
+                  color: tint,
+                  background: `color-mix(in srgb, ${tint} 18%, transparent)`,
+                }}
+              >
+                <svg viewBox="0 0 24 24" className="h-2.5 w-2.5" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m5 13 4 4L19 7" />
+                </svg>
+              </span>
+            ) : (
+              <motion.span
+                className="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full"
+                aria-hidden="true"
+                style={{
+                  color: tint,
+                  background: `color-mix(in srgb, ${tint} 18%, transparent)`,
+                }}
+                animate={{ opacity: [0.75, 1, 0.75] }}
+                transition={{ duration: 3.4, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                <svg viewBox="0 0 24 24" className="h-2.5 w-2.5" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m5 13 4 4L19 7" />
+                </svg>
+              </motion.span>
+            ))}
+          {cred.badge && (
+            <span
+              className="ml-0.5 shrink-0 rounded-md px-1.5 py-0.5 font-display text-[10px] font-bold leading-none"
+              style={{
+                color: tint,
+                background: `color-mix(in srgb, ${tint} 16%, transparent)`,
+                border: `1px solid color-mix(in srgb, ${tint} 30%, transparent)`,
+              }}
+            >
+              {cred.badge}
+            </span>
+          )}
+        </div>
+
+        {/* micro-line */}
+        <p className="text-[11px] leading-snug text-muted sm:text-xs">{cred.micro}</p>
+      </div>
+    </div>
+  )
+
+  if (reduce) return <div className="h-full">{card}</div>
+
+  return (
+    <motion.div className="h-full" variants={credCardVariants}>
+      {card}
+    </motion.div>
+  )
+}
+
+/* "credenciales clave" mini-module — replaces the old plain pill row */
+function CredentialsModule() {
+  const reduce = useReducedMotion()
+
+  return (
+    <div className="mt-12">
+      <Reveal delay={0.4}>
+        <p className="font-display text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+          Credenciales clave
+        </p>
+      </Reveal>
+
+      {reduce ? (
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:gap-4">
+          {about.credentials.map((cred) => (
+            <CredentialCard key={cred.label} cred={cred} />
+          ))}
+        </div>
+      ) : (
+        <motion.div
+          className="mt-4 grid grid-cols-2 gap-3 sm:gap-4"
+          variants={credGridVariants}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.3 }}
+        >
+          {about.credentials.map((cred) => (
+            <CredentialCard key={cred.label} cred={cred} />
+          ))}
+        </motion.div>
+      )}
+    </div>
+  )
+}
 
 /* Parse a beat string that uses **bold** markers and return JSX */
 function BeatText({ text }) {
@@ -76,19 +256,8 @@ export function About() {
         </div>
       </div>
 
-      {/* credentials pills — full width below */}
-      <Reveal delay={0.5}>
-        <ul className="mt-10 flex flex-wrap gap-3">
-          {about.chips.map((c) => (
-            <li
-              key={c}
-              className="rounded-full border border-glassborder bg-glass px-4 py-2 font-display text-xs font-semibold text-fg"
-            >
-              {c}
-            </li>
-          ))}
-        </ul>
-      </Reveal>
+      {/* credenciales clave — premium mini-module (full width below) */}
+      <CredentialsModule />
     </section>
   )
 }
