@@ -1,34 +1,41 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 
-vi.mock('motion/react', () => ({
-  useReducedMotion: () => true,
-  useMotionValue: (v) => ({ set: () => {}, get: () => v }),
-  useSpring: (v) => v,
-  useTransform: () => 0,
-  useScroll: () => ({ scrollYProgress: { get: () => 0 }, scrollY: { get: () => 0 } }),
-  useInView: () => true,
-  motion: new Proxy(
-    {},
-    {
-      get:
-        (_, tag) =>
-        ({ children, ...rest }) => {
-          ;[
-            'initial',
-            'animate',
-            'whileInView',
-            'viewport',
-            'transition',
-            'style',
-            'exit',
-          ].forEach((k) => delete rest[k])
-          const Tag = typeof tag === 'string' ? tag : 'div'
-          return <Tag {...rest}>{children}</Tag>
-        },
-    }
-  ),
-}))
+vi.mock('motion/react', () => {
+  const React = require('react')
+  return {
+    useReducedMotion: () => true,
+    useMotionValue: (v) => ({ set: () => {}, get: () => v }),
+    useSpring: (v) => v,
+    useTransform: () => 0,
+    useScroll: () => ({ scrollYProgress: { get: () => 0 }, scrollY: { get: () => 0 } }),
+    useInView: () => true,
+    AnimatePresence: ({ children }) => React.createElement(React.Fragment, null, children),
+    motion: new Proxy(
+      {},
+      {
+        get:
+          (_, tag) =>
+          ({ children, ...rest }) => {
+            ;[
+              'initial',
+              'animate',
+              'whileInView',
+              'whileHover',
+              'whileTap',
+              'viewport',
+              'transition',
+              'style',
+              'exit',
+              'variants',
+            ].forEach((k) => delete rest[k])
+            const Tag = typeof tag === 'string' ? tag : 'div'
+            return React.createElement(Tag, rest, children)
+          },
+      }
+    ),
+  }
+})
 
 import { ThemeProvider } from '../src/theme/ThemeProvider.jsx'
 import App from '../src/App.jsx'
