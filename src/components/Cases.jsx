@@ -101,7 +101,7 @@ export function Cases() {
   const secondary = cases.slice(1)
 
   return (
-    <section id="casos" className="relative mx-auto w-full max-w-6xl px-5 py-20 sm:px-8 md:py-28">
+    <section id="casos" className="relative mx-auto w-full max-w-6xl overflow-hidden px-5 py-20 sm:px-8 md:py-28">
       {/* depth glow drifts at a different rate than content */}
       <Parallax speed={30} className="pointer-events-none absolute -left-40 top-1/4 h-80 w-80 rounded-full blur-3xl opacity-15">
         <div

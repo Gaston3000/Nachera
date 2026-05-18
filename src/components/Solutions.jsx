@@ -713,7 +713,7 @@ export function Solutions() {
   const [activeId, setActiveId] = useState(null)
 
   return (
-    <section id="soluciones" className="relative mx-auto w-full max-w-6xl px-5 py-20 sm:px-8 md:py-28">
+    <section id="soluciones" className="relative mx-auto w-full max-w-6xl overflow-hidden px-5 py-20 sm:px-8 md:py-28">
       {/* decorative parallax glow */}
       <Parallax speed={-50} className="pointer-events-none absolute -right-32 top-0 h-96 w-96 rounded-full blur-3xl opacity-20">
         <div
