@@ -1,4 +1,11 @@
-import { motion, useReducedMotion } from 'motion/react'
+import { useRef } from 'react'
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+  useSpring,
+} from 'motion/react'
 import { Button } from './primitives/Button.jsx'
 import { FloatingHead } from './FloatingHead.jsx'
 import { OrbitingChips } from './OrbitingChips.jsx'
@@ -7,17 +14,45 @@ import { siteConfig } from '../data/siteConfig.js'
 
 export function Hero() {
   const reduce = useReducedMotion()
+  const heroRef = useRef(null)
+
+  // Scroll progress within the hero section (0 = top, 1 = bottom of hero leaving viewport)
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ['start start', 'end start'],
+  })
+
+  // Cinematic scroll-out for the visual column (head + chips)
+  const rawVisualY = useTransform(scrollYProgress, [0, 1], [0, -60])
+  const rawVisualOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0.6])
+
+  // Slightly slower parallax for the headline copy
+  const rawHeadlineY = useTransform(scrollYProgress, [0, 1], [0, -20])
+
+  const visualY = useSpring(rawVisualY, { stiffness: 80, damping: 22 })
+  const visualOpacity = useSpring(rawVisualOpacity, { stiffness: 80, damping: 22 })
+  const headlineY = useSpring(rawHeadlineY, { stiffness: 80, damping: 22 })
+
   const fade = (delay) =>
     reduce
       ? {}
-      : { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.7, delay } }
+      : {
+          initial: { opacity: 0, y: 20 },
+          animate: { opacity: 1, y: 0 },
+          transition: { duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] },
+        }
 
   return (
     <section
       id="hero"
+      ref={heroRef}
       className="relative mx-auto flex w-full max-w-6xl flex-col-reverse items-center gap-10 px-5 pb-16 pt-28 sm:px-8 md:min-h-screen md:flex-row md:justify-between md:gap-6 md:pb-0 md:pt-32"
     >
-      <div className="max-w-xl text-center md:text-left">
+      {/* Text column — slides up very slightly as hero exits */}
+      <motion.div
+        className="max-w-xl text-center md:text-left"
+        style={reduce ? {} : { y: headlineY }}
+      >
         <motion.p
           {...fade(0)}
           className="mb-5 font-display text-xs font-semibold uppercase tracking-[0.2em] text-accent"
@@ -45,12 +80,16 @@ export function Hero() {
             Hablemos →
           </Button>
         </motion.div>
-      </div>
+      </motion.div>
 
-      <div className="relative">
+      {/* Visual column — drifts up and fades as hero scrolls out */}
+      <motion.div
+        className="relative"
+        style={reduce ? {} : { y: visualY, opacity: visualOpacity }}
+      >
         <FloatingHead />
         <OrbitingChips chips={hero.chips} />
-      </div>
+      </motion.div>
     </section>
   )
 }

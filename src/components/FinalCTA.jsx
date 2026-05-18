@@ -1,4 +1,5 @@
 import { Reveal } from './primitives/Reveal.jsx'
+import { Parallax } from './primitives/Parallax.jsx'
 import { GlassPanel } from './primitives/GlassPanel.jsx'
 import { Button } from './primitives/Button.jsx'
 import { finalCta } from '../data/content.js'
@@ -7,15 +8,19 @@ import { siteConfig } from '../data/siteConfig.js'
 export function FinalCTA() {
   return (
     <section id="contacto" className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8 md:py-28">
-      <Reveal>
+      <Reveal direction="scale">
         <GlassPanel className="overflow-hidden p-10 text-center md:p-16">
-          <div
-            className="pointer-events-none absolute inset-0 opacity-60"
-            style={{
-              background:
-                'radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--c-accent) 18%, transparent), transparent 60%)',
-            }}
-          />
+          {/* parallax top glow — floats independently of the card */}
+          <Parallax speed={-30} className="pointer-events-none absolute inset-0 overflow-hidden">
+            <div
+              className="absolute inset-0 opacity-60"
+              style={{
+                background:
+                  'radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--c-accent) 18%, transparent), transparent 60%)',
+              }}
+              aria-hidden="true"
+            />
+          </Parallax>
           <h2 className="relative mx-auto max-w-2xl font-display text-3xl font-bold leading-tight tracking-tight text-fg sm:text-4xl md:text-5xl">
             {finalCta.title}
           </h2>
