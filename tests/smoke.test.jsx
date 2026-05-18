@@ -49,7 +49,7 @@ describe('App smoke', () => {
   it('renders the hero headline', () => {
     expect(
       screen.getByRole('heading', {
-        name: /Estrategia, contenido y performance para marcas que quieren crecer\./i,
+        name: /Convierto marcas que improvisan en marcas que crecen\./i,
       })
     ).toBeInTheDocument()
   })

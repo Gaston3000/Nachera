@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { Fragment, useRef } from 'react'
 import {
   motion,
   useReducedMotion,
@@ -64,11 +64,19 @@ export function Hero() {
           {...fade(0.1)}
           className="font-display text-4xl font-bold leading-[1.05] tracking-tight text-fg sm:text-5xl md:text-6xl"
         >
-          {hero.h1}
+          {hero.h1Parts.map((p, i) =>
+            p.accent ? (
+              <span key={i} className="hero-accent-word">
+                {p.t}
+              </span>
+            ) : (
+              <Fragment key={i}>{p.t}</Fragment>
+            )
+          )}
         </motion.h1>
         <motion.p
           {...fade(0.2)}
-          className="mx-auto mt-6 max-w-md text-base leading-relaxed text-muted md:mx-0"
+          className="mx-auto mt-6 max-w-lg text-base leading-relaxed text-muted md:mx-0"
         >
           {hero.sub}
         </motion.p>

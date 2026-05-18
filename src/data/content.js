@@ -1,7 +1,14 @@
 export const hero = {
-  eyebrow: 'Estrategia · Contenido · Performance',
-  h1: 'Estrategia, contenido y performance para marcas que quieren crecer.',
-  sub: 'Ayudo a negocios y emprendedores a transformar ideas en campañas digitales con identidad, datos y creatividad.',
+  eyebrow: 'Marketing digital con criterio',
+  // h1 (string plano) = nombre accesible / SEO / fallback.
+  // h1Parts = render con la palabra clave destacada ("crecen").
+  h1: 'Convierto marcas que improvisan en marcas que crecen.',
+  h1Parts: [
+    { t: 'Convierto marcas que improvisan en marcas que ' },
+    { t: 'crecen', accent: true },
+    { t: '.' },
+  ],
+  sub: 'Estrategia, contenido y performance con identidad, datos y ejecución real. Para negocios y emprendedores que quieren resultados, no promesas.',
   chips: ['SEO', 'Google Ads', 'Branding', 'Contenido', 'Analytics'],
 }
 

@@ -79,3 +79,37 @@
   height: 0;
   display: none;
 }
+
+/* hero — palabra clave destacada: gradiente premium (cyan→blanco→violeta)
+   muy lento + glow sutil. Reduced-motion: estático (gradiente + glow, sin animar) */
+.hero-accent-word {
+  background-image: linear-gradient(
+    100deg,
+    var(--c-accent) 0%,
+    #eaf6ff 36%,
+    var(--c-accent2) 66%,
+    var(--c-accent) 100%
+  );
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 16px color-mix(in srgb, var(--c-accent) 30%, transparent));
+  animation: heroAccentShimmer 7s ease-in-out infinite;
+}
+@keyframes heroAccentShimmer {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-accent-word {
+    animation: none;
+    background-position: 0% 50%;
+  }
+}
