@@ -375,3 +375,130 @@
     display: none;
   }
 }
+
+/* ── Logo premium: el punto "respira" (LED de marca) + al hover el
+   wordmark toma el gradiente del hero con shimmer y el punto emite un
+   anillo de energía. Mismo lenguaje visual que hero/botones/nav. ─────── */
+.logo {
+  display: inline-flex;
+  align-items: baseline;
+  transition: transform 0.15s ease;
+}
+.logo:active {
+  transform: scale(0.97);
+}
+
+/* wordmark — blanco sólido en reposo; al hover revela el gradiente
+   cyan→blanco→violeta (mismo de .hero-accent-word) con shimmer */
+.logo__word {
+  display: inline-block;
+  background-image: linear-gradient(
+    100deg,
+    var(--c-accent) 0%,
+    #eaf6ff 36%,
+    var(--c-accent2) 66%,
+    var(--c-accent) 100%
+  );
+  background-size: 220% 100%;
+  background-position: 0% 50%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: var(--c-fg);
+  -webkit-text-fill-color: currentColor;
+  transition:
+    color 0.25s ease,
+    -webkit-text-fill-color 0.25s ease;
+}
+.logo:hover .logo__word,
+.logo:focus-visible .logo__word {
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: logoWordShimmer 2.4s ease-in-out infinite;
+}
+@keyframes logoWordShimmer {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* el punto — "respira" un glow lento (LED vivo) y al hover crece +
+   dispara un anillo accent (lenguaje del pulso del nav) */
+.logo__dot {
+  position: relative;
+  display: inline-block;
+  color: var(--c-accent);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: logoDotBreath 3.6s ease-in-out infinite;
+}
+.logo:hover .logo__dot,
+.logo:focus-visible .logo__dot {
+  transform: scale(1.18);
+}
+.logo__dot::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  height: 6px;
+  width: 6px;
+  margin: -3px 0 0 -3px;
+  border-radius: 9999px;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--c-accent) 55%, transparent),
+    transparent 70%
+  );
+  opacity: 0;
+  pointer-events: none;
+}
+.logo:hover .logo__dot::after,
+.logo:focus-visible .logo__dot::after {
+  animation: logoDotRing 0.7s ease-out;
+}
+@keyframes logoDotBreath {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--c-accent) 45%, transparent));
+  }
+  50% {
+    filter: drop-shadow(0 0 9px color-mix(in srgb, var(--c-accent) 80%, transparent));
+  }
+}
+@keyframes logoDotRing {
+  0% {
+    opacity: 0.6;
+    transform: scale(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo,
+  .logo:active {
+    transform: none;
+  }
+  .logo__dot {
+    animation: none;
+    filter: drop-shadow(0 0 6px color-mix(in srgb, var(--c-accent) 60%, transparent));
+  }
+  .logo:hover .logo__dot,
+  .logo:focus-visible .logo__dot {
+    transform: none;
+  }
+  .logo__dot::after {
+    display: none;
+  }
+  .logo:hover .logo__word,
+  .logo:focus-visible .logo__word {
+    animation: none;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+}

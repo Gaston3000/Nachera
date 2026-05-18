@@ -207,9 +207,13 @@ export function Nav() {
       >
         <nav className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 sm:px-8">
           {/* Logo */}
-          <a href="#hero" className="font-display text-xl font-bold lowercase tracking-tight text-fg">
-            {siteConfig.brand}
-            <span className="text-accent">.</span>
+          <a
+            href="#hero"
+            aria-label={`${siteConfig.brand} — inicio`}
+            className="logo font-display text-xl font-bold lowercase tracking-tight"
+          >
+            <span className="logo__word">{siteConfig.brand}</span>
+            <span className="logo__dot" aria-hidden="true">.</span>
           </a>
 
           {/* Desktop nav links — blanco + indicador activo deslizante */}
