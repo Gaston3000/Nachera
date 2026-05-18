@@ -284,17 +284,17 @@ function FlowViz({ inView }) {
 
   return (
     <div className="flex flex-col gap-2" aria-hidden="true">
-      <div className="relative h-28 w-full sm:h-32">
-        <svg viewBox="0 0 140 96" preserveAspectRatio="xMidYMid meet" className="absolute inset-0 h-full w-full overflow-visible" fill="none">
+      <div className="relative h-48 w-full sm:h-56">
+        <svg viewBox="-6 -6 152 108" preserveAspectRatio="xMidYMid meet" className="absolute inset-0 h-full w-full overflow-visible" fill="none">
           {/* connector lines */}
           {connectors.map((c, i) => (
             <motion.path
               key={i}
               d={c.d}
               stroke="var(--c-accent)"
-              strokeWidth="1.5"
+              strokeWidth="2"
               strokeLinecap="round"
-              strokeDasharray="3 2"
+              strokeDasharray="4 3"
               variants={reduce ? {} : lineVariants(c.delay)}
               style={reduce ? { pathLength: 1, opacity: 0.5 } : undefined}
             />
@@ -302,8 +302,8 @@ function FlowViz({ inView }) {
           {/* nodes */}
           {nodes.map((n, i) => (
             <motion.g key={i} variants={reduce ? {} : nodeVariants}>
-              <circle cx={n.x} cy={n.y} r="15" fill={n.color} fillOpacity="0.15" stroke={n.color} strokeOpacity="0.55" strokeWidth="1.25" />
-              <text x={n.x} y={n.y + 4} textAnchor="middle" fontSize="12" fill={n.color}>{n.label}</text>
+              <circle cx={n.x} cy={n.y} r="20" fill={n.color} fillOpacity="0.15" stroke={n.color} strokeOpacity="0.55" strokeWidth="1.5" />
+              <text x={n.x} y={n.y + 5} textAnchor="middle" fontSize="15" fill={n.color}>{n.label}</text>
             </motion.g>
           ))}
         </svg>

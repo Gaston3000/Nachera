@@ -12,10 +12,10 @@ export function Nav() {
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-40 transition-all duration-300 ${
+      className={`fixed inset-x-0 top-0 z-40 border-b transition-[background-color,border-color,padding,backdrop-filter] duration-300 ${
         scrolled
-          ? 'border-b border-glassborder bg-glass py-3 backdrop-blur-xl'
-          : 'py-5'
+          ? 'border-glassborder bg-glass py-3 backdrop-blur-xl'
+          : 'border-transparent bg-transparent py-5'
       }`}
     >
       <nav className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 sm:px-8">
