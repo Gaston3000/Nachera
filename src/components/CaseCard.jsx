@@ -22,8 +22,11 @@ export function CaseCard({ caseData, index, onOpen }) {
     </div>
   )
 
+  // Alternate left/right entrance for visual interest across the 3-card grid
+  const direction = index % 2 === 0 ? 'left' : 'right'
+
   return (
-    <Reveal delay={index * 0.08}>
+    <Reveal delay={Math.min(index * 0.1, 0.3)} direction={direction}>
       <GlassPanel
         className={`group relative h-full overflow-hidden p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_40px_-12px_var(--c-accent)] ${borderClass}`}
       >

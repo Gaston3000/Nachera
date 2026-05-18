@@ -3,7 +3,8 @@ import { motion, useScroll, useSpring, useReducedMotion } from 'motion/react'
 export function ScrollProgress() {
   const reduce = useReducedMotion()
   const { scrollYProgress } = useScroll()
-  const scaleX = useSpring(scrollYProgress, { stiffness: 200, damping: 30 })
+  // Lower stiffness = silkier trailing feel; no bounce with high damping ratio
+  const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 28, restDelta: 0.001 })
 
   if (reduce) return null
 

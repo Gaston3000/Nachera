@@ -25,7 +25,7 @@ export function ProcessTimeline() {
                 initial={reduce ? {} : { opacity: 0, y: -16 }}
                 whileInView={reduce ? {} : { opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.5 }}
-                transition={reduce ? {} : { duration: 0.5, delay: i * 0.12 }}
+                transition={reduce ? {} : { duration: 0.7, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
               >
                 {/* dot */}
                 <div
@@ -41,13 +41,11 @@ export function ProcessTimeline() {
         {/* step content below the rail */}
         <div className="grid grid-cols-4 gap-6">
           {process.map((p, i) => (
-            <motion.div
+            <Reveal
               key={p.n}
               className="relative"
-              initial={reduce ? {} : { opacity: 0, y: 24 }}
-              whileInView={reduce ? {} : { opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={reduce ? {} : { duration: 0.6, delay: i * 0.12 + 0.1 }}
+              direction="up"
+              delay={Math.min(i * 0.1 + 0.08, 0.4)}
             >
               {/* ghost number */}
               <span className="font-display text-6xl font-black leading-none text-fg/5 select-none">
@@ -55,7 +53,7 @@ export function ProcessTimeline() {
               </span>
               <h3 className="mt-1 font-display text-lg font-bold text-fg">{p.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted">{p.desc}</p>
-            </motion.div>
+            </Reveal>
           ))}
         </div>
       </div>

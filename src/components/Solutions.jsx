@@ -2,6 +2,7 @@ import { motion, useReducedMotion } from 'motion/react'
 import { GlassPanel } from './primitives/GlassPanel.jsx'
 import { SectionHeading } from './primitives/SectionHeading.jsx'
 import { Reveal } from './primitives/Reveal.jsx'
+import { Parallax } from './primitives/Parallax.jsx'
 
 /* ─── mini visuals ─────────────────────────────────────────────────────── */
 
@@ -164,11 +165,16 @@ const tiles = [
 
 /* ─── single tile ────────────────────────────────────────────────────────── */
 
-function SolutionTile({ tile }) {
+function SolutionTile({ tile, index }) {
   const reduce = useReducedMotion()
 
+  // Large tiles (first 2, col-span-3 row-span-2) → scale entrance
+  // Small tiles (last 3) → alternate left/right
+  const direction = index < 2 ? 'scale' : index % 2 === 0 ? 'left' : 'right'
+  const delay = Math.min(index * 0.08, 0.4)
+
   return (
-    <Reveal className={`group ${tile.span}`}>
+    <Reveal className={`group ${tile.span}`} direction={direction} delay={delay}>
       <GlassPanel
         className={`relative h-full overflow-hidden p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_48px_-12px_var(--c-accent)] ${
           tile.accentBorder ? 'border-accent/30' : ''
@@ -223,7 +229,15 @@ function SolutionTile({ tile }) {
 
 export function Solutions() {
   return (
-    <section id="soluciones" className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8 md:py-28">
+    <section id="soluciones" className="relative mx-auto w-full max-w-6xl px-5 py-20 sm:px-8 md:py-28">
+      {/* decorative parallax glow — depth layer */}
+      <Parallax speed={-50} className="pointer-events-none absolute -right-32 top-0 h-96 w-96 rounded-full blur-3xl opacity-20" >
+        <div
+          className="h-full w-full rounded-full"
+          style={{ background: 'radial-gradient(circle, var(--c-accent2), transparent 70%)' }}
+          aria-hidden="true"
+        />
+      </Parallax>
       <Reveal>
         <SectionHeading
           eyebrow="SOLUCIONES"
@@ -231,8 +245,8 @@ export function Solutions() {
         />
       </Reveal>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-6 md:auto-rows-[minmax(200px,auto)]">
-        {tiles.map((tile) => (
-          <SolutionTile key={tile.id} tile={tile} />
+        {tiles.map((tile, i) => (
+          <SolutionTile key={tile.id} tile={tile} index={i} />
         ))}
       </div>
     </section>
