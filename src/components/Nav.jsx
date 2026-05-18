@@ -77,6 +77,105 @@ function HamburgerIcon({ open, reduced }) {
   )
 }
 
+/* ─── Scrollspy ───────────────────────────────────────────────────
+   Detecta la sección en una banda central del viewport y devuelve su
+   href. `select()` fija el activo y bloquea el spy ~850ms para que el
+   indicador no rebote entre links mientras corre el scroll suave.
+   Deshabilitado bajo reduced-motion / sin IntersectionObserver (jsdom). */
+function useScrollSpy(items, enabled) {
+  const [active, setActive] = useState(null)
+  const lockRef = useRef(0)
+
+  useEffect(() => {
+    if (!enabled || typeof IntersectionObserver === 'undefined') return
+    const ids = ['hero', ...items.map((n) => n.href.replace('#', ''))]
+    const els = ids
+      .map((id) => document.getElementById(id))
+      .filter(Boolean)
+    if (!els.length) return
+    const obs = new IntersectionObserver(
+      (entries) => {
+        if (Date.now() < lockRef.current) return
+        const vis = entries.filter((e) => e.isIntersecting)
+        if (!vis.length) return
+        vis.sort((a, b) => b.intersectionRatio - a.intersectionRatio)
+        const id = vis[0].target.id
+        setActive(id === 'hero' ? null : `#${id}`)
+      },
+      { rootMargin: '-45% 0px -50% 0px', threshold: [0, 0.5, 1] }
+    )
+    els.forEach((el) => obs.observe(el))
+    return () => obs.disconnect()
+  }, [items, enabled])
+
+  const select = (href) => {
+    lockRef.current = Date.now() + 850
+    setActive(href)
+  }
+  return [active, select]
+}
+
+/* ─── Desktop nav links ────────────────────────────────────────────
+   Blanco (pedido del cliente, mejor legibilidad) + indicador accent
+   que se desliza entre secciones (layoutId), pulso de energía al clic
+   y subrayado-hint al hover. */
+function NavLinks() {
+  const prefersReduced = useReducedMotion()
+  const enabled = !prefersReduced
+  const [active, select] = useScrollSpy(siteConfig.nav, enabled)
+  const [pulse, setPulse] = useState(null) // { href, key }
+
+  const handleClick = (href) => {
+    if (prefersReduced) return // honra reduced-motion: scroll nativo, sin extras
+    select(href)
+    setPulse({ href, key: Date.now() })
+  }
+
+  return (
+    <ul className="hidden gap-8 md:flex">
+      {siteConfig.nav.map((n) => {
+        const isActive = active === n.href
+        return (
+          <li key={n.href} className="relative">
+            <a
+              href={n.href}
+              data-active={isActive}
+              onClick={() => handleClick(n.href)}
+              className="nav-link rounded-sm text-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+            >
+              {n.label}
+              {isActive &&
+                (prefersReduced ? (
+                  <span className="nav-indicator" aria-hidden="true" />
+                ) : (
+                  <motion.span
+                    layoutId="nav-indicator"
+                    className="nav-indicator"
+                    aria-hidden="true"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ type: 'spring', stiffness: 360, damping: 30 }}
+                  />
+                ))}
+              {!prefersReduced && pulse && pulse.href === n.href && (
+                <motion.span
+                  key={pulse.key}
+                  className="nav-pulse"
+                  aria-hidden="true"
+                  initial={{ opacity: 0.55, scale: 0 }}
+                  animate={{ opacity: 0, scale: 7 }}
+                  transition={{ duration: 0.55, ease: 'easeOut' }}
+                  onAnimationComplete={() => setPulse(null)}
+                />
+              )}
+            </a>
+          </li>
+        )
+      })}
+    </ul>
+  )
+}
+
 /* ─── Nav ─────────────────────────────────────────────────────── */
 export function Nav() {
   const [scrolled, setScrolled] = useState(false)
@@ -108,19 +207,8 @@ export function Nav() {
             <span className="text-accent">.</span>
           </a>
 
-          {/* Desktop nav links — unchanged */}
-          <ul className="hidden gap-8 md:flex">
-            {siteConfig.nav.map((n) => (
-              <li key={n.href}>
-                <a
-                  href={n.href}
-                  className="text-sm text-muted transition hover:text-fg"
-                >
-                  {n.label}
-                </a>
-              </li>
-            ))}
-          </ul>
+          {/* Desktop nav links — blanco + indicador activo deslizante */}
+          <NavLinks />
 
           {/* Desktop CTA — hidden on mobile */}
           <div className="hidden md:inline-flex">

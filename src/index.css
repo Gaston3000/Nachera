@@ -245,3 +245,82 @@
     display: none;
   }
 }
+
+/* ── Nav premium: links en blanco + indicador activo deslizante +
+   pulso de energía al clic + subrayado-hint al hover ─────────────────── */
+.nav-link {
+  position: relative;
+  color: color-mix(in srgb, var(--c-fg) 82%, transparent);
+  transition:
+    color 0.25s ease,
+    text-shadow 0.25s ease;
+}
+.nav-link:hover,
+.nav-link:focus-visible {
+  color: var(--c-fg);
+}
+.nav-link[data-active='true'] {
+  color: var(--c-fg);
+  text-shadow: 0 0 14px color-mix(in srgb, var(--c-accent) 55%, transparent);
+}
+
+/* hover/focus hint underline — sólo para links NO activos (el activo usa
+   el indicador con glow). Se dibuja desde el centro. */
+.nav-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 2px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--c-fg) 35%, transparent);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.nav-link:hover::after,
+.nav-link:focus-visible::after {
+  transform: scaleX(0.6);
+}
+.nav-link[data-active='true']::after {
+  transform: scaleX(0);
+}
+
+/* indicador activo — barra gradiente cyan→violeta con glow. Comparte
+   layoutId entre links: se desliza de uno a otro al cambiar de sección. */
+.nav-indicator {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--c-accent), var(--c-accent2));
+  box-shadow:
+    0 0 10px color-mix(in srgb, var(--c-accent) 70%, transparent),
+    0 0 18px color-mix(in srgb, var(--c-accent2) 45%, transparent);
+}
+
+/* pulso de energía — anillo accent que expande una vez al hacer clic */
+.nav-pulse {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  height: 8px;
+  width: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 9999px;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--c-accent) 60%, transparent),
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-link::after {
+    transition: none;
+  }
+}
