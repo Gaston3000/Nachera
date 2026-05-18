@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react'
 
 vi.mock('motion/react', () => {
   const React = require('react')
@@ -135,8 +135,12 @@ describe('App smoke', () => {
   })
 
   it('renders the about beats with bold emphasis', () => {
-    // Check that beat content from periodismo / sintonía is rendered
-    expect(screen.getByText(/periodismo deportivo/i)).toBeInTheDocument()
+    // "Periodismo Deportivo" also appears as a real certification in the
+    // credential timeline, so scope this to the About section to assert the
+    // about beat specifically (its intent), not any DOM-wide occurrence.
+    const about = document.getElementById('sobre-mi')
+    expect(about).not.toBeNull()
+    expect(within(about).getByText(/periodismo deportivo/i)).toBeInTheDocument()
     // Sintonía Digital appears in trust bar AND about beats — both are fine
     const sintonia = screen.getAllByText(/Sintonía Digital/i)
     expect(sintonia.length).toBeGreaterThanOrEqual(1)
