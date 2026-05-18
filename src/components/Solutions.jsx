@@ -84,7 +84,7 @@ function BarChartViz({ inView }) {
         ))}
       </div>
       {/* SVG trend line */}
-      <svg viewBox="0 0 120 28" className="w-full" fill="none">
+      <svg viewBox="-4 -4 132 36" className="w-full overflow-visible" fill="none">
         <motion.path
           d="M0 22 L20 16 L40 18 L60 10 L80 12 L100 4 L120 2"
           stroke="var(--c-accent)"
@@ -258,18 +258,18 @@ function FlowViz({ inView }) {
   const openRate = useCountUp(34, { decimals: 0, suffix: '%', duration: 1.2, inView })
 
   const nodes = [
-    { label: '✉', color: 'var(--c-accent)', x: 10, y: 32 },
-    { label: '↗', color: 'var(--c-accent2)', x: 60, y: 10 },
-    { label: '🔁', color: 'var(--c-accent)', x: 60, y: 54 },
-    { label: '★', color: 'var(--c-accent2)', x: 110, y: 32 },
+    { label: '✉', color: 'var(--c-accent)', x: 20, y: 48 },
+    { label: '↗', color: 'var(--c-accent2)', x: 72, y: 24 },
+    { label: '🔁', color: 'var(--c-accent)', x: 72, y: 72 },
+    { label: '★', color: 'var(--c-accent2)', x: 120, y: 48 },
   ]
 
-  // SVG connector paths between nodes
+  // SVG connector paths between nodes (endpoints kept inside the padded viewBox)
   const connectors = [
-    { d: 'M26 32 Q43 32 60 16', delay: 0.3 },
-    { d: 'M26 32 Q43 32 60 48', delay: 0.45 },
-    { d: 'M76 16 Q93 32 110 32', delay: 0.65 },
-    { d: 'M76 48 Q93 48 110 38', delay: 0.75 },
+    { d: 'M37 42 Q55 34 62 32', delay: 0.3 },
+    { d: 'M37 54 Q55 62 62 64', delay: 0.45 },
+    { d: 'M86 30 Q104 36 106 42', delay: 0.65 },
+    { d: 'M86 66 Q104 60 106 54', delay: 0.75 },
   ]
 
   const nodeVariants = {
@@ -284,8 +284,8 @@ function FlowViz({ inView }) {
 
   return (
     <div className="flex flex-col gap-2" aria-hidden="true">
-      <div className="relative h-16 w-full">
-        <svg viewBox="0 0 130 64" className="absolute inset-0 h-full w-full" fill="none">
+      <div className="relative h-28 w-full sm:h-32">
+        <svg viewBox="0 0 140 96" preserveAspectRatio="xMidYMid meet" className="absolute inset-0 h-full w-full overflow-visible" fill="none">
           {/* connector lines */}
           {connectors.map((c, i) => (
             <motion.path
@@ -302,8 +302,8 @@ function FlowViz({ inView }) {
           {/* nodes */}
           {nodes.map((n, i) => (
             <motion.g key={i} variants={reduce ? {} : nodeVariants}>
-              <circle cx={n.x} cy={n.y} r="13" fill={n.color} fillOpacity="0.15" stroke={n.color} strokeOpacity="0.5" strokeWidth="1" />
-              <text x={n.x} y={n.y + 4} textAnchor="middle" fontSize="10" fill={n.color}>{n.label}</text>
+              <circle cx={n.x} cy={n.y} r="15" fill={n.color} fillOpacity="0.15" stroke={n.color} strokeOpacity="0.55" strokeWidth="1.25" />
+              <text x={n.x} y={n.y + 4} textAnchor="middle" fontSize="12" fill={n.color}>{n.label}</text>
             </motion.g>
           ))}
         </svg>
