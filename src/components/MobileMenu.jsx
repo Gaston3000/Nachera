@@ -1,18 +1,18 @@
 import { useEffect, useRef } from 'react'
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
 import { Button } from './primitives/Button.jsx'
-import { MessageIcon } from './primitives/icons.jsx'
+import { MessageIcon, ArrowUpRight } from './primitives/icons.jsx'
 import { siteConfig } from '../data/siteConfig.js'
 
 /* ─── Nav links ─────────────────────────────────────────────── */
 const NAV_LINKS = [
-  { index: '01', label: 'Inicio',       href: '#hero' },
-  { index: '02', label: 'Servicios',    href: '#soluciones' },
-  { index: '03', label: 'Casos',        href: '#casos' },
-  { index: '04', label: 'Proceso',      href: '#proceso' },
-  { index: '05', label: 'Herramientas', href: '#formacion' },
-  { index: '06', label: 'Formación',    href: '#formacion' },
-  { index: '07', label: 'Contacto',     href: '#contacto' },
+  { index: '01', label: 'Inicio',       desc: 'Visión general',        href: '#hero' },
+  { index: '02', label: 'Servicios',    desc: 'Lo que puedo resolver', href: '#soluciones' },
+  { index: '03', label: 'Casos',        desc: 'Resultados y ejemplos', href: '#casos' },
+  { index: '04', label: 'Proceso',      desc: 'Cómo trabajo',          href: '#proceso' },
+  { index: '05', label: 'Herramientas', desc: 'Stack profesional',     href: '#formacion' },
+  { index: '06', label: 'Formación',    desc: 'Respaldo y criterio',   href: '#formacion' },
+  { index: '07', label: 'Contacto',     desc: 'Conversemos',           href: '#contacto' },
 ]
 
 /* ─── Animation variants ─────────────────────────────────────── */
@@ -61,19 +61,44 @@ const listVariants = {
   exit:    { transition: { staggerChildren: 0.04, staggerDirection: -1 } },
 }
 
+/* Row wrapper: orchestrates a tiny internal stagger so the index
+   resolves a beat before the label + microcopy. Inherits the list's
+   outer staggerChildren; this only sequences within one row. */
 const itemVariants = {
-  hidden:  { y: 16, opacity: 0, filter: 'blur(4px)' },
+  hidden:  {},
+  visible: { transition: { staggerChildren: 0.05, delayChildren: 0.02 } },
+  exit:    { transition: { staggerChildren: 0.03, staggerDirection: -1 } },
+}
+
+/* The system index — enters first, slightly ahead of the label. */
+const rowIndexVariants = {
+  hidden:  { x: -6, opacity: 0, filter: 'blur(3px)' },
+  visible: {
+    x: 0,
+    opacity: 1,
+    filter: 'blur(0px)',
+    transition: { duration: 0.34, ease: EASE },
+  },
+  exit: {
+    opacity: 0,
+    transition: { duration: 0.18, ease: 'easeIn' },
+  },
+}
+
+/* The label + microdescriptor block — follows the index. */
+const rowBodyVariants = {
+  hidden:  { y: 12, opacity: 0, filter: 'blur(4px)' },
   visible: {
     y: 0,
     opacity: 1,
     filter: 'blur(0px)',
-    transition: { duration: 0.4, ease: EASE },
+    transition: { duration: 0.42, ease: EASE },
   },
   exit: {
-    y: 8,
+    y: 6,
     opacity: 0,
-    filter: 'blur(4px)',
-    transition: { duration: 0.24, ease: 'easeIn' },
+    filter: 'blur(3px)',
+    transition: { duration: 0.2, ease: 'easeIn' },
   },
 }
 
@@ -103,7 +128,8 @@ const rmPanel = {
   exit:    { opacity: 0, transition: { duration: 0.15 } },
 }
 const rmList   = { hidden: {}, visible: {}, exit: {} }
-const rmItem   = {
+const rmItem   = { hidden: {}, visible: {}, exit: {} }
+const rmRowPart = {
   hidden:  { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0.1 } },
   exit:    { opacity: 0, transition: { duration: 0.1 } },
@@ -167,6 +193,8 @@ export function MobileMenu({ open, onClose, hamburgerRef }) {
   const pv  = prefersReduced ? rmPanel    : panelVariants
   const lv  = prefersReduced ? rmList     : listVariants
   const iv  = prefersReduced ? rmItem     : itemVariants
+  const ixv = prefersReduced ? rmRowPart  : rowIndexVariants
+  const bdv = prefersReduced ? rmRowPart  : rowBodyVariants
   const cv  = prefersReduced ? rmCta      : ctaVariants
 
   return (
@@ -240,30 +268,66 @@ export function MobileMenu({ open, onClose, hamburgerRef }) {
 
             {/* ── Nav links ── */}
             <motion.ul
-              className="mt-2 flex-1 px-3"
+              className="mt-1 flex-1 px-3"
               variants={lv}
               initial="hidden"
               animate="visible"
               exit="exit"
             >
-              {NAV_LINKS.map(({ index, label, href }, i) => (
-                <motion.li key={href + index} variants={iv}>
+              {NAV_LINKS.map(({ index, label, desc, href }, i) => (
+                <motion.li
+                  key={href + index}
+                  variants={iv}
+                  className={
+                    i < NAV_LINKS.length - 1
+                      ? 'border-b border-glassborder/60'
+                      : undefined
+                  }
+                >
                   <a
                     ref={i === 0 ? firstLinkRef : undefined}
                     href={href}
                     onClick={(e) => { e.preventDefault(); handleLinkClick(href) }}
-                    className="group flex min-h-[48px] items-center gap-3 rounded-xl px-2 py-3 transition-all duration-200 hover:bg-glass"
+                    className="group relative flex min-h-[48px] items-center gap-3.5 overflow-hidden rounded-lg px-2 py-3 transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                   >
-                    <span className="w-7 font-display text-[11px] font-semibold tabular-nums text-muted transition-colors duration-200 group-hover:text-accent/70">
+                    {/* left→right accent wash on hover / focus / press */}
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-accent/[0.10] via-accent/[0.05] to-transparent opacity-0 transition-all duration-300 ease-out group-hover:translate-x-0 group-hover:opacity-100 group-focus-visible:translate-x-0 group-focus-visible:opacity-100 group-active:translate-x-0 group-active:opacity-100"
+                    />
+
+                    {/* system index — animates a beat before the label */}
+                    <motion.span
+                      variants={ixv}
+                      className="relative w-9 shrink-0 text-center font-display text-[13px] font-semibold tabular-nums leading-none text-accent/40 transition-colors duration-200 group-hover:text-accent group-focus-visible:text-accent group-active:text-accent"
+                    >
                       {index}
-                    </span>
-                    <span className="font-display text-[17px] font-semibold text-fg transition-all duration-200 group-hover:translate-x-1 group-hover:text-accent">
-                      {label}
-                    </span>
+                    </motion.span>
+
+                    {/* hairline divider: index reads as a real system slot */}
+                    <span
+                      aria-hidden="true"
+                      className="relative h-7 w-px shrink-0 bg-glassborder transition-colors duration-200 group-hover:bg-accent/50 group-focus-visible:bg-accent/50 group-active:bg-accent/60"
+                    />
+
+                    {/* label + microdescriptor */}
+                    <motion.span
+                      variants={bdv}
+                      className="relative flex min-w-0 flex-col transition-transform duration-200 ease-out group-hover:translate-x-0.5 group-focus-visible:translate-x-0.5 group-active:translate-x-0.5"
+                    >
+                      <span className="truncate font-display text-lg font-semibold leading-tight text-fg transition-colors duration-200 group-hover:text-accent group-focus-visible:text-accent group-active:text-accent">
+                        {label}
+                      </span>
+                      <span className="truncate text-xs leading-tight text-muted">
+                        {desc}
+                      </span>
+                    </motion.span>
+
+                    {/* right indicator — nudges + brightens */}
+                    <ArrowUpRight
+                      className="relative ml-auto shrink-0 text-muted/50 transition-all duration-200 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-accent group-focus-visible:translate-x-0.5 group-focus-visible:-translate-y-0.5 group-focus-visible:text-accent group-active:translate-x-0.5 group-active:-translate-y-0.5 group-active:text-accent"
+                    />
                   </a>
-                  {i < NAV_LINKS.length - 1 && (
-                    <div className="mx-2 h-px bg-glassborder/30" />
-                  )}
                 </motion.li>
               ))}
             </motion.ul>
