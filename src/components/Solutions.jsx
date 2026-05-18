@@ -194,7 +194,6 @@ function SerpViz() {
   const rows = [
     { title: 'Mi marca · Resultado principal', url: 'mimarca.com', accent: true },
     { title: 'Competidor A · Resultado 2', url: 'competidor-a.com', accent: false },
-    { title: 'Competidor B · Resultado 3', url: 'competidor-b.com', accent: false },
   ]
 
   const rowVariants = {
@@ -215,10 +214,10 @@ function SerpViz() {
   }
 
   return (
-    <div className="flex flex-col gap-2.5" aria-hidden="true">
+    <div className="flex flex-col gap-2" aria-hidden="true">
       {/* search bar */}
       <motion.div
-        className="flex items-center gap-2 rounded-lg border border-glassborder bg-bg/60 px-3 py-2"
+        className="flex items-center gap-2 rounded-lg border border-glassborder bg-bg/60 px-3 py-1.5"
         variants={reduce ? {} : itemVariants}
       >
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -237,7 +236,7 @@ function SerpViz() {
           <span className={`flex-shrink-0 font-display text-xs font-bold ${r.accent ? 'text-accent' : 'text-muted/40'}`}>
             #{i + 1}
           </span>
-          <div className="min-w-0 flex-1 rounded-md border border-glassborder bg-glass px-2 py-1.5">
+          <div className="min-w-0 flex-1 rounded-md border border-glassborder bg-glass px-2 py-1">
             <div className={`truncate text-[10px] font-semibold ${r.accent ? 'text-fg' : 'text-muted/50'}`}>{r.title}</div>
             <div className={`truncate text-[9px] ${r.accent ? 'text-accent/70' : 'text-muted/30'}`}>{r.url}</div>
           </div>
