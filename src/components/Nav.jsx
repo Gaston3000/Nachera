@@ -143,7 +143,12 @@ function NavLinks() {
               onClick={() => handleClick(n.href)}
               className="nav-link rounded-sm text-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
             >
-              {n.label}
+              <span className="nav-label">
+                <span className="nav-label__main">{n.label}</span>
+                <span className="nav-label__ghost" aria-hidden="true">
+                  {n.label}
+                </span>
+              </span>
               {isActive &&
                 (prefersReduced ? (
                   <span className="nav-indicator" aria-hidden="true" />

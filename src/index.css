@@ -258,14 +258,46 @@
 .nav-link:hover,
 .nav-link:focus-visible {
   color: var(--c-fg);
+  text-shadow: 0 0 12px color-mix(in srgb, var(--c-accent) 35%, transparent);
+}
+
+/* label launch/swap — mismo efecto premium que los íconos de los botones:
+   el texto despega hacia arriba y entra un clon desde abajo (mismo
+   easing con micro-overshoot y duración que .btn-ico). */
+.nav-label {
+  display: inline-grid;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+.nav-label > span {
+  grid-area: 1 / 1;
+  display: block;
+  transition:
+    transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 0.28s ease;
+}
+.nav-label__ghost {
+  opacity: 0;
+  transform: translateY(100%);
+}
+.nav-link:hover .nav-label__main,
+.nav-link:focus-visible .nav-label__main {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+.nav-link:hover .nav-label__ghost,
+.nav-link:focus-visible .nav-label__ghost {
+  transform: translateY(0);
+  opacity: 1;
 }
 .nav-link[data-active='true'] {
   color: var(--c-fg);
   text-shadow: 0 0 14px color-mix(in srgb, var(--c-accent) 55%, transparent);
 }
 
-/* hover/focus hint underline — sólo para links NO activos (el activo usa
-   el indicador con glow). Se dibuja desde el centro. */
+/* hover/focus underline — gradiente cyan→violeta con glow que barre de
+   izquierda a derecha (mismo lenguaje visual que el indicador activo).
+   El link activo no lo usa: tiene el indicador deslizante con glow. */
 .nav-link::after {
   content: '';
   position: absolute;
@@ -274,16 +306,22 @@
   bottom: -6px;
   height: 2px;
   border-radius: 2px;
-  background: color-mix(in srgb, var(--c-fg) 35%, transparent);
+  background: linear-gradient(90deg, var(--c-accent), var(--c-accent2));
+  box-shadow: 0 0 10px color-mix(in srgb, var(--c-accent) 60%, transparent);
+  opacity: 0;
   transform: scaleX(0);
-  transform-origin: center;
-  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  transform-origin: left center;
+  transition:
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.3s ease;
 }
 .nav-link:hover::after,
 .nav-link:focus-visible::after {
-  transform: scaleX(0.6);
+  opacity: 1;
+  transform: scaleX(1);
 }
 .nav-link[data-active='true']::after {
+  opacity: 0;
   transform: scaleX(0);
 }
 
@@ -322,5 +360,18 @@
 @media (prefers-reduced-motion: reduce) {
   .nav-link::after {
     transition: none;
+  }
+  .nav-label {
+    overflow: visible;
+  }
+  .nav-label > span {
+    transition: none;
+  }
+  .nav-label__main {
+    transform: none !important;
+    opacity: 1 !important;
+  }
+  .nav-label__ghost {
+    display: none;
   }
 }
