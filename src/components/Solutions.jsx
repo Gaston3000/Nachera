@@ -284,7 +284,7 @@ function FlowViz({ inView }) {
 
   return (
     <div className="flex flex-col gap-2" aria-hidden="true">
-      <div className="relative h-48 w-full sm:h-56">
+      <div className="relative h-full min-h-[140px] w-full">
         <svg viewBox="-6 -6 152 108" preserveAspectRatio="xMidYMid meet" className="absolute inset-0 h-full w-full overflow-visible" fill="none">
           {/* connector lines */}
           {connectors.map((c, i) => (
@@ -529,11 +529,15 @@ function SolutionTile({ tile, index }) {
   if (reduce) {
     return (
       <div className={tile.span}>
-        <GlassPanel className={`relative h-full overflow-hidden p-6 ${tile.accentBorder ? 'border-accent/30' : ''}`}>
-          <div className="mb-4"><Viz inView={true} /></div>
-          <h3 className="font-display text-lg font-bold text-fg sm:text-xl">{tile.title}</h3>
+        <GlassPanel className={`relative flex h-full flex-col overflow-hidden p-6 ${tile.accentBorder ? 'border-accent/30' : ''}`}>
+          {/* reserved visual area — same height across every card */}
+          <div className="flex h-44 shrink-0 items-center overflow-hidden md:h-52 [&>*]:w-full">
+            <Viz inView={true} />
+          </div>
+          <h3 className="mt-5 font-display text-lg font-bold text-fg sm:text-xl">{tile.title}</h3>
           <p className="mt-2 text-sm leading-relaxed text-muted">{tile.value}</p>
-          <div className="mt-4">
+          {/* result box — pinned to the bottom, aligned across cards */}
+          <div className="mt-auto pt-6">
             <div className="rounded-xl border border-glassborder bg-bg/60 p-3 text-xs leading-relaxed backdrop-blur-sm">
               <div className="mb-1">
                 <span className="font-semibold text-muted uppercase tracking-wider">Resuelve</span>{' '}
@@ -564,7 +568,7 @@ function SolutionTile({ tile, index }) {
       viewport={{ once: true, amount: 0.25 }}
     >
       <GlassPanel
-        className={`relative h-full overflow-hidden p-6 transition-all duration-300 hover:-translate-y-1 ${
+        className={`relative flex h-full flex-col overflow-hidden p-6 transition-all duration-300 hover:-translate-y-1 ${
           tile.accentBorder ? 'border-accent/30' : ''
         } hover:border-accent/50`}
         style={{
@@ -598,14 +602,18 @@ function SolutionTile({ tile, index }) {
           aria-hidden="true"
         />
 
-        {/* mini visual */}
-        <motion.div className="mb-4" variants={itemVariants}>
+        {/* reserved visual area — identical height on every card so the
+            title always starts at the same place; viz centered within it */}
+        <motion.div
+          className="flex h-44 shrink-0 items-center overflow-hidden md:h-52 [&>*]:w-full"
+          variants={itemVariants}
+        >
           <Viz inView={inView} />
         </motion.div>
 
         {/* title */}
         <motion.h3
-          className="font-display text-lg font-bold text-fg sm:text-xl"
+          className="mt-5 font-display text-lg font-bold text-fg sm:text-xl"
           variants={itemVariants}
         >
           {tile.title}
@@ -619,8 +627,8 @@ function SolutionTile({ tile, index }) {
           {tile.value}
         </motion.p>
 
-        {/* detail — always visible, animates in staggered after the above */}
-        <motion.div className="mt-4" variants={itemVariants}>
+        {/* result box — flexible spacer pushes it to the bottom, aligned across cards */}
+        <motion.div className="mt-auto pt-6" variants={itemVariants}>
           <DetailBlock detail={tile.detail} />
         </motion.div>
       </GlassPanel>

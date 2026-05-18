@@ -71,9 +71,10 @@ export function Hero() {
         >
           {hero.sub}
         </motion.p>
+        {/* CTAs — desktop: under the copy (left column) */}
         <motion.div
           {...fade(0.3)}
-          className="mt-9 flex flex-wrap justify-center gap-3 md:justify-start"
+          className="mt-9 hidden flex-wrap gap-3 md:flex md:justify-start"
         >
           <Button href="#soluciones">Ver servicios</Button>
           <Button href={siteConfig.whatsappUrlWithMsg} target="_blank" rel="noopener" variant="ghost">
@@ -89,6 +90,17 @@ export function Hero() {
       >
         <FloatingHead />
         <OrbitingChips chips={hero.chips} />
+      </motion.div>
+
+      {/* CTAs — mobile: below the floating head */}
+      <motion.div
+        {...fade(0.4)}
+        className="flex flex-wrap justify-center gap-3 md:hidden"
+      >
+        <Button href="#soluciones">Ver servicios</Button>
+        <Button href={siteConfig.whatsappUrlWithMsg} target="_blank" rel="noopener" variant="ghost">
+          Hablemos →
+        </Button>
       </motion.div>
     </section>
   )
