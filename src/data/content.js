@@ -2,9 +2,9 @@ export const hero = {
   eyebrow: 'Marketing digital con criterio',
   // h1 (string plano) = nombre accesible / SEO / fallback.
   // h1Parts = render con la palabra clave destacada ("crecen").
-  h1: 'Convierto marcas que improvisan en marcas que crecen.',
+  h1: 'Convierto marcas con potencial en marcas que crecen.',
   h1Parts: [
-    { t: 'Convierto marcas que improvisan en marcas que ' },
+    { t: 'Convierto marcas con potencial en marcas que ' },
     { t: 'crecen', accent: true },
     { t: '.' },
   ],
