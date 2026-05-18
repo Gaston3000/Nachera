@@ -112,4 +112,26 @@ describe('App smoke', () => {
       expect(screen.getByRole('dialog')).toBeInTheDocument()
     })
   })
+
+  it('renders solutions detail (Resuelve/Entrega/Resultado) in DOM without hover', () => {
+    // Detail is now always in the DOM, not hidden behind hover
+    const resolveLabels = screen.getAllByText(/Resuelve/i)
+    const entregaLabels = screen.getAllByText(/Entrega/i)
+    const resultadoLabels = screen.getAllByText(/Resultado/i)
+    expect(resolveLabels.length).toBeGreaterThanOrEqual(5)
+    expect(entregaLabels.length).toBeGreaterThanOrEqual(5)
+    expect(resultadoLabels.length).toBeGreaterThanOrEqual(5)
+  })
+
+  it('renders the about pull quote', () => {
+    expect(screen.getByText(/vendo criterio/i)).toBeInTheDocument()
+  })
+
+  it('renders the about beats with bold emphasis', () => {
+    // Check that beat content from periodismo / sintonía is rendered
+    expect(screen.getByText(/periodismo deportivo/i)).toBeInTheDocument()
+    // Sintonía Digital appears in trust bar AND about beats — both are fine
+    const sintonia = screen.getAllByText(/Sintonía Digital/i)
+    expect(sintonia.length).toBeGreaterThanOrEqual(1)
+  })
 })

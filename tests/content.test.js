@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { siteConfig } from '../src/data/siteConfig.js'
 import {
+  about,
   services,
   process,
   projects,
@@ -18,6 +19,23 @@ describe('siteConfig', () => {
   it('has nav items pointing to section ids', () => {
     expect(siteConfig.nav.length).toBeGreaterThanOrEqual(5)
     siteConfig.nav.forEach((n) => expect(n.href.startsWith('#')).toBe(true))
+  })
+})
+
+describe('about', () => {
+  it('has pull, lead, beats and chips', () => {
+    expect(about.pull).toBeTruthy()
+    expect(about.lead).toBeTruthy()
+    expect(Array.isArray(about.beats)).toBe(true)
+    expect(about.beats).toHaveLength(3)
+    expect(Array.isArray(about.chips)).toBe(true)
+    expect(about.chips).toHaveLength(4)
+  })
+  it('pull quote contains the key phrase', () => {
+    expect(about.pull).toMatch(/vendo criterio/i)
+  })
+  it('beats contain bold markers', () => {
+    about.beats.forEach((b) => expect(b).toMatch(/\*\*.+\*\*/))
   })
 })
 

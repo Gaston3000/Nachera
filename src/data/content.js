@@ -14,7 +14,13 @@ export const trustBar = [
 
 export const about = {
   title: 'Detrás de cada métrica, una estrategia.',
-  body: 'Soy Ignacio Costa —Nachera—, Licenciado en Ciencias de la Comunicación (UADE). Vengo del periodismo deportivo y la producción de radio, y ese origen me dejó algo que no se aprende en un curso: saber contar historias y escuchar de verdad. Hoy aplico eso al marketing digital —estrategia, branding, contenido y performance— para que marcas y emprendimientos comuniquen con identidad y decidan con datos, no con intuición. Fundé mi propia agencia (Sintonía Digital) y mi propio proyecto (Focaccheras), así que sé lo que es construir una marca desde cero. No vendo humo: vendo criterio, ejecución y números que se pueden mirar.',
+  pull: 'No vendo humo: vendo criterio, ejecución y números que se pueden mirar.',
+  lead: 'Soy Ignacio Costa —Nachera—, Licenciado en Ciencias de la Comunicación (UADE).',
+  beats: [
+    'Vengo del **periodismo deportivo y la producción de radio**: sé **contar historias y escuchar de verdad**.',
+    'Aplico eso al marketing digital para que las marcas **comuniquen con identidad y decidan con datos, no con intuición**.',
+    'Fundé mi agencia (**Sintonía Digital**) y mi proyecto (**Focaccheras**): **sé lo que es construir una marca desde cero**.',
+  ],
   chips: [
     'Lic. en Cs. de la Comunicación',
     'Google Ads & Analytics certificado',
