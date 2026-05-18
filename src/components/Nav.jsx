@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import { Button } from './primitives/Button.jsx'
+import { MessageIcon } from './primitives/icons.jsx'
 import { MobileMenu } from './MobileMenu.jsx'
 import { siteConfig } from '../data/siteConfig.js'
 
@@ -128,6 +129,7 @@ export function Nav() {
               target="_blank"
               rel="noopener"
               className="!px-5 !py-2.5"
+              icon={<MessageIcon />}
             >
               Hablemos
             </Button>

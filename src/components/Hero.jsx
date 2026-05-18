@@ -7,6 +7,7 @@ import {
   useSpring,
 } from 'motion/react'
 import { Button } from './primitives/Button.jsx'
+import { ArrowDown, MessageIcon } from './primitives/icons.jsx'
 import { FloatingHead } from './FloatingHead.jsx'
 import { OrbitingChips } from './OrbitingChips.jsx'
 import { hero } from '../data/content.js'
@@ -76,9 +77,17 @@ export function Hero() {
           {...fade(0.3)}
           className="mt-9 hidden flex-wrap gap-3 md:flex md:justify-start"
         >
-          <Button href="#soluciones">Ver servicios</Button>
-          <Button href={siteConfig.whatsappUrlWithMsg} target="_blank" rel="noopener" variant="ghost">
-            Hablemos →
+          <Button href="#soluciones" icon={<ArrowDown />} iconNudge="y">
+            Ver servicios
+          </Button>
+          <Button
+            href={siteConfig.whatsappUrlWithMsg}
+            target="_blank"
+            rel="noopener"
+            variant="ghost"
+            icon={<MessageIcon />}
+          >
+            Hablemos
           </Button>
         </motion.div>
       </motion.div>
@@ -97,9 +106,17 @@ export function Hero() {
         {...fade(0.4)}
         className="flex flex-wrap justify-center gap-3 md:hidden"
       >
-        <Button href="#soluciones">Ver servicios</Button>
-        <Button href={siteConfig.whatsappUrlWithMsg} target="_blank" rel="noopener" variant="ghost">
-          Hablemos →
+        <Button href="#soluciones" icon={<ArrowDown />} iconNudge="y">
+          Ver servicios
+        </Button>
+        <Button
+          href={siteConfig.whatsappUrlWithMsg}
+          target="_blank"
+          rel="noopener"
+          variant="ghost"
+          icon={<MessageIcon />}
+        >
+          Hablemos
         </Button>
       </motion.div>
     </section>

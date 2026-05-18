@@ -2,6 +2,7 @@ import { Reveal } from './primitives/Reveal.jsx'
 import { Parallax } from './primitives/Parallax.jsx'
 import { GlassPanel } from './primitives/GlassPanel.jsx'
 import { Button } from './primitives/Button.jsx'
+import { MessageIcon, CalendarIcon, MailIcon } from './primitives/icons.jsx'
 import { finalCta } from '../data/content.js'
 import { siteConfig } from '../data/siteConfig.js'
 
@@ -28,11 +29,22 @@ export function FinalCTA() {
             {finalCta.sub}
           </p>
           <div className="relative mt-9 flex flex-wrap justify-center gap-3">
-            <Button href={siteConfig.whatsappUrlWithMsg} target="_blank" rel="noopener">
+            <Button
+              href={siteConfig.whatsappUrlWithMsg}
+              target="_blank"
+              rel="noopener"
+              icon={<MessageIcon />}
+            >
               Escribirme por WhatsApp
             </Button>
             {siteConfig.scheduleUrl ? (
-              <Button href={siteConfig.scheduleUrl} target="_blank" rel="noopener" variant="ghost">
+              <Button
+                href={siteConfig.scheduleUrl}
+                target="_blank"
+                rel="noopener"
+                variant="ghost"
+                icon={<CalendarIcon />}
+              >
                 Agendar una reunión
               </Button>
             ) : (
@@ -40,6 +52,7 @@ export function FinalCTA() {
                 href={`mailto:${siteConfig.email}`}
                 variant="ghost"
                 title="Link de agenda pendiente — por ahora, mail"
+                icon={<MailIcon />}
               >
                 Escribirme por mail
               </Button>

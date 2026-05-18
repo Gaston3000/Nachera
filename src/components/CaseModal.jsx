@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import { Button } from './primitives/Button.jsx'
+import { MessageIcon } from './primitives/icons.jsx'
 import { MiniDashboard } from './MiniDashboard.jsx'
 import { siteConfig } from '../data/siteConfig.js'
 
@@ -204,6 +205,7 @@ export function CaseModal({ caseData, onClose }) {
               href={siteConfig.whatsappUrlWithMsg}
               target="_blank"
               rel="noopener"
+              icon={<MessageIcon />}
             >
               Escribirme por WhatsApp
             </Button>

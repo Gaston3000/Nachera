@@ -1,5 +1,6 @@
 import { GlassPanel } from './primitives/GlassPanel.jsx'
 import { Button } from './primitives/Button.jsx'
+import { ArrowUpRight } from './primitives/icons.jsx'
 import { Reveal } from './primitives/Reveal.jsx'
 
 // Secondary case card — each has slightly different visual treatment
@@ -64,8 +65,9 @@ export function CaseCard({ caseData, index, onOpen }) {
             as="button"
             variant="ghost"
             onClick={() => onOpen(caseData)}
+            icon={<ArrowUpRight />}
           >
-            Ver caso →
+            Ver caso
           </Button>
         </div>
       </GlassPanel>

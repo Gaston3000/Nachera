@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
 import { Button } from './primitives/Button.jsx'
+import { MessageIcon } from './primitives/icons.jsx'
 import { siteConfig } from '../data/siteConfig.js'
 
 /* ─── Nav links ─────────────────────────────────────────────── */
@@ -280,6 +281,7 @@ export function MobileMenu({ open, onClose, hamburgerRef }) {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full justify-center"
+                icon={<MessageIcon />}
               >
                 Hablemos
               </Button>

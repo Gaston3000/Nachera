@@ -4,6 +4,7 @@ import { SectionHeading } from './primitives/SectionHeading.jsx'
 import { Reveal } from './primitives/Reveal.jsx'
 import { Parallax } from './primitives/Parallax.jsx'
 import { Button } from './primitives/Button.jsx'
+import { ArrowUpRight } from './primitives/icons.jsx'
 import { GlassPanel } from './primitives/GlassPanel.jsx'
 import { CaseCard } from './CaseCard.jsx'
 import { CaseModal } from './CaseModal.jsx'
@@ -161,8 +162,13 @@ export function Cases() {
               </div>
 
               <div className="mt-8">
-                <Button as="button" variant="ghost" onClick={() => setActiveCase(featured)}>
-                  Ver caso completo →
+                <Button
+                  as="button"
+                  variant="ghost"
+                  onClick={() => setActiveCase(featured)}
+                  icon={<ArrowUpRight />}
+                >
+                  Ver caso completo
                 </Button>
               </div>
             </div>

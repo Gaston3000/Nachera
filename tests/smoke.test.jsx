@@ -112,7 +112,10 @@ describe('App smoke', () => {
   })
 
   it('secondary "Ver caso" buttons open the modal', async () => {
-    const btns = screen.getAllByRole('button', { name: /ver caso →/i })
+    // Label no longer carries a literal "→" (now an aria-hidden ArrowUpRight
+    // icon); match the visible text. Use an end anchor so this doesn't also
+    // grab the featured "Ver caso completo" button.
+    const btns = screen.getAllByRole('button', { name: /ver caso$/i })
     expect(btns.length).toBeGreaterThanOrEqual(3)
     fireEvent.click(btns[0])
     await waitFor(() => {
