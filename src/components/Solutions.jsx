@@ -86,8 +86,9 @@ function BarChartViz({ inView }) {
           </motion.div>
         ))}
       </div>
-      {/* SVG trend line */}
-      <svg viewBox="-4 -4 132 36" className="w-full overflow-visible" fill="none">
+      {/* SVG trend line — height capped so it never balloons on wide cards
+          and pushes the KPI out of the fixed (overflow-hidden) visual area */}
+      <svg viewBox="-4 -4 132 36" className="h-10 w-full shrink-0 overflow-visible" fill="none">
         <motion.path
           d="M0 22 L20 16 L40 18 L60 10 L80 12 L100 4 L120 2"
           stroke="var(--c-accent)"
