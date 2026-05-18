@@ -41,15 +41,10 @@ vi.mock('motion/react', () => {
   }
 })
 
-import { ThemeProvider } from '../src/theme/ThemeProvider.jsx'
 import { Nav } from '../src/components/Nav.jsx'
 
 function renderNav() {
-  return render(
-    <ThemeProvider>
-      <Nav />
-    </ThemeProvider>
-  )
+  return render(<Nav />)
 }
 
 describe('MobileMenu', () => {

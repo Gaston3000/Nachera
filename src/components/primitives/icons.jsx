@@ -139,38 +139,64 @@ export const ChartCheckIcon = ({ className = '' }) => (
   </svg>
 )
 
-/* Minimal refined US-flag glyph — rounded rect, 3 stripes, a small
-   filled canton with a star: "inglés avanzado / C1" */
-export const FlagENIcon = ({ className = '' }) => (
-  <svg
-    className={`${base} ${className}`}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={1.5}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
-    {/* flag body */}
-    <rect x="3" y="5" width="18" height="14" rx="2.5" />
-    {/* stripes */}
-    <path d="M11 9.5h10" />
-    <path d="M3 14h18" />
-    <path d="M11 18.5h10" />
-    {/* canton + star */}
-    <path
-      d="M3 7.5A2.5 2.5 0 0 1 5.5 5H11v5H3V7.5Z"
-      fill="currentColor"
-      stroke="none"
-    />
-    <path
-      d="m7 6.4.7 1.45 1.55.2-1.13 1.06.29 1.54L7 9.97l-1.4.72.29-1.54-1.13-1.06 1.55-.2L7 6.4Z"
-      fill="var(--c-bg, #0a0a0f)"
-      stroke="none"
-    />
-  </svg>
-)
+/* US flag — the one justified color exception in this otherwise monochrome
+   icon system: a flag must keep its real colors to read at h-6/h-7. Flat &
+   elegant (no gradients/3D/text) to sit inside the accent-tinted credential
+   chip. Same export name + `className` API so About.jsx's registry is
+   unchanged. Geometry: rounded body, 7 red/white stripes, blue canton
+   (~40%×~54%) with a small grid of white stars. "inglés avanzado / C1" */
+export const FlagENIcon = ({ className = '' }) => {
+  const cid = 'usflag-clip'
+  return (
+    <svg
+      className={`${base} ${className}`}
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <defs>
+        <clipPath id={cid}>
+          <rect x="3" y="5.5" width="18" height="13" rx="2.4" />
+        </clipPath>
+      </defs>
+      <g clipPath={`url(#${cid})`}>
+        {/* white field (odd stripes) */}
+        <rect x="3" y="5.5" width="18" height="13" fill="#F4F5F7" />
+        {/* 3 red stripes → 7 alternating bands of ~1.857 each */}
+        <g fill="#D7263D">
+          <rect x="3" y="5.5" width="18" height="1.857" />
+          <rect x="3" y="9.214" width="18" height="1.857" />
+          <rect x="3" y="12.929" width="18" height="1.857" />
+          <rect x="3" y="16.643" width="18" height="1.857" />
+        </g>
+        {/* blue canton — ~40% width, spans top ~4 stripes */}
+        <rect x="3" y="5.5" width="7.2" height="7" fill="#1E3A8A" />
+        {/* simplified star grid (white dots) — reads as the union at small px */}
+        <g fill="#F4F5F7">
+          <circle cx="4.7" cy="7" r="0.62" />
+          <circle cx="6.6" cy="7" r="0.62" />
+          <circle cx="8.5" cy="7" r="0.62" />
+          <circle cx="5.65" cy="9" r="0.62" />
+          <circle cx="7.55" cy="9" r="0.62" />
+          <circle cx="4.7" cy="11" r="0.62" />
+          <circle cx="6.6" cy="11" r="0.62" />
+          <circle cx="8.5" cy="11" r="0.62" />
+        </g>
+      </g>
+      {/* crisp rounded edge over the clipped fills */}
+      <rect
+        x="3"
+        y="5.5"
+        width="18"
+        height="13"
+        rx="2.4"
+        fill="none"
+        stroke="rgba(0,0,0,0.18)"
+        strokeWidth="0.75"
+      />
+    </svg>
+  )
+}
 
 /* Logic node-graph + spark — connected nodes crossed with a 4-point
    star: "perfil analítico + creativo" (data × criterio) */

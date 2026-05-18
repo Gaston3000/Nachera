@@ -8,7 +8,6 @@ import { Cases } from './components/Cases.jsx'
 import { StackFormacion } from './components/StackFormacion.jsx'
 import { FinalCTA } from './components/FinalCTA.jsx'
 import { Footer } from './components/Footer.jsx'
-import { ThemeSwitcher } from './theme/ThemeSwitcher.jsx'
 import { ScrollProgress } from './components/ScrollProgress.jsx'
 
 export default function App() {
@@ -27,7 +26,6 @@ export default function App() {
         <FinalCTA />
       </main>
       <Footer />
-      <ThemeSwitcher />
     </>
   )
 }

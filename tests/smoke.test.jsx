@@ -37,15 +37,10 @@ vi.mock('motion/react', () => {
   }
 })
 
-import { ThemeProvider } from '../src/theme/ThemeProvider.jsx'
 import App from '../src/App.jsx'
 
 function renderApp() {
-  return render(
-    <ThemeProvider>
-      <App />
-    </ThemeProvider>
-  )
+  return render(<App />)
 }
 
 describe('App smoke', () => {
