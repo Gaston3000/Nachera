@@ -9,7 +9,7 @@ export const hero = {
     { t: '.' },
   ],
   sub: 'Diseño la comunicación digital de marcas y emprendimientos: identidad, contenido y oficio narrativo. Sin fórmulas mágicas — con estrategia, criterio y ejecución real.',
-  chips: ['Estrategia', 'Branding', 'Contenido', 'Redes', 'Email'],
+  chips: ['Storytelling', 'Estrategia', 'Reels', 'Email', 'Branding'],
 }
 
 export const trustBar = [
