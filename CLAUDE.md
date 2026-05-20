@@ -15,6 +15,14 @@ contra una pregunta: **¿esto lo ayuda a cerrar una primera reunión?**
   manager genérico. Usar siempre como ancla — eso lo separa del resto.
 - **Foco temático:** comunicación digital, contenido, branding, redes,
   producción audiovisual, copywriting, email marketing.
+- **Extensión "Tu marca online" (capstone Soluciones):** también ofrece
+  llevar proyectos web integrales (sitio, landing, portfolio) cuando una
+  marca lo necesita. Se comunica como **extensión natural** del servicio,
+  no como ítem aparte. **Framing válido:** "lo llevo adelante / coordino
+  / dirijo el proyecto integral". **Framing inválido:** "desarrollo /
+  programo / codeo personalmente". Si en una reunión 1-a-1 le preguntan
+  quién ejecuta lo técnico, esa conversación se da ahí — la web no
+  explicita la mecánica interna.
 
 ## Lo que NUNCA se hace
 

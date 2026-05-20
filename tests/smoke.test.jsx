@@ -84,12 +84,13 @@ describe('App smoke', () => {
     ).toBe(true)
   })
 
-  it('renders all 5 solution tile titles', () => {
+  it('renders all 6 solution tile titles', () => {
     expect(screen.getByText('Estrategia de Contenido')).toBeInTheDocument()
     expect(screen.getByText('Marca, Voz & Contenido')).toBeInTheDocument()
     expect(screen.getByText('Producción & Edición')).toBeInTheDocument()
     expect(screen.getByText('Email Marketing')).toBeInTheDocument()
     expect(screen.getByText('Análisis & decisiones')).toBeInTheDocument()
+    expect(screen.getByText('Tu marca online')).toBeInTheDocument()
   })
 
   it('renders all 4 case brands (real clients)', () => {

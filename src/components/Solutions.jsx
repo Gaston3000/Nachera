@@ -700,6 +700,190 @@ function DashboardViz() {
   )
 }
 
+/* ─── 6. WebViz — Tu marca online (capstone full-width) ──────────────────── */
+
+function WebViz() {
+  const reduce = useReducedMotion()
+
+  const frameVariants = {
+    hidden: { opacity: 0, scale: 0.95, y: 8 },
+    show: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.55, ease: EASE } },
+  }
+  const blockVariants = {
+    hidden: { opacity: 0, scaleY: 0, originY: 0 },
+    show: (c) => ({
+      opacity: 1,
+      scaleY: 1,
+      originY: 0,
+      transition: { duration: 0.5, ease: EASE, delay: 0.3 + c * 0.08 },
+    }),
+  }
+  const cursorBlink = reduce ? undefined : { opacity: [1, 0, 1] }
+  const cursorTrans = reduce ? undefined : { duration: 1.1, repeat: Infinity, ease: 'linear' }
+
+  return (
+    <div className="flex items-center gap-4" aria-hidden="true">
+      {/* Desktop / browser mockup */}
+      <motion.div
+        className="relative h-32 flex-1 rounded-lg border border-glassborder overflow-hidden"
+        variants={reduce ? {} : frameVariants}
+        style={{
+          background:
+            'linear-gradient(135deg, color-mix(in srgb, var(--c-accent) 8%, transparent), color-mix(in srgb, var(--c-accent2) 12%, transparent))',
+        }}
+      >
+        {/* browser chrome: dots + URL bar con cursor parpadeando */}
+        <div className="flex items-center gap-1.5 border-b border-glassborder bg-bg/40 px-2 py-1.5">
+          <div className="flex gap-1">
+            <div className="h-1.5 w-1.5 rounded-full bg-muted/40" />
+            <div className="h-1.5 w-1.5 rounded-full bg-muted/40" />
+            <div className="h-1.5 w-1.5 rounded-full bg-muted/40" />
+          </div>
+          <div className="ml-1 flex flex-1 items-center gap-1 rounded border border-glassborder bg-bg/60 px-1.5 py-0.5">
+            <svg width="6" height="6" viewBox="0 0 10 10" fill="none">
+              <circle cx="4" cy="4" r="3" stroke="rgba(255,255,255,0.5)" strokeWidth="1" />
+              <line
+                x1="6.5"
+                y1="6.5"
+                x2="9"
+                y2="9"
+                stroke="rgba(255,255,255,0.5)"
+                strokeWidth="1"
+                strokeLinecap="round"
+              />
+            </svg>
+            <span className="font-mono text-[7px] text-fg/70">tumarca.com</span>
+            {!reduce ? (
+              <motion.span
+                className="ml-auto h-2 w-px"
+                style={{ background: 'var(--c-accent)' }}
+                animate={cursorBlink}
+                transition={cursorTrans}
+              />
+            ) : (
+              <span
+                className="ml-auto h-2 w-px"
+                style={{ background: 'var(--c-accent)' }}
+              />
+            )}
+          </div>
+        </div>
+        {/* page content */}
+        <div className="flex flex-col gap-1.5 p-3">
+          {/* hero heading */}
+          <motion.div
+            className="h-3 w-3/5 rounded"
+            custom={0}
+            variants={reduce ? {} : blockVariants}
+            style={
+              reduce
+                ? { background: 'var(--c-fg)', opacity: 0.7 }
+                : { background: 'var(--c-fg)', opacity: 0.7, scaleY: 0, originY: 0 }
+            }
+          />
+          {/* sub heading */}
+          <motion.div
+            className="h-1.5 w-4/5 rounded"
+            custom={1}
+            variants={reduce ? {} : blockVariants}
+            style={
+              reduce
+                ? { background: 'rgba(255,255,255,0.4)' }
+                : { background: 'rgba(255,255,255,0.4)', scaleY: 0, originY: 0 }
+            }
+          />
+          {/* CTA button con glow estático */}
+          <motion.div
+            className="mt-1 h-3 w-14 rounded-full"
+            custom={2}
+            variants={reduce ? {} : blockVariants}
+            style={
+              reduce
+                ? {
+                    background: 'var(--c-accent)',
+                    boxShadow: '0 0 12px color-mix(in srgb, var(--c-accent) 60%, transparent)',
+                  }
+                : {
+                    background: 'var(--c-accent)',
+                    boxShadow: '0 0 12px color-mix(in srgb, var(--c-accent) 60%, transparent)',
+                    scaleY: 0,
+                    originY: 0,
+                  }
+            }
+          />
+          {/* content blocks row */}
+          <div className="mt-1 flex gap-1.5">
+            {[0, 1, 2].map((i) => (
+              <motion.div
+                key={i}
+                className="h-8 flex-1 rounded"
+                custom={3 + i}
+                variants={reduce ? {} : blockVariants}
+                style={
+                  reduce
+                    ? {
+                        background:
+                          i === 0
+                            ? 'color-mix(in srgb, var(--c-accent) 25%, transparent)'
+                            : i === 1
+                              ? 'color-mix(in srgb, var(--c-accent2) 25%, transparent)'
+                              : 'rgba(255,255,255,0.08)',
+                        border: i === 2 ? '1px solid rgba(255,255,255,0.12)' : undefined,
+                      }
+                    : {
+                        background:
+                          i === 0
+                            ? 'color-mix(in srgb, var(--c-accent) 25%, transparent)'
+                            : i === 1
+                              ? 'color-mix(in srgb, var(--c-accent2) 25%, transparent)'
+                              : 'rgba(255,255,255,0.08)',
+                        border: i === 2 ? '1px solid rgba(255,255,255,0.12)' : undefined,
+                        scaleY: 0,
+                        originY: 0,
+                      }
+                }
+              />
+            ))}
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Mobile mockup */}
+      <motion.div
+        className="relative h-32 w-16 flex-shrink-0 rounded-xl border-2 border-glassborder overflow-hidden"
+        variants={reduce ? {} : frameVariants}
+        style={{
+          background:
+            'linear-gradient(180deg, color-mix(in srgb, var(--c-accent) 10%, transparent), color-mix(in srgb, var(--c-accent2) 14%, transparent))',
+        }}
+      >
+        <div className="mx-auto mt-1 h-1 w-6 rounded-full bg-glassborder" />
+        <div className="flex flex-col gap-1 p-1.5">
+          <div className="h-2 w-3/4 rounded" style={{ background: 'var(--c-fg)', opacity: 0.55 }} />
+          <div className="h-1 w-full rounded" style={{ background: 'rgba(255,255,255,0.35)' }} />
+          <div
+            className="mt-1 h-1.5 w-8 rounded-full"
+            style={{
+              background: 'var(--c-accent)',
+              boxShadow: '0 0 6px color-mix(in srgb, var(--c-accent) 50%, transparent)',
+            }}
+          />
+          <div className="mt-1 flex flex-col gap-0.5">
+            <div
+              className="h-4 w-full rounded"
+              style={{ background: 'color-mix(in srgb, var(--c-accent) 20%, transparent)' }}
+            />
+            <div
+              className="h-4 w-full rounded"
+              style={{ background: 'color-mix(in srgb, var(--c-accent2) 20%, transparent)' }}
+            />
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
 /* ─── tile data ─────────────────────────────────────────────────────────── */
 
 const tiles = [
@@ -772,6 +956,24 @@ const tiles = [
     span: 'md:col-span-2',
     accentBorder: false,
     glowColor: 'var(--c-accent)',
+  },
+  {
+    // Capstone: extensión del servicio a la presencia online.
+    // Nachera lleva el proyecto integral (estrategia, identidad, contenido,
+    // coordinación) — NO se claima ejecución técnica.
+    id: 'web',
+    title: 'Tu marca online',
+    value:
+      'Cuando tu marca también necesita su lugar en internet — sitio, landing o portfolio — lo llevo adelante en un proyecto integral, alineado con tu identidad y tu contenido.',
+    detail: {
+      resuelve: 'tu marca sin sitio propio o atada a plantillas genéricas',
+      entrega: 'sitio, landing o portfolio diseñado a medida de tu marca',
+      resultado: 'tu marca con un lugar propio en internet, no en un template',
+    },
+    Viz: WebViz,
+    span: 'md:col-span-6 md:row-span-1',
+    accentBorder: true,
+    glowColor: 'var(--c-accent2)',
   },
 ]
 

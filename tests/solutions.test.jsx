@@ -62,10 +62,10 @@ describe('Solutions — tap/click reactivation', () => {
     })
     expect(tile).toBeInTheDocument()
     expect(tile).toHaveAttribute('tabindex', '0')
-    // all 5 tiles expose the reactivation control
+    // all 6 tiles expose the reactivation control (5 + "Tu marca online" capstone)
     expect(
       screen.getAllByRole('button', { name: /^Reactivar la animación de / }).length
-    ).toBe(5)
+    ).toBe(6)
   })
 
   it('clicking a tile sets aria-pressed; clicking another moves it (only one pressed)', () => {
