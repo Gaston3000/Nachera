@@ -8,7 +8,7 @@ export const hero = {
     { t: 'criterio', accent: true },
     { t: '.' },
   ],
-  sub: 'Diseño la comunicación digital de marcas y emprendimientos: identidad, contenido y oficio narrativo. Sin fórmulas mágicas — con estrategia, criterio y ejecución real.',
+  sub: 'Trabajo la comunicación digital de marcas y emprendimientos: identidad, contenido y oficio narrativo. **Sin fórmulas mágicas** — con criterio y ejecución real.',
   chips: ['Storytelling', 'Estrategia', 'Reels', 'Email', 'Branding'],
 }
 
@@ -21,12 +21,12 @@ export const trustBar = [
 
 export const about = {
   title: 'Detrás de cada publicación, una decisión.',
-  pull: 'No vendo humo: vendo criterio, oficio y comunicación que se entiende.',
+  pull: 'No vendo humo. Vendo criterio, oficio y comunicación que se entiende.',
   lead: 'Soy Ignacio Costa —Nachera—, Licenciado en Ciencias de la Comunicación (UADE).',
   beats: [
-    'Vengo del **periodismo deportivo y la producción de radio**: sé **contar historias y escuchar de verdad**.',
-    'Aplico eso a la comunicación digital para que las marcas **comuniquen con identidad y decidan con criterio, no con intuición**.',
-    'Fundé mi agencia (**Sintonía Digital**) y mi proyecto (**Focaccheras**): **sé lo que es construir una marca desde cero**.',
+    'Vengo del **periodismo deportivo y la radio**: aprendí a **contar bien y a escuchar mejor**.',
+    'Hoy aplico ese oficio a la comunicación digital, para que las marcas **decidan con criterio y no con intuición**.',
+    'Fundé **Sintonía Digital** y **Focaccheras**: sé lo que es **construir una marca desde cero**, no en teoría.',
   ],
   credentials: [
     {
@@ -105,6 +105,6 @@ export const tools = [
 ]
 
 export const finalCta = {
-  title: '¿Querés que tu marca comunique mejor?',
-  sub: 'Una charla de 20 minutos y te digo, sin vueltas, qué haría con tu comunicación.',
+  title: '¿Querés que **tu marca comunique mejor**?',
+  sub: 'Una charla de **20 minutos**, sin vueltas, y te digo qué haría con tu comunicación.',
 }

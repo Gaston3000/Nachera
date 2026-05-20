@@ -7,7 +7,7 @@ export const cases = [
     id: 'lae',
     brand: 'LAE SRL',
     sector: 'Audiología · empresa con +60 años',
-    tagline: 'Construcción de marca digital desde cero.',
+    tagline: 'Construcción de marca digital **desde cero**.',
     problem:
       'Laboratorio de Aplicaciones Electrónicas no tenía presencia digital activa ni canales desarrollados en redes. Reconocida en el plano físico, era invisible online.',
     approach: [
@@ -46,7 +46,7 @@ export const cases = [
     id: 'dominga',
     brand: 'Dominga Pastelería',
     sector: 'Gastronomía · pastelería artesanal',
-    tagline: 'De feed improvisado a identidad consistente.',
+    tagline: 'De un feed improvisado a una **identidad consistente**.',
     problem:
       'Tenía presencia en redes, pero sin estrategia ni identidad de contenido clara. Frecuencia baja y sin planificación para crecer.',
     approach: [
@@ -84,7 +84,7 @@ export const cases = [
     id: 'onlywines',
     brand: 'Only Wines',
     sector: 'Vinoteca · etiquetas de Cuyo',
-    tagline: 'Identidad digital alineada al mundo del vino.',
+    tagline: 'Identidad digital **a tono con el mundo del vino**.',
     problem:
       'Comunicación digital desordenada, sin línea editorial clara dentro de un rubro muy expresivo y exigente.',
     approach: [
@@ -122,7 +122,7 @@ export const cases = [
     id: 'gtelite',
     brand: 'GT Elite Soccer',
     sector: 'Deportes · representación de futbolistas',
-    tagline: 'Highlights y narrativa deportiva en tiempo real.',
+    tagline: 'Highlights y narrativa deportiva, **en tiempo real**.',
     problem:
       'La agencia buscaba mayor visibilidad para sus jugadores, sin una estrategia activa de contenido deportivo dinámico.',
     approach: [

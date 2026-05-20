@@ -1,6 +1,7 @@
 import { motion, useReducedMotion } from 'motion/react'
 import { Reveal } from './primitives/Reveal.jsx'
 import { SectionHeading } from './primitives/SectionHeading.jsx'
+import { RichText } from './primitives/RichText.jsx'
 import {
   DiplomaIcon,
   ChartCheckIcon,
@@ -182,24 +183,6 @@ function CredentialsModule() {
   )
 }
 
-/* Parse a beat string that uses **bold** markers and return JSX */
-function BeatText({ text }) {
-  const parts = text.split(/\*\*(.+?)\*\*/g)
-  return (
-    <>
-      {parts.map((part, i) =>
-        i % 2 === 1 ? (
-          <strong key={i} className="text-fg font-semibold">
-            {part}
-          </strong>
-        ) : (
-          <span key={i}>{part}</span>
-        )
-      )}
-    </>
-  )
-}
-
 export function About() {
   return (
     <section id="sobre-mi" className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8 md:py-28">
@@ -219,11 +202,11 @@ export function About() {
               aria-hidden="true"
             />
             <blockquote className="font-display text-2xl font-bold leading-snug text-fg sm:text-3xl md:text-4xl">
-              {/* accent key word */}
-              <span style={{ color: 'var(--c-accent)' }}>No vendo humo:</span>
+              {/* dos colores acentuando los dos golpes del pull */}
+              <span style={{ color: 'var(--c-accent)' }}>No vendo humo.</span>
               <br />
-              vendo criterio, ejecución y{' '}
-              <span style={{ color: 'var(--c-accent2)' }}>números que se pueden mirar.</span>
+              Vendo criterio, oficio y{' '}
+              <span style={{ color: 'var(--c-accent2)' }}>comunicación que se entiende</span>.
             </blockquote>
           </div>
         </Reveal>
@@ -247,7 +230,7 @@ export function About() {
                     0{i + 1}
                   </span>
                   <p className="text-sm leading-relaxed text-muted">
-                    <BeatText text={beat} />
+                    <RichText text={beat} />
                   </p>
                 </li>
               </Reveal>

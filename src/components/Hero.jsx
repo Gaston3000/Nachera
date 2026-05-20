@@ -8,6 +8,7 @@ import {
 } from 'motion/react'
 import { Button } from './primitives/Button.jsx'
 import { ArrowDown, MessageIcon } from './primitives/icons.jsx'
+import { RichText } from './primitives/RichText.jsx'
 import { FloatingHead } from './FloatingHead.jsx'
 import { OrbitingChips } from './OrbitingChips.jsx'
 import { hero } from '../data/content.js'
@@ -78,7 +79,7 @@ export function Hero() {
           {...fade(0.2)}
           className="mx-auto mt-6 max-w-lg text-base leading-relaxed text-muted md:mx-0"
         >
-          {hero.sub}
+          <RichText text={hero.sub} />
         </motion.p>
         {/* CTAs — desktop: under the copy (left column) */}
         <motion.div

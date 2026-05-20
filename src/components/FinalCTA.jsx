@@ -3,6 +3,7 @@ import { Parallax } from './primitives/Parallax.jsx'
 import { GlassPanel } from './primitives/GlassPanel.jsx'
 import { Button } from './primitives/Button.jsx'
 import { MessageIcon, CalendarIcon, MailIcon } from './primitives/icons.jsx'
+import { RichText } from './primitives/RichText.jsx'
 import { finalCta } from '../data/content.js'
 import { siteConfig } from '../data/siteConfig.js'
 
@@ -23,10 +24,10 @@ export function FinalCTA() {
             />
           </Parallax>
           <h2 className="relative mx-auto max-w-2xl font-display text-3xl font-bold leading-tight tracking-tight text-fg sm:text-4xl md:text-5xl">
-            {finalCta.title}
+            <RichText text={finalCta.title} strongClassName="text-accent" />
           </h2>
           <p className="relative mx-auto mt-4 max-w-lg text-base text-muted">
-            {finalCta.sub}
+            <RichText text={finalCta.sub} />
           </p>
           <div className="relative mt-9 flex flex-wrap justify-center gap-3">
             <Button

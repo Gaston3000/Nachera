@@ -3,6 +3,7 @@ import { GlassPanel } from './primitives/GlassPanel.jsx'
 import { Button } from './primitives/Button.jsx'
 import { ArrowUpRight } from './primitives/icons.jsx'
 import { CountUp } from './primitives/CountUp.jsx'
+import { RichText } from './primitives/RichText.jsx'
 import { useCardReplay } from './primitives/useCardReplay.js'
 import { EASE, containerVariants, itemVariants } from './primitives/motionPresets.js'
 
@@ -152,7 +153,7 @@ export function CaseCard({ caseData, index, onOpen, active = false, onActivate }
             className="mt-1 text-sm italic text-muted"
             variants={reduce ? undefined : itemVariants}
           >
-            {caseData.tagline}
+            <RichText text={caseData.tagline} />
           </motion.p>
 
           {/* top result as big accent number — cuenta en cada (re)load */}

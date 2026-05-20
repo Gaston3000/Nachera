@@ -4,6 +4,7 @@ import { GlassPanel } from './primitives/GlassPanel.jsx'
 import { SectionHeading } from './primitives/SectionHeading.jsx'
 import { Reveal } from './primitives/Reveal.jsx'
 import { Parallax } from './primitives/Parallax.jsx'
+import { RichText } from './primitives/RichText.jsx'
 
 /* ─── shared constants ───────────────────────────────────────────────────── */
 
@@ -890,11 +891,11 @@ const tiles = [
   {
     id: 'estrategia',
     title: 'Estrategia de Contenido',
-    value: 'Pilares, tono y calendario adaptados a tu marca y a tu público — no plantillas.',
+    value: 'Pilares, tono y calendario armados **a medida de tu marca y de tu público**. Cero plantillas que sirven para cualquiera.',
     detail: {
-      resuelve: 'comunicación sin rumbo ni planificación',
-      entrega: 'estrategia, calendario y línea editorial propia',
-      resultado: 'marca que comunica con intención',
+      resuelve: 'publicar **sin un norte claro** ni calendario',
+      entrega: 'estrategia, calendario y **línea editorial propia**',
+      resultado: 'una marca que **deja de improvisar** y comunica con intención',
     },
     Viz: BarChartViz,
     span: 'md:col-span-3 md:row-span-2',
@@ -904,11 +905,11 @@ const tiles = [
   {
     id: 'marca',
     title: 'Marca, Voz & Contenido',
-    value: 'Identidad clara, voz consistente y piezas con intención en cada publicación.',
+    value: 'Una marca con **identidad clara y voz propia**, sostenida pieza por pieza — no un logo lindo y nada más.',
     detail: {
-      resuelve: 'identidad débil o inconsistente',
-      entrega: 'branding, voz, sistema visual y contenido',
-      resultado: 'una marca deseable y coherente',
+      resuelve: 'una marca que **se ve y suena distinta en cada pieza**',
+      entrega: 'branding, voz, sistema visual y contenido **a tono**',
+      resultado: 'una marca **deseable, coherente y reconocible**',
     },
     Viz: FeedViz,
     span: 'md:col-span-3 md:row-span-2',
@@ -918,11 +919,11 @@ const tiles = [
   {
     id: 'produccion',
     title: 'Producción & Edición',
-    value: 'Reels, video, placas, carruseles e historias — de la idea al material listo para publicar.',
+    value: 'Reels, video, placas y carruseles. **De la idea al material listo para publicar**, sin parches de último momento.',
     detail: {
-      resuelve: 'falta de material o piezas hechas a las apuradas',
-      entrega: 'reels, edición de video, placas y carruseles',
-      resultado: 'contenido con identidad propia',
+      resuelve: '**piezas hechas a las apuradas** o material que falta',
+      entrega: 'reels, video, placas y carruseles **con tu identidad**',
+      resultado: 'contenido que **se nota que es tuyo**',
     },
     Viz: MediaViz,
     span: 'md:col-span-2 md:row-span-1',
@@ -932,11 +933,11 @@ const tiles = [
   {
     id: 'email',
     title: 'Email Marketing',
-    value: 'Campañas y mailing con planificación, segmentación y copywriting que respeta tu marca.',
+    value: 'Campañas que **no terminan en spam ni en silencio**: planificación, segmentación y copy que respeta tu voz.',
     detail: {
-      resuelve: 'comunicación directa abandonada o sin método',
-      entrega: 'flujos, segmentación y métricas',
-      resultado: 'audiencia activa y conversaciones reales',
+      resuelve: 'una base de mails **abandonada** o que nunca arrancó',
+      entrega: 'flujos, segmentación y métricas **que se leen**',
+      resultado: '**conversaciones reales** y una audiencia que abre lo que mandás',
     },
     Viz: FlowViz,
     span: 'md:col-span-2',
@@ -946,11 +947,11 @@ const tiles = [
   {
     id: 'analytics',
     title: 'Análisis & decisiones',
-    value: 'Seguimiento honesto de métricas que detecta qué funciona y orienta los próximos pasos.',
+    value: '**Métricas que se leen** y se traducen en decisiones — no en un PDF que nadie abre.',
     detail: {
-      resuelve: 'datos sin lectura ni decisiones',
-      entrega: 'lectura de métricas + ajustes concretos',
-      resultado: 'decisiones basadas en datos reales',
+      resuelve: '**datos sueltos** que no orientan ninguna decisión',
+      entrega: 'lectura de métricas y **ajustes concretos**, no opiniones',
+      resultado: 'decisiones **basadas en números reales**, no en intuición',
     },
     Viz: DashboardViz,
     span: 'md:col-span-2',
@@ -964,11 +965,11 @@ const tiles = [
     id: 'web',
     title: 'Experiencias digitales',
     value:
-      'Desde la identidad visual hasta la presencia online: acompañamos a marcas que necesitan verse bien, comunicar mejor y tener una experiencia digital a la altura.',
+      'Desde la identidad visual hasta la presencia online: **llevamos tu marca al entorno digital** con la misma exigencia con la que la pensamos. Sitio, landing o portfolio: tu marca online, **a la altura**.',
     detail: {
-      resuelve: 'presencia digital sin coherencia con la identidad de tu marca',
-      entrega: 'sitio, landing o portfolio diseñado como continuidad de tu marca',
-      resultado: 'tu marca online a la altura, no en una plantilla genérica',
+      resuelve: 'estar online en **una plantilla genérica** que no te representa',
+      entrega: 'sitio, landing o portfolio como **continuidad natural de tu marca**',
+      resultado: 'tu marca online **a la altura de lo que querés transmitir**',
     },
     Viz: WebViz,
     span: 'md:col-span-6 md:row-span-1',
@@ -980,6 +981,9 @@ const tiles = [
 /* ─── detail block ───────────────────────────────────────────────────────── */
 
 function DetailBlock({ detail }) {
+  // Negrita en accent dentro del bloque para que los puntos clave pinchen
+  // (parent es text-fg blanco; usar text-accent diferencia bien la jerarquía).
+  const strong = 'text-accent font-semibold'
   return (
     <motion.div
       className="rounded-xl border border-glassborder bg-bg/60 p-3 text-xs leading-relaxed backdrop-blur-sm"
@@ -987,15 +991,21 @@ function DetailBlock({ detail }) {
     >
       <div className="mb-1">
         <span className="font-semibold text-muted uppercase tracking-wider">Resuelve</span>{' '}
-        <span className="text-fg">{detail.resuelve}</span>
+        <span className="text-fg">
+          <RichText text={detail.resuelve} strongClassName={strong} />
+        </span>
       </div>
       <div className="mb-1">
         <span className="font-semibold text-muted uppercase tracking-wider">Entrega</span>{' '}
-        <span className="text-fg">{detail.entrega}</span>
+        <span className="text-fg">
+          <RichText text={detail.entrega} strongClassName={strong} />
+        </span>
       </div>
       <div>
         <span className="font-semibold text-accent uppercase tracking-wider">Resultado</span>{' '}
-        <span className="text-fg">{detail.resultado}</span>
+        <span className="text-fg">
+          <RichText text={detail.resultado} strongClassName={strong} />
+        </span>
       </div>
     </motion.div>
   )
@@ -1076,22 +1086,11 @@ function SolutionTile({ tile, index, active = false, onActivate }) {
             <Viz inView={true} />
           </div>
           <h3 className="relative mt-5 font-display text-lg font-bold text-fg sm:text-xl">{tile.title}</h3>
-          <p className="relative mt-2 text-sm leading-relaxed text-muted">{tile.value}</p>
+          <p className="relative mt-2 text-sm leading-relaxed text-muted">
+            <RichText text={tile.value} />
+          </p>
           <div className="relative mt-auto pt-6">
-            <div className="rounded-xl border border-glassborder bg-bg/60 p-3 text-xs leading-relaxed backdrop-blur-sm">
-              <div className="mb-1">
-                <span className="font-semibold text-muted uppercase tracking-wider">Resuelve</span>{' '}
-                <span className="text-fg">{tile.detail.resuelve}</span>
-              </div>
-              <div className="mb-1">
-                <span className="font-semibold text-muted uppercase tracking-wider">Entrega</span>{' '}
-                <span className="text-fg">{tile.detail.entrega}</span>
-              </div>
-              <div>
-                <span className="font-semibold text-accent uppercase tracking-wider">Resultado</span>{' '}
-                <span className="text-fg">{tile.detail.resultado}</span>
-              </div>
-            </div>
+            <DetailBlock detail={tile.detail} />
           </div>
         </GlassPanel>
       </div>
@@ -1161,7 +1160,7 @@ function SolutionTile({ tile, index, active = false, onActivate }) {
             className="mt-2 text-sm leading-relaxed text-muted"
             variants={itemVariants}
           >
-            {tile.value}
+            <RichText text={tile.value} />
           </motion.p>
 
           <motion.div className="mt-auto pt-6" variants={itemVariants}>
