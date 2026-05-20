@@ -90,7 +90,7 @@ describe('App smoke', () => {
     expect(screen.getByText('Producción & Edición')).toBeInTheDocument()
     expect(screen.getByText('Email Marketing')).toBeInTheDocument()
     expect(screen.getByText('Análisis & decisiones')).toBeInTheDocument()
-    expect(screen.getByText('Tu marca online')).toBeInTheDocument()
+    expect(screen.getByText('Experiencias digitales')).toBeInTheDocument()
   })
 
   it('renders all 4 case brands (real clients)', () => {

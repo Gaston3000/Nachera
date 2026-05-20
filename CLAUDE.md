@@ -15,14 +15,18 @@ contra una pregunta: **¿esto lo ayuda a cerrar una primera reunión?**
   manager genérico. Usar siempre como ancla — eso lo separa del resto.
 - **Foco temático:** comunicación digital, contenido, branding, redes,
   producción audiovisual, copywriting, email marketing.
-- **Extensión "Tu marca online" (capstone Soluciones):** también ofrece
-  llevar proyectos web integrales (sitio, landing, portfolio) cuando una
-  marca lo necesita. Se comunica como **extensión natural** del servicio,
-  no como ítem aparte. **Framing válido:** "lo llevo adelante / coordino
-  / dirijo el proyecto integral". **Framing inválido:** "desarrollo /
-  programo / codeo personalmente". Si en una reunión 1-a-1 le preguntan
-  quién ejecuta lo técnico, esa conversación se da ahí — la web no
-  explicita la mecánica interna.
+- **Capstone "Experiencias digitales" (capacidad de equipo):** el equipo
+  Nachera incorporó la capacidad de llevar proyectos web (sitio, landing,
+  portfolio) como continuidad de la identidad al entorno digital. **Voz
+  plural** ("acompañamos / armamos / diseñamos") porque es trabajo de
+  equipo — no es delegación ni tercerización, es capacidad propia del
+  equipo (Gastón / De Caso es parte del equipo en estos proyectos).
+  **Framing válido:** "acompañamos / diseñamos / armamos / llevamos
+  adelante" en plural; categoría "Experiencias digitales" (no
+  "Desarrollo web", ese vocabulario es técnico y nos vuelve genéricos).
+  **Framing inválido:** "delegamos / tercerizamos / trabajamos con
+  externos" — eso baja autoridad y es falso (el equipo es propio).
+  Tampoco claimear que Nachera personalmente codea.
 
 ## Lo que NUNCA se hace
 

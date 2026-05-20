@@ -958,17 +958,17 @@ const tiles = [
     glowColor: 'var(--c-accent)',
   },
   {
-    // Capstone: extensión del servicio a la presencia online.
-    // Nachera lleva el proyecto integral (estrategia, identidad, contenido,
-    // coordinación) — NO se claima ejecución técnica.
+    // Capstone: capacidad de equipo. El equipo Nachera incorpora la
+    // ejecución web/digital — se comunica en voz plural ("acompañamos"),
+    // como continuidad natural de la identidad al entorno digital.
     id: 'web',
-    title: 'Tu marca online',
+    title: 'Experiencias digitales',
     value:
-      'Cuando tu marca también necesita su lugar en internet — sitio, landing o portfolio — lo llevo adelante en un proyecto integral, alineado con tu identidad y tu contenido.',
+      'Desde la identidad visual hasta la presencia online: acompañamos a marcas que necesitan verse bien, comunicar mejor y tener una experiencia digital a la altura.',
     detail: {
-      resuelve: 'tu marca sin sitio propio o atada a plantillas genéricas',
-      entrega: 'sitio, landing o portfolio diseñado a medida de tu marca',
-      resultado: 'tu marca con un lugar propio en internet, no en un template',
+      resuelve: 'presencia digital sin coherencia con la identidad de tu marca',
+      entrega: 'sitio, landing o portfolio diseñado como continuidad de tu marca',
+      resultado: 'tu marca online a la altura, no en una plantilla genérica',
     },
     Viz: WebViz,
     span: 'md:col-span-6 md:row-span-1',
