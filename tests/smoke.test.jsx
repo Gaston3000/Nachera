@@ -49,7 +49,7 @@ describe('App smoke', () => {
   it('renders the hero headline', () => {
     expect(
       screen.getByRole('heading', {
-        name: /Convierto marcas con potencial en marcas que crecen\./i,
+        name: /Estrategia y contenido para que tu marca comunique con criterio\./i,
       })
     ).toBeInTheDocument()
   })
@@ -85,24 +85,23 @@ describe('App smoke', () => {
   })
 
   it('renders all 5 solution tile titles', () => {
-    expect(screen.getByText('Estrategia & Performance')).toBeInTheDocument()
-    expect(screen.getByText('Marca & Contenido')).toBeInTheDocument()
-    // 'SEO' appears in multiple places (hero chips, tools, tile) — just ensure it exists
-    expect(screen.getAllByText('SEO').length).toBeGreaterThan(0)
-    expect(screen.getByText('Email & Automatizaciones')).toBeInTheDocument()
+    expect(screen.getByText('Estrategia de Contenido')).toBeInTheDocument()
+    expect(screen.getByText('Marca, Voz & Contenido')).toBeInTheDocument()
+    expect(screen.getByText('Producción & Edición')).toBeInTheDocument()
+    expect(screen.getByText('Email Marketing')).toBeInTheDocument()
     expect(screen.getByText('Análisis & decisiones')).toBeInTheDocument()
   })
 
-  it('renders all 4 case brands', () => {
-    expect(screen.getByText('Bruma Café')).toBeInTheDocument()
-    expect(screen.getByText('Nómade Store')).toBeInTheDocument()
-    expect(screen.getByText('Estudio Valen Ruiz')).toBeInTheDocument()
-    expect(screen.getByText('Distrito Pulso')).toBeInTheDocument()
+  it('renders all 4 case brands (real clients)', () => {
+    expect(screen.getByText('LAE SRL')).toBeInTheDocument()
+    expect(screen.getByText('Dominga Pastelería')).toBeInTheDocument()
+    expect(screen.getByText('Only Wines')).toBeInTheDocument()
+    expect(screen.getByText('GT Elite Soccer')).toBeInTheDocument()
   })
 
-  it('shows placeholder note for cases', () => {
+  it('shows the cases intro (real selection, no placeholder note)', () => {
     expect(
-      screen.getByText(/placeholders premium, se reemplazan por trabajos reales/i)
+      screen.getByText(/una selección de marcas que estoy acompañando/i)
     ).toBeInTheDocument()
   })
 
@@ -112,9 +111,9 @@ describe('App smoke', () => {
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument()
     })
-    // challenge text from Bruma case
+    // challenge text from LAE case (featured)
     expect(
-      screen.getByText(/feed inconsistente, sin calendario, sin estrategia/i)
+      screen.getByText(/no contaba con presencia digital activa/i)
     ).toBeInTheDocument()
   })
 
@@ -134,7 +133,7 @@ describe('App smoke', () => {
     // The card surface is click-to-replay; only the "Ver caso" button opens
     // the case modal (it stops propagation). Clicking the brand text inside
     // the card must NOT open a dialog.
-    fireEvent.click(screen.getByText('Bruma Café'))
+    fireEvent.click(screen.getByText('LAE SRL'))
     expect(screen.queryByRole('dialog')).toBeNull()
   })
 

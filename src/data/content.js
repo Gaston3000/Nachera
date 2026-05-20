@@ -1,15 +1,15 @@
 export const hero = {
-  eyebrow: 'Marketing digital con criterio',
+  eyebrow: 'Comunicación con criterio',
   // h1 (string plano) = nombre accesible / SEO / fallback.
-  // h1Parts = render con la palabra clave destacada ("crecen").
-  h1: 'Convierto marcas con potencial en marcas que crecen.',
+  // h1Parts = render con la palabra clave destacada ("criterio").
+  h1: 'Estrategia y contenido para que tu marca comunique con criterio.',
   h1Parts: [
-    { t: 'Convierto marcas con potencial en marcas que ' },
-    { t: 'crecen', accent: true },
+    { t: 'Estrategia y contenido para que tu marca comunique con ' },
+    { t: 'criterio', accent: true },
     { t: '.' },
   ],
-  sub: 'Estrategia, contenido y performance con identidad, datos y ejecución real. Para negocios y emprendedores que quieren resultados, no promesas.',
-  chips: ['SEO', 'Google Ads', 'Branding', 'Contenido', 'Analytics'],
+  sub: 'Diseño la comunicación digital de marcas y emprendimientos: identidad, contenido y oficio narrativo. Sin fórmulas mágicas — con estrategia, criterio y ejecución real.',
+  chips: ['Estrategia', 'Branding', 'Contenido', 'Redes', 'Email'],
 }
 
 export const trustBar = [
@@ -20,12 +20,12 @@ export const trustBar = [
 ]
 
 export const about = {
-  title: 'Detrás de cada métrica, una estrategia.',
-  pull: 'No vendo humo: vendo criterio, ejecución y números que se pueden mirar.',
+  title: 'Detrás de cada publicación, una decisión.',
+  pull: 'No vendo humo: vendo criterio, oficio y comunicación que se entiende.',
   lead: 'Soy Ignacio Costa —Nachera—, Licenciado en Ciencias de la Comunicación (UADE).',
   beats: [
     'Vengo del **periodismo deportivo y la producción de radio**: sé **contar historias y escuchar de verdad**.',
-    'Aplico eso al marketing digital para que las marcas **comuniquen con identidad y decidan con datos, no con intuición**.',
+    'Aplico eso a la comunicación digital para que las marcas **comuniquen con identidad y decidan con criterio, no con intuición**.',
     'Fundé mi agencia (**Sintonía Digital**) y mi proyecto (**Focaccheras**): **sé lo que es construir una marca desde cero**.',
   ],
   credentials: [
@@ -37,7 +37,7 @@ export const about = {
       verified: true,
     },
     {
-      label: 'Certificado en performance',
+      label: 'Formación en performance',
       micro: 'Google Ads & Analytics · Skillshop',
       icon: 'chartcheck',
       accent: 'accent2',
@@ -50,8 +50,8 @@ export const about = {
       badge: 'C1',
     },
     {
-      label: 'Perfil analítico + creativo',
-      micro: 'Datos y criterio, no intuición',
+      label: 'Perfil narrativo + analítico',
+      micro: 'Oficio de comunicador, lectura de datos',
       icon: 'sparklogic',
       accent: 'accent',
     },
@@ -59,21 +59,20 @@ export const about = {
 }
 
 export const services = [
-  { icon: '◎', title: 'Estrategia de Marketing Digital', desc: 'Un plan con norte: objetivos, canales y prioridades según tu negocio, no plantillas.' },
-  { icon: '◈', title: 'Branding e identidad', desc: 'Que tu marca se vea y suene como lo que es. Coherencia en cada punto de contacto.' },
-  { icon: '◐', title: 'Gestión de redes', desc: 'Contenido con intención: comunidad, no solo posteos.' },
-  { icon: '▲', title: 'Google Ads & campañas pagas', desc: 'Pauta que se mide y se optimiza. Cada peso con un porqué.' },
-  { icon: '⌖', title: 'SEO y posicionamiento orgánico', desc: 'Que te encuentren cuando te buscan. Tráfico que no se apaga al cortar la pauta.' },
-  { icon: '✉', title: 'Email marketing & automatizaciones', desc: 'Flujos que venden mientras dormís. Brevo, segmentación, métricas.' },
-  { icon: '✎', title: 'Contenido & copywriting', desc: 'Mensajes que conectan y convierten, en tu voz.' },
-  { icon: '📈', title: 'Análisis y optimización', desc: 'Analytics que se traduce en decisiones, no en reportes que nadie lee.' },
+  { icon: '◎', title: 'Estrategia de contenido', desc: 'Pilares, tono, líneas y calendario adaptado a tu marca y a tu público — no plantillas.' },
+  { icon: '◈', title: 'Marca, voz e identidad', desc: 'Que tu marca se vea y suene como lo que es. Coherencia en cada pieza.' },
+  { icon: '◐', title: 'Gestión de redes', desc: 'Comunidad y publicación con intención en IG, FB, TikTok y LinkedIn.' },
+  { icon: '🎬', title: 'Producción & edición', desc: 'Reels, video, placas gráficas, carruseles e historias. Idea, guion y pieza terminada.' },
+  { icon: '✎', title: 'Copywriting', desc: 'Textos que mantienen tu voz y conectan: publicaciones, campañas y piezas digitales.' },
+  { icon: '✉', title: 'Email marketing', desc: 'Planificación, segmentación, automatización y seguimiento — comunicación directa con tu audiencia.' },
+  { icon: '📈', title: 'Lectura de métricas', desc: 'Seguimiento honesto que detecta qué funciona y orienta las próximas decisiones.' },
 ]
 
 export const process = [
-  { n: '01', title: 'Diagnóstico', desc: 'Entiendo tu negocio, tu mercado y tus números actuales.' },
-  { n: '02', title: 'Estrategia', desc: 'Defino objetivos, canales y mensajes. Un plan, no una corazonada.' },
-  { n: '03', title: 'Ejecución', desc: 'Campañas, contenido y piezas, con identidad y prolijidad.' },
-  { n: '04', title: 'Optimización', desc: 'Mido, ajusto y escalo lo que funciona. Mejora continua.' },
+  { n: '01', title: 'Diagnóstico', desc: 'Entiendo tu marca, tu rubro, tu público y cómo te estás comunicando hoy.' },
+  { n: '02', title: 'Estrategia', desc: 'Defino pilares, tono y calendario. Un plan claro, no una corazonada.' },
+  { n: '03', title: 'Ejecución', desc: 'Contenido, piezas y publicaciones con identidad y prolijidad.' },
+  { n: '04', title: 'Ajuste', desc: 'Leo las métricas, ajusto lo que conviene y sostengo la comunicación en el tiempo.' },
 ]
 
 export const projects = [
@@ -84,8 +83,8 @@ export const projects = [
 ]
 
 export const experience = [
-  { role: 'Founder', org: 'Sintonía Digital · Agencia de Marketing', period: 'Ene 2025 – Presente', desc: 'Estrategias de branding integrales, gestión de redes data-driven, campañas de email marketing y assets creativos a medida de cada cliente.' },
-  { role: 'Founder', org: 'Focaccheras', period: 'Ene 2024 – Presente', desc: 'Desarrollo de marca, automatización de email marketing, SEO y presencia multicanal (Instagram, Facebook).' },
+  { role: 'Founder', org: 'Sintonía Digital · Agencia de Marketing', period: 'Ene 2025 – Presente', desc: 'Estrategias de comunicación integrales, gestión de redes data-driven, campañas de email marketing y assets creativos a medida de cada cliente.' },
+  { role: 'Founder', org: 'Focaccheras', period: 'Ene 2024 – Presente', desc: 'Desarrollo de marca, automatización de email marketing, gestión de contenido y presencia multicanal (Instagram, Facebook).' },
   { role: 'Operador Técnico de Sonido e Iluminación', org: 'Pulso', period: 'Ene 2024 – May 2025', desc: 'Coordinación y operación de equipos profesionales en eventos de gran escala.' },
   { role: 'Productor Ejecutivo', org: 'Fuego Sagrado Radio', period: '2019 – 2021', desc: 'Distribución de contenido periodístico en digital, entrevistas con figuras del deporte y newsletters vía email marketing.' },
 ]
@@ -101,11 +100,11 @@ export const certifications = [
 ]
 
 export const tools = [
-  'Google Ads', 'Google Analytics', 'SEO', 'Metricool', 'Meta Business Suite',
-  'Adobe Premiere', 'Canva', 'CapCut', 'Sony Vegas', 'Trello', 'Brevo', 'Microsoft Office',
+  'Metricool', 'Meta Business Suite', 'Adobe Premiere', 'Canva', 'CapCut',
+  'Sony Vegas', 'Trello', 'Brevo', 'Google Analytics', 'Microsoft Office',
 ]
 
 export const finalCta = {
-  title: '¿Querés que tu marca comunique mejor y venda más?',
-  sub: 'Una charla de 20 minutos y te digo, sin vueltas, qué haría con tu marca.',
+  title: '¿Querés que tu marca comunique mejor?',
+  sub: 'Una charla de 20 minutos y te digo, sin vueltas, qué haría con tu comunicación.',
 }

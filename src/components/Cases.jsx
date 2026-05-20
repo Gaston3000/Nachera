@@ -193,7 +193,7 @@ export function Cases() {
       </Reveal>
       <Reveal delay={0.05}>
         <p className="mb-12 text-sm text-muted max-w-xl">
-          Casos de muestra — placeholders premium, se reemplazan por trabajos reales.
+          Una selección de marcas que estoy acompañando.
         </p>
       </Reveal>
 

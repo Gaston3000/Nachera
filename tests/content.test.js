@@ -52,8 +52,8 @@ describe('about', () => {
 })
 
 describe('content', () => {
-  it('has 8 services with required fields', () => {
-    expect(services).toHaveLength(8)
+  it('has 7 services with required fields', () => {
+    expect(services).toHaveLength(7)
     services.forEach((s) => {
       expect(s.title).toBeTruthy()
       expect(s.desc).toBeTruthy()

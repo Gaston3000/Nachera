@@ -6,9 +6,9 @@ describe('cases data', () => {
     expect(cases).toHaveLength(4)
   })
 
-  it('every case has isPlaceholder: true', () => {
+  it('no case is flagged as a placeholder (all real now)', () => {
     cases.forEach((c) => {
-      expect(c.isPlaceholder, `${c.id} missing isPlaceholder`).toBe(true)
+      expect(c.isPlaceholder, `${c.id} should not be a placeholder`).toBeFalsy()
     })
   })
 
@@ -44,8 +44,8 @@ describe('cases data', () => {
     })
   })
 
-  it('case ids match expected values', () => {
+  it('case ids match expected values (real clients)', () => {
     const ids = cases.map((c) => c.id)
-    expect(ids).toEqual(['bruma', 'nomade', 'valen', 'pulso'])
+    expect(ids).toEqual(['lae', 'dominga', 'onlywines', 'gtelite'])
   })
 })

@@ -49,7 +49,7 @@ describe('Solutions — tap/click reactivation', () => {
     expect(container.querySelector('#soluciones')).not.toBeNull()
     // reduced-motion static branch must still render titles + the
     // Resuelve/Entrega/Resultado block for every tile (5 tiles).
-    expect(screen.getByText('Estrategia & Performance')).toBeInTheDocument()
+    expect(screen.getByText('Estrategia de Contenido')).toBeInTheDocument()
     expect(screen.getAllByText(/Resuelve/i).length).toBeGreaterThanOrEqual(5)
     expect(screen.getAllByText(/Entrega/i).length).toBeGreaterThanOrEqual(5)
     expect(screen.getAllByText(/Resultado/i).length).toBeGreaterThanOrEqual(5)
@@ -58,7 +58,7 @@ describe('Solutions — tap/click reactivation', () => {
   it('each tile is an activatable button with the reactivation aria-label', () => {
     render(<Solutions />)
     const tile = screen.getByRole('button', {
-      name: 'Reactivar la animación de Estrategia & Performance',
+      name: 'Reactivar la animación de Estrategia de Contenido',
     })
     expect(tile).toBeInTheDocument()
     expect(tile).toHaveAttribute('tabindex', '0')
@@ -71,10 +71,10 @@ describe('Solutions — tap/click reactivation', () => {
   it('clicking a tile sets aria-pressed; clicking another moves it (only one pressed)', () => {
     render(<Solutions />)
     const first = screen.getByRole('button', {
-      name: 'Reactivar la animación de Estrategia & Performance',
+      name: 'Reactivar la animación de Estrategia de Contenido',
     })
     const second = screen.getByRole('button', {
-      name: 'Reactivar la animación de Marca & Contenido',
+      name: 'Reactivar la animación de Marca, Voz & Contenido',
     })
 
     // nothing pressed initially
@@ -100,13 +100,13 @@ describe('Solutions — tap/click reactivation', () => {
   it('keyboard (Enter / Space) activates a tile like a click', () => {
     render(<Solutions />)
     const tile = screen.getByRole('button', {
-      name: 'Reactivar la animación de SEO',
+      name: 'Reactivar la animación de Producción & Edición',
     })
     fireEvent.keyDown(tile, { key: 'Enter' })
     expect(tile).toHaveAttribute('aria-pressed', 'true')
 
     const other = screen.getByRole('button', {
-      name: 'Reactivar la animación de Email & Automatizaciones',
+      name: 'Reactivar la animación de Email Marketing',
     })
     fireEvent.keyDown(other, { key: ' ' })
     expect(other).toHaveAttribute('aria-pressed', 'true')
