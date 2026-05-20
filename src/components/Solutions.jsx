@@ -64,7 +64,6 @@ function BarChartViz() {
 
   return (
     <div className="flex flex-col gap-3" aria-hidden="true">
-      {/* bar chart — actividad sostenida */}
       <div className="flex h-16 items-end gap-1.5">
         {bars.map((h, i) => (
           <motion.div
@@ -82,7 +81,6 @@ function BarChartViz() {
           </motion.div>
         ))}
       </div>
-      {/* SVG trend line */}
       <svg viewBox="-4 -4 132 36" className="h-10 w-full shrink-0 overflow-visible" fill="none">
         <motion.path
           d="M0 22 L20 16 L40 18 L60 10 L80 12 L100 4 L120 2"
@@ -104,7 +102,6 @@ function BarChartViz() {
           }}
         />
       </svg>
-      {/* etiqueta honesta — sin números inventados */}
       <motion.div
         className="flex items-baseline gap-2"
         variants={reduce ? {} : itemVariants}
@@ -115,72 +112,166 @@ function BarChartViz() {
   )
 }
 
-/* ─── 2. FeedViz — Marca, Voz & Contenido ────────────────────────────────── */
+/* ─── 2. FeedViz — Marca, Voz & Contenido (PREMIUM: feed mockup real) ────── */
 
 function FeedViz() {
   const reduce = useReducedMotion()
 
-  const blocks = [
-    { col: 'col-span-2', h: 'h-10', bg: 'var(--c-accent2)', opacity: 0.7 },
-    { col: 'col-span-1', h: 'h-10', bg: 'var(--c-accent)', opacity: 0.5 },
-    { col: 'col-span-1', h: 'h-7', bg: 'rgba(255,255,255,0.08)', border: true },
-    { col: 'col-span-2', h: 'h-7', bg: 'var(--c-accent2)', opacity: 0.35 },
+  // 3x3 IG-style feed mockup with varied post types
+  const posts = [
+    { bg: 'var(--c-accent)', opacity: 0.85, type: 'reel' },
+    { bg: 'var(--c-accent2)', opacity: 0.55, type: 'photo' },
+    { bg: 'rgba(255,255,255,0.06)', type: 'type', border: true },
+    { bg: 'var(--c-accent2)', opacity: 0.45, type: 'carousel' },
+    { bg: 'var(--c-accent)', opacity: 0.65, type: 'hero' },
+    { bg: 'rgba(255,255,255,0.08)', type: 'photo', border: true },
+    { bg: 'rgba(255,255,255,0.06)', type: 'type', border: true },
+    { bg: 'var(--c-accent2)', opacity: 0.6, type: 'reel' },
+    { bg: 'var(--c-accent)', opacity: 0.4, type: 'photo' },
   ]
 
-  const swatches = [
-    { bg: 'var(--c-accent)', opacity: 1 },
-    { bg: 'var(--c-accent2)', opacity: 1 },
-    { bg: 'rgba(255,255,255,0.25)', opacity: 1 },
-    { bg: 'rgba(255,255,255,0.08)', opacity: 1, border: true },
-  ]
+  const postVariants = {
+    hidden: { opacity: 0, scale: 0.7 },
+    show: (c) => ({
+      opacity: 1,
+      scale: 1,
+      transition: { duration: 0.4, ease: EASE, delay: c * 0.04 },
+    }),
+  }
 
-  const blockVariants = {
-    hidden: { opacity: 0, scale: 0.88, y: 10 },
-    show: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.5, ease: EASE } },
+  const rowVariants = {
+    hidden: { opacity: 0, y: 6 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: EASE } },
   }
 
   const swatchVariants = {
     hidden: { opacity: 0, scale: 0 },
-    show: { opacity: 1, scale: 1, transition: { duration: 0.35, ease: EASE } },
+    show: { opacity: 1, scale: 1, transition: { duration: 0.3, ease: EASE } },
+  }
+
+  const liveDotPulse = reduce ? {} : {
+    opacity: [0.4, 1, 0.4],
+    scale: [1, 1.3, 1],
+  }
+  const liveDotTransition = reduce ? {} : {
+    duration: 1.8,
+    repeat: Infinity,
+    ease: 'easeInOut',
   }
 
   return (
-    <div className="flex flex-col gap-3" aria-hidden="true">
-      <div className="grid grid-cols-3 gap-2">
-        {blocks.map((b, i) => (
+    <div className="flex flex-col gap-2" aria-hidden="true">
+      {/* brand profile row */}
+      <motion.div className="flex items-center gap-2" variants={reduce ? {} : rowVariants}>
+        <div
+          className="h-5 w-5 rounded-full"
+          style={{ background: 'linear-gradient(135deg, var(--c-accent), var(--c-accent2))' }}
+        />
+        <div className="flex flex-col gap-0.5">
+          <div className="h-1.5 w-14 rounded bg-fg/35" />
+          <div className="h-1 w-8 rounded bg-muted/40" />
+        </div>
+        {/* live "publicando" pulsing dot */}
+        <div className="ml-auto flex items-center gap-1">
+          {!reduce ? (
+            <motion.div
+              className="h-1.5 w-1.5 rounded-full bg-accent"
+              style={{ filter: 'drop-shadow(0 0 4px var(--c-accent))' }}
+              animate={liveDotPulse}
+              transition={liveDotTransition}
+            />
+          ) : (
+            <div
+              className="h-1.5 w-1.5 rounded-full bg-accent"
+              style={{ filter: 'drop-shadow(0 0 4px var(--c-accent))' }}
+            />
+          )}
+          <span className="text-[7px] uppercase tracking-widest text-muted">en línea</span>
+        </div>
+      </motion.div>
+
+      {/* 3x3 feed grid */}
+      <div className="grid grid-cols-3 gap-1">
+        {posts.map((p, i) => (
           <motion.div
             key={i}
-            variants={reduce ? {} : blockVariants}
-            className={`${b.col} ${b.h} rounded-lg`}
+            custom={i}
+            variants={reduce ? {} : postVariants}
+            className="relative aspect-square rounded-md overflow-hidden"
             style={{
-              background: b.bg,
-              opacity: b.opacity ?? 1,
-              border: b.border ? '1px solid rgba(255,255,255,0.12)' : undefined,
+              background: p.bg,
+              opacity: p.opacity ?? 1,
+              border: p.border ? '1px solid rgba(255,255,255,0.12)' : undefined,
             }}
-          />
+          >
+            {/* tipo de post: badge en esquina */}
+            {p.type === 'reel' && (
+              <div className="absolute top-0.5 right-0.5 flex items-center gap-px rounded-sm bg-bg/60 px-0.5">
+                <svg width="5" height="5" viewBox="0 0 6 6">
+                  <polygon points="1,1 5,3 1,5" fill="rgba(255,255,255,0.9)" />
+                </svg>
+              </div>
+            )}
+            {p.type === 'carousel' && (
+              <div className="absolute top-0.5 right-0.5 flex items-center gap-0.5">
+                <div className="h-1 w-1 rounded-sm border border-white/70" />
+                <div className="h-1 w-1 rounded-sm bg-white/70" />
+              </div>
+            )}
+            {p.type === 'photo' && (
+              <div className="absolute bottom-0.5 left-0.5">
+                <svg width="6" height="6" viewBox="0 0 8 8">
+                  <rect x="0.5" y="1.5" width="7" height="5" rx="0.8" fill="none" stroke="rgba(255,255,255,0.55)" strokeWidth="0.6" />
+                  <circle cx="2.4" cy="3.4" r="0.5" fill="rgba(255,255,255,0.55)" />
+                </svg>
+              </div>
+            )}
+            {p.type === 'type' && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="font-display text-[7px] font-bold text-fg/55">Aa</span>
+              </div>
+            )}
+            {p.type === 'hero' && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div
+                  className="h-2 w-2 rounded-full"
+                  style={{ background: 'var(--c-fg)', filter: 'drop-shadow(0 0 4px var(--c-fg))' }}
+                />
+              </div>
+            )}
+          </motion.div>
         ))}
       </div>
-      {/* brand palette */}
-      <div className="flex items-center gap-2">
-        <span className="text-[10px] text-muted uppercase tracking-widest">Paleta</span>
-        {swatches.map((s, i) => (
-          <motion.div
-            key={i}
-            variants={reduce ? {} : swatchVariants}
-            className="h-5 w-5 rounded-full"
-            style={{
-              background: s.bg,
-              opacity: s.opacity,
-              border: s.border ? '1px solid rgba(255,255,255,0.2)' : undefined,
-            }}
-          />
-        ))}
-      </div>
+
+      {/* palette + voice */}
+      <motion.div className="flex items-center gap-1.5" variants={reduce ? {} : rowVariants}>
+        <span className="text-[7px] uppercase tracking-widest text-muted">Paleta</span>
+        <div className="flex items-center gap-1">
+          {[
+            { bg: 'var(--c-accent)' },
+            { bg: 'var(--c-accent2)' },
+            { bg: 'rgba(255,255,255,0.25)' },
+            { bg: 'rgba(255,255,255,0.08)', border: true },
+          ].map((s, i) => (
+            <motion.div
+              key={i}
+              variants={reduce ? {} : swatchVariants}
+              className="h-3 w-3 rounded-full"
+              style={{
+                background: s.bg,
+                border: s.border ? '1px solid rgba(255,255,255,0.2)' : undefined,
+              }}
+            />
+          ))}
+        </div>
+        <span className="ml-auto text-[7px] uppercase tracking-widest text-muted">Voz</span>
+        <span className="font-display text-[10px] font-bold text-accent">propia</span>
+      </motion.div>
     </div>
   )
 }
 
-/* ─── 3. MediaViz — Producción & Edición (reemplaza SerpViz) ─────────────── */
+/* ─── 3. MediaViz — Producción & Edición (PREMIUM: editor + reels) ───────── */
 
 function MediaViz() {
   const reduce = useReducedMotion()
@@ -206,66 +297,164 @@ function MediaViz() {
     }),
   }
 
+  // continuous (alive)
+  const playBreathe = reduce ? undefined : { scale: [1, 1.07, 1] }
+  const playBreatheTransition = reduce
+    ? undefined
+    : { duration: 2.6, repeat: Infinity, ease: 'easeInOut', delay: 1.2 }
+  const recDotPulse = reduce ? undefined : { opacity: [0.5, 1, 0.5], scale: [1, 1.25, 1] }
+  const recDotTrans = reduce ? undefined : { duration: 1.5, repeat: Infinity, ease: 'easeInOut' }
+  const highlightGlow = reduce
+    ? undefined
+    : {
+        boxShadow: [
+          '0 0 8px -2px var(--c-accent2)',
+          '0 0 18px -2px var(--c-accent2)',
+          '0 0 8px -2px var(--c-accent2)',
+        ],
+      }
+  const highlightTrans = reduce
+    ? undefined
+    : { duration: 2.4, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }
+
+  // small audio waveform (decorative)
+  const waveform = [3, 6, 2, 5, 8, 4, 7, 3, 6, 4, 2, 7, 5, 3, 6, 4, 5, 3]
+
   return (
     <div className="flex flex-col gap-3" aria-hidden="true">
       <div className="flex items-stretch gap-3">
-        {/* main video player frame */}
+        {/* main player */}
         <motion.div
           className="relative h-28 flex-1 rounded-lg border border-glassborder overflow-hidden"
           variants={reduce ? {} : playerVariants}
           style={{
             background:
-              'linear-gradient(135deg, color-mix(in srgb, var(--c-accent) 12%, transparent), color-mix(in srgb, var(--c-accent2) 16%, transparent))',
+              'linear-gradient(135deg, color-mix(in srgb, var(--c-accent) 12%, transparent), color-mix(in srgb, var(--c-accent2) 18%, transparent))',
           }}
         >
-          {/* play button con halo */}
+          {/* film grain overlay (texture) */}
+          <div
+            className="pointer-events-none absolute inset-0 opacity-[0.08]"
+            style={{
+              backgroundImage:
+                "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='60' height='60' filter='url(%23n)'/%3E%3C/svg%3E\")",
+            }}
+          />
+
+          {/* REC badge top-left */}
+          <div className="absolute top-1.5 left-1.5 flex items-center gap-1 rounded bg-bg/60 px-1.5 py-0.5 backdrop-blur-sm border border-glassborder">
+            {!reduce ? (
+              <motion.div
+                className="h-1 w-1 rounded-full"
+                style={{ background: 'var(--c-accent)', filter: 'drop-shadow(0 0 3px var(--c-accent))' }}
+                animate={recDotPulse}
+                transition={recDotTrans}
+              />
+            ) : (
+              <div
+                className="h-1 w-1 rounded-full"
+                style={{ background: 'var(--c-accent)', filter: 'drop-shadow(0 0 3px var(--c-accent))' }}
+              />
+            )}
+            <span className="font-display text-[7px] font-bold tracking-wider text-fg">EN VIVO</span>
+          </div>
+
+          {/* timecode top-right */}
+          <div className="absolute top-1.5 right-1.5 rounded bg-bg/60 px-1 py-0.5 backdrop-blur-sm border border-glassborder">
+            <span className="font-mono text-[7px] text-muted">0:32 / 1:45</span>
+          </div>
+
+          {/* play button: outer = entrance (variants), inner = breathe (animate) */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <motion.div
-              className="flex h-9 w-9 items-center justify-center rounded-full"
-              style={{
-                background: 'color-mix(in srgb, var(--c-accent) 35%, transparent)',
-                boxShadow: '0 0 18px color-mix(in srgb, var(--c-accent) 50%, transparent)',
-              }}
-              variants={reduce ? {} : playPulseVariants}
-            >
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <polygon points="3,2 12,7 3,12" fill="var(--c-fg)" />
-              </svg>
+            <motion.div variants={reduce ? {} : playPulseVariants}>
+              <motion.div
+                className="flex h-9 w-9 items-center justify-center rounded-full"
+                style={{
+                  background: 'color-mix(in srgb, var(--c-accent) 35%, transparent)',
+                  boxShadow: '0 0 18px color-mix(in srgb, var(--c-accent) 55%, transparent)',
+                }}
+                animate={playBreathe}
+                transition={playBreatheTransition}
+              >
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <polygon points="3,2 12,7 3,12" fill="var(--c-fg)" />
+                </svg>
+              </motion.div>
             </motion.div>
           </div>
-          {/* progress bar (decorativa) */}
-          <div className="absolute bottom-2 left-3 right-3 h-1 rounded-full bg-glassborder overflow-hidden">
+
+          {/* audio waveform (above progress) */}
+          <div className="absolute bottom-3.5 left-3 right-3 flex h-3 items-end gap-[1px]">
+            {waveform.map((h, i) => (
+              <div
+                key={i}
+                className="flex-1 rounded-full"
+                style={{
+                  height: `${h * 10}%`,
+                  background: 'color-mix(in srgb, var(--c-accent) 55%, transparent)',
+                }}
+              />
+            ))}
+          </div>
+
+          {/* progress bar */}
+          <div className="absolute bottom-1.5 left-3 right-3 h-1 rounded-full bg-glassborder overflow-hidden">
             <motion.div
-              className="h-full rounded-full"
+              className="relative h-full rounded-full"
               style={{ background: 'var(--c-accent)', transformOrigin: 'left' }}
               variants={reduce ? {} : progressVariants}
             />
           </div>
         </motion.div>
-        {/* reel thumbnails apilados */}
+
+        {/* reel thumbnails stack */}
         <div className="flex flex-col gap-1.5">
-          {[0, 1, 2].map((i) => (
+          {[
+            { dur: '0:15', highlighted: false },
+            { dur: '0:30', highlighted: true },
+            { dur: '0:22', highlighted: false },
+          ].map((t, i) => (
+            // outer wrapper: entrance variant + (si highlighted) glow pulsante
+            // (separados porque animate-object pisa el variants en framer motion)
             <motion.div
               key={i}
               custom={i}
               variants={reduce ? {} : thumbVariants}
-              className="relative h-8 w-12 rounded-md border border-glassborder overflow-hidden"
-              style={{
-                background:
-                  i === 0
-                    ? 'color-mix(in srgb, var(--c-accent) 28%, transparent)'
-                    : i === 1
-                      ? 'color-mix(in srgb, var(--c-accent2) 26%, transparent)'
-                      : 'rgba(255,255,255,0.06)',
-              }}
+              className="relative"
             >
-              <div className="absolute inset-0 flex items-center justify-center">
-                <svg width="8" height="8" viewBox="0 0 8 8">
-                  <polygon
-                    points="2,1 7,4 2,7"
-                    fill={i === 2 ? 'rgba(255,255,255,0.6)' : 'var(--c-fg)'}
-                  />
-                </svg>
+              {t.highlighted && !reduce && (
+                <motion.div
+                  className="pointer-events-none absolute inset-0 rounded-md"
+                  animate={highlightGlow}
+                  transition={highlightTrans}
+                />
+              )}
+              <div
+                className={`relative h-8 w-14 rounded-md border overflow-hidden ${
+                  t.highlighted ? 'border-accent2' : 'border-glassborder'
+                }`}
+                style={{
+                  background:
+                    i === 0
+                      ? 'color-mix(in srgb, var(--c-accent) 28%, transparent)'
+                      : i === 1
+                        ? 'color-mix(in srgb, var(--c-accent2) 32%, transparent)'
+                        : 'rgba(255,255,255,0.06)',
+                }}
+              >
+                {/* play triangle */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <svg width="8" height="8" viewBox="0 0 8 8">
+                    <polygon
+                      points="2,1 7,4 2,7"
+                      fill={i === 2 ? 'rgba(255,255,255,0.6)' : 'var(--c-fg)'}
+                    />
+                  </svg>
+                </div>
+                {/* duration badge */}
+                <div className="absolute bottom-0.5 right-0.5 rounded-sm bg-bg/80 px-0.5">
+                  <span className="font-mono text-[6px] text-fg">{t.dur}</span>
+                </div>
               </div>
             </motion.div>
           ))}
@@ -343,7 +532,7 @@ function FlowViz({ inView }) {
   )
 }
 
-/* ─── 5. DashboardViz — Análisis & decisiones (sin números inventados) ───── */
+/* ─── 5. DashboardViz — Análisis & decisiones (PREMIUM: live monitor) ────── */
 
 function DashboardViz() {
   const reduce = useReducedMotion()
@@ -360,66 +549,153 @@ function DashboardViz() {
     },
   }
 
-  const miniBarHeights = [45, 70, 55]
+  const sparkPathVariants = reduce ? {} : {
+    hidden: { pathLength: 0, opacity: 0 },
+    show: { pathLength: 1, opacity: 1, transition: { duration: 1.0, ease: EASE, delay: 0.4 } },
+  }
+  const sparkAreaVariants = reduce ? {} : {
+    hidden: { opacity: 0 },
+    show: { opacity: 1, transition: { duration: 0.9, ease: EASE, delay: 0.6 } },
+  }
+  const sparkDotVariants = reduce ? {} : {
+    hidden: { opacity: 0, scale: 0 },
+    show: { opacity: 1, scale: 1, transition: { duration: 0.35, ease: EASE, delay: 1.2 } },
+  }
+  const liveDotPulse = reduce ? undefined : { opacity: [0.4, 1, 0.4], scale: [1, 1.3, 1] }
+  const liveDotTrans = reduce ? undefined : { duration: 1.6, repeat: Infinity, ease: 'easeInOut' }
+
+  const kpis = [
+    { icon: '↑', color: 'var(--c-accent)' },
+    { icon: '✓', color: 'var(--c-accent2)' },
+    { icon: '◴', color: 'var(--c-accent)' },
+    { icon: '~', color: 'var(--c-accent2)' },
+  ]
 
   return (
-    <div className="flex items-center gap-5" aria-hidden="true">
-      {/* donut decorativo (sin número adentro) */}
-      <div className="relative flex-shrink-0">
-        <svg width="60" height="60" viewBox="0 0 60 60">
-          <circle cx="30" cy="30" r={RADIUS} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="6" />
-          <motion.circle
-            cx="30" cy="30" r={RADIUS}
-            fill="none"
-            stroke="var(--c-accent)"
-            strokeWidth="6"
-            strokeLinecap="round"
-            strokeDasharray={CIRCUMFERENCE}
-            variants={donutVariants}
-            style={reduce ? { strokeDashoffset: CIRCUMFERENCE * (1 - TARGET_FILL) } : undefined}
-            transform="rotate(-90 30 30)"
+    <div className="flex flex-col gap-2" aria-hidden="true">
+      {/* live monitor pill */}
+      <motion.div
+        className="flex items-center gap-1.5 self-start rounded-full border border-glassborder bg-glass px-1.5 py-0.5"
+        variants={reduce ? {} : itemVariants}
+      >
+        {!reduce ? (
+          <motion.div
+            className="h-1 w-1 rounded-full"
+            style={{ background: 'var(--c-accent)', filter: 'drop-shadow(0 0 3px var(--c-accent))' }}
+            animate={liveDotPulse}
+            transition={liveDotTrans}
           />
-          <motion.circle
-            cx="30" cy="30" r={RADIUS}
-            fill="none"
-            stroke="var(--c-accent2)"
-            strokeWidth="6"
-            strokeLinecap="round"
-            strokeDasharray={`${CIRCUMFERENCE * 0.18} ${CIRCUMFERENCE}`}
-            variants={reduce ? {} : {
-              hidden: { strokeDashoffset: CIRCUMFERENCE * (1 - 0.62), opacity: 0 },
-              show: { strokeDashoffset: CIRCUMFERENCE * (1 - 0.62), opacity: 1, transition: { duration: 0.5, delay: 1.5 } },
-            }}
-            style={reduce ? { strokeDashoffset: CIRCUMFERENCE * (1 - 0.62), opacity: 1 } : undefined}
-            transform="rotate(-90 30 30)"
+        ) : (
+          <div
+            className="h-1 w-1 rounded-full"
+            style={{ background: 'var(--c-accent)', filter: 'drop-shadow(0 0 3px var(--c-accent))' }}
           />
-        </svg>
-      </div>
+        )}
+        <span className="font-display text-[7px] font-bold uppercase tracking-widest text-muted">
+          monitoreo
+        </span>
+      </motion.div>
 
-      {/* etiqueta honesta + barras decorativas */}
-      <div className="flex flex-col gap-2 flex-1">
-        <motion.div variants={reduce ? {} : itemVariants} className="flex items-baseline gap-2">
-          <span className="font-display text-lg font-bold text-accent2">Datos que orientan</span>
-        </motion.div>
-        <div className="flex h-8 items-end gap-1">
-          {miniBarHeights.map((h, i) => (
-            <motion.div
-              key={i}
-              className="flex-1 rounded-t-sm"
+      {/* donut + sparkline */}
+      <div className="flex items-center gap-3">
+        {/* donut */}
+        <div className="relative flex-shrink-0">
+          <svg width="58" height="58" viewBox="0 0 60 60">
+            <circle cx="30" cy="30" r={RADIUS} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="6" />
+            <motion.circle
+              cx="30" cy="30" r={RADIUS}
+              fill="none"
+              stroke="var(--c-accent)"
+              strokeWidth="6"
+              strokeLinecap="round"
+              strokeDasharray={CIRCUMFERENCE}
+              variants={donutVariants}
+              style={reduce ? { strokeDashoffset: CIRCUMFERENCE * (1 - TARGET_FILL) } : undefined}
+              transform="rotate(-90 30 30)"
+            />
+            <motion.circle
+              cx="30" cy="30" r={RADIUS}
+              fill="none"
+              stroke="var(--c-accent2)"
+              strokeWidth="6"
+              strokeLinecap="round"
+              strokeDasharray={`${CIRCUMFERENCE * 0.18} ${CIRCUMFERENCE}`}
               variants={reduce ? {} : {
-                hidden: { scaleY: 0 },
-                show: { scaleY: 1, transition: { duration: 0.45, ease: EASE, delay: 0.6 + i * 0.1 } },
+                hidden: { strokeDashoffset: CIRCUMFERENCE * (1 - 0.62), opacity: 0 },
+                show: { strokeDashoffset: CIRCUMFERENCE * (1 - 0.62), opacity: 1, transition: { duration: 0.5, delay: 1.5 } },
               }}
-              style={reduce ? { height: `${h}%`, originY: '100%' } : { height: `${h}%`, scaleY: 0, originY: '100%' }}
-            >
-              <div
-                className="h-full w-full rounded-t-sm"
-                style={{ background: `color-mix(in srgb, var(--c-accent2) ${60 + i * 12}%, var(--c-accent))` }}
-              />
-            </motion.div>
-          ))}
+              style={reduce ? { strokeDashoffset: CIRCUMFERENCE * (1 - 0.62), opacity: 1 } : undefined}
+              transform="rotate(-90 30 30)"
+            />
+          </svg>
+        </div>
+
+        {/* sparkline trend with peak pulse */}
+        <div className="flex-1">
+          <svg viewBox="-4 -4 132 36" className="h-12 w-full overflow-visible" fill="none">
+            {/* faint baseline */}
+            <line x1="0" y1="22" x2="120" y2="22" stroke="rgba(255,255,255,0.06)" strokeWidth="0.5" />
+            <line x1="0" y1="10" x2="120" y2="10" stroke="rgba(255,255,255,0.06)" strokeWidth="0.5" strokeDasharray="2 2" />
+
+            {/* area fill */}
+            <defs>
+              <linearGradient id="dashboardSparkFill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="var(--c-accent2)" stopOpacity="0.45" />
+                <stop offset="100%" stopColor="var(--c-accent2)" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            <motion.path
+              d="M0 22 L20 16 L40 18 L60 10 L80 12 L100 4 L120 2 L120 28 L0 28 Z"
+              fill="url(#dashboardSparkFill)"
+              variants={sparkAreaVariants}
+            />
+
+            {/* trend line */}
+            <motion.path
+              d="M0 22 L20 16 L40 18 L60 10 L80 12 L100 4 L120 2"
+              stroke="var(--c-accent2)"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              variants={sparkPathVariants}
+            />
+
+            {/* peak dot — entrance vía variants, glow estático con drop-shadow
+                (animate-object pisaría el variants → quedaría invisible) */}
+            <motion.circle
+              cx="120"
+              cy="2"
+              r="3"
+              fill="var(--c-accent2)"
+              style={{ filter: 'drop-shadow(0 0 5px var(--c-accent2))' }}
+              variants={sparkDotVariants}
+            />
+          </svg>
         </div>
       </div>
+
+      {/* mini KPI tiles */}
+      <div className="flex gap-1.5">
+        {kpis.map((k, i) => (
+          <motion.div
+            key={i}
+            className="flex h-6 flex-1 items-center justify-center rounded-md border border-glassborder bg-bg/40"
+            variants={reduce ? {} : {
+              hidden: { opacity: 0, y: 6 },
+              show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: EASE, delay: 0.6 + i * 0.08 } },
+            }}
+          >
+            <span className="font-display text-xs font-bold" style={{ color: k.color }}>
+              {k.icon}
+            </span>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* label */}
+      <motion.div variants={reduce ? {} : itemVariants} className="flex items-baseline gap-2">
+        <span className="font-display text-lg font-bold text-accent2">Datos que orientan</span>
+      </motion.div>
     </div>
   )
 }
