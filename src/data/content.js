@@ -86,13 +86,14 @@ export const services = [
   { icon: '📈', title: 'Lectura de métricas', desc: 'Seguimiento honesto que detecta qué funciona y orienta las próximas decisiones.' },
 ]
 
+// Descripciones textuales del PDF del cliente ("mantener los titulos").
 export const process = [
   { n: '01', title: 'Diagnóstico', desc: 'Entiendo tu marca, tu rubro, tu público y cómo te estás comunicando hoy.' },
-  { n: '02', title: 'Estrategia', desc: 'Defino pilares, tono y calendario. Un plan claro, no una corazonada.' },
-  { n: '03', title: 'Ejecución', desc: 'Contenido, piezas y publicaciones con identidad y prolijidad.' },
+  { n: '02', title: 'Estrategia', desc: 'Defino pilares, tono y calendario. Un plan claro con objetivos concretos.' },
+  { n: '03', title: 'Ejecución', desc: 'Contenido, piezas y publicaciones con identidad y criterio.' },
   // Paso pedido por el cliente: instancia explícita de revisión antes de seguir.
-  { n: '03bis', title: 'Revisión', desc: 'Comparto los resultados, escucho tu feedback y nos aseguramos de que todo esté alineado antes de seguir.' },
-  { n: '04', title: 'Ajuste', desc: 'Leo las métricas, ajusto lo que conviene y sostengo la comunicación en el tiempo.' },
+  { n: '03bis', title: 'Revisión', desc: 'Comparto los resultados con el cliente, escucho el feedback y nos aseguramos de que todo esté alineado antes de seguir.' },
+  { n: '04', title: 'Ajuste', desc: 'Analizo las métricas, ajusto lo que funciona y mantengo la comunicación activa en el tiempo.' },
 ]
 
 export const projects = [
