@@ -2,7 +2,7 @@ import { site } from "@/data/site";
 import { Reveal } from "./Reveal";
 
 export function FinalCTA() {
-  const { title, button } = site.finalCta;
+  const { title, subtitle, button } = site.finalCta;
   const { whatsapp, email } = site.contact;
 
   // Prioridad de contacto: WhatsApp > email > ancla interna.
@@ -22,9 +22,12 @@ export function FinalCTA() {
               aria-hidden
               className="pointer-events-none absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-accent/25 blur-3xl"
             />
-            <h2 className="mx-auto max-w-2xl font-display text-3xl font-bold leading-tight sm:text-5xl">
+            <h2 className="mx-auto max-w-3xl font-display text-3xl font-bold leading-tight sm:text-5xl">
               {title}
             </h2>
+            <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-white/65 sm:text-lg">
+              {subtitle}
+            </p>
             <a
               href={href}
               target={href.startsWith("http") ? "_blank" : undefined}

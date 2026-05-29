@@ -5,12 +5,12 @@ import { site } from "@/data/site";
 import { AnimatedFace } from "./AnimatedFace";
 
 export function Hero() {
-  const { name, subtitle, primaryCta, secondaryCta } = site.hero;
+  const { title, subtitle, primaryCta, secondaryCta } = site.hero;
 
   return (
     <section
       id="inicio"
-      className="relative overflow-hidden pb-20 pt-28 sm:pb-28 sm:pt-32"
+      className="relative overflow-hidden pb-16 pt-28 sm:pb-20 sm:pt-32"
     >
       {/* Elementos 3D abstractos livianos de fondo (CSS, sin coste) */}
       <div
@@ -26,26 +26,30 @@ export function Hero() {
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-8">
           {/* Texto — primero en mobile */}
           <div className="order-2 text-center lg:order-1 lg:text-left">
-            <motion.span
-              className="eyebrow"
+            <motion.div
+              className="mb-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 lg:justify-start"
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              {site.person}
-            </motion.span>
+              <span className="eyebrow !mb-0">{site.brand}</span>
+              <span aria-hidden className="text-white/20">·</span>
+              <span className="text-xs uppercase tracking-[0.2em] text-white/50">
+                {site.tagline}
+              </span>
+            </motion.div>
 
             <motion.h1
-              className="font-display text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl"
+              className="font-display text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl"
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.05 }}
             >
-              {name}
+              {title}
             </motion.h1>
 
             <motion.p
-              className="mx-auto mt-5 max-w-md text-lg text-white/65 lg:mx-0"
+              className="mx-auto mt-5 max-w-xl text-base text-white/65 sm:text-lg lg:mx-0"
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.15 }}
