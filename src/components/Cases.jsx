@@ -179,6 +179,12 @@ export function Cases() {
   const featured = cases[0]
   const secondary = cases.slice(1)
 
+  // La grilla se adapta a la cantidad de casos secundarios para llenar
+  // el ancho completo (alineado con el featured) en vez de dejar una
+  // columna vacía. 2 casos → 2 cols; 3+ → 3 cols.
+  const secondaryCols =
+    secondary.length <= 2 ? 'sm:grid-cols-2' : 'sm:grid-cols-3'
+
   return (
     <section id="casos" className="relative mx-auto w-full max-w-6xl overflow-hidden px-5 py-20 sm:px-8 md:py-28">
       {/* depth glow drifts at a different rate than content */}
@@ -206,8 +212,8 @@ export function Cases() {
         onOpen={setActiveCase}
       />
 
-      {/* ── 3 SECONDARY cards ── */}
-      <div className="grid gap-4 sm:grid-cols-3">
+      {/* ── SECONDARY cards (grilla adaptativa al N de casos) ── */}
+      <div className={`grid gap-4 ${secondaryCols}`}>
         {secondary.map((c, i) => (
           <CaseCard
             key={c.id}
