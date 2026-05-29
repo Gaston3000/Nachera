@@ -1,6 +1,5 @@
 import { motion, useReducedMotion } from 'motion/react'
 import { Reveal } from './primitives/Reveal.jsx'
-import { SectionHeading } from './primitives/SectionHeading.jsx'
 import { RichText } from './primitives/RichText.jsx'
 import {
   DiplomaIcon,
@@ -192,56 +191,84 @@ function CredentialsModule() {
 export function About() {
   return (
     <section id="sobre-mi" className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8 md:py-28">
-      <Reveal>
-        <SectionHeading eyebrow="Sobre mí" title={about.title} />
-      </Reveal>
-
-      {/* editorial 2-col layout */}
-      <div className="mt-10 grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-16">
-        {/* LEFT — eyebrow + pull quote */}
-        <Reveal direction="left" delay={0.1}>
-          <div className="flex gap-4">
-            {/* accent vertical bar */}
+      {/*
+       * Layout editorial asimétrico 5/7 en desktop.
+       * - Columna izquierda = ANCLA: eyebrow + h2 + pull quote unidos por
+       *   un rail vertical de gradiente (la barra acento se extiende sobre
+       *   los tres elementos, no solo sobre el pull).
+       * - Columna derecha = NARRATIVA: lead + aside + beats, alineadas al
+       *   top así arrancan a la misma altura que el eyebrow.
+       * Mobile (grid-cols-1) preserva el flujo apilado actual.
+       */}
+      <div className="grid grid-cols-1 gap-10 md:grid-cols-12 md:gap-12 lg:gap-16">
+        {/* LEFT (5/12) — ANCLA */}
+        <div className="md:col-span-5">
+          <div className="flex gap-5">
+            {/* Rail vertical acento: ancla eyebrow + título + pull en un bloque */}
             <div
               className="hidden flex-shrink-0 sm:block w-1 rounded-full self-stretch"
-              style={{ background: 'linear-gradient(180deg, var(--c-accent), var(--c-accent2))' }}
+              style={{
+                background:
+                  'linear-gradient(180deg, var(--c-accent), var(--c-accent2))',
+              }}
               aria-hidden="true"
             />
-            <blockquote className="font-display text-2xl font-bold leading-snug text-fg sm:text-3xl md:text-4xl">
-              {/* dos colores acentuando los dos golpes del pull */}
-              <span style={{ color: 'var(--c-accent)' }}>No vendo humo.</span>
-              <br />
-              Vendo criterio, oficio y{' '}
-              <span style={{ color: 'var(--c-accent2)' }}>comunicación que se entiende</span>.
-            </blockquote>
+            <div className="flex min-w-0 flex-col gap-8 md:gap-10">
+              <Reveal>
+                <p className="mb-3 font-display text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+                  Sobre mí
+                </p>
+                <h2 className="font-display text-3xl font-bold leading-[1.1] tracking-tight text-fg sm:text-4xl md:text-[2.5rem] lg:text-5xl">
+                  {about.title}
+                </h2>
+              </Reveal>
+              <Reveal direction="left" delay={0.1}>
+                <blockquote className="font-display text-2xl font-bold leading-snug text-fg sm:text-3xl md:text-[1.6rem] lg:text-[2rem]">
+                  {/* dos colores acentuando los dos golpes del pull */}
+                  <span style={{ color: 'var(--c-accent)' }}>No vendo humo.</span>
+                  <br />
+                  Vendo criterio, oficio y{' '}
+                  <span style={{ color: 'var(--c-accent2)' }}>
+                    comunicación que se entiende
+                  </span>
+                  .
+                </blockquote>
+              </Reveal>
+            </div>
           </div>
-        </Reveal>
+        </div>
 
-        {/* RIGHT — lead + beats list */}
-        <div className="flex flex-col justify-center gap-6">
+        {/* RIGHT (7/12) — NARRATIVA. Top-aligned, body con más peso en desktop. */}
+        <div className="flex flex-col gap-6 md:col-span-7 md:gap-7 md:pt-2">
           <Reveal delay={0.2}>
-            <p className="text-sm text-muted">{about.lead}</p>
+            <p className="text-sm leading-relaxed text-muted md:text-[15px] lg:text-base">
+              {about.lead}
+            </p>
           </Reveal>
 
           {about.aside && (
             <Reveal delay={0.25}>
-              <p className="text-sm text-muted">{about.aside}</p>
+              <p className="text-sm leading-relaxed text-muted md:text-[15px] lg:text-base">
+                {about.aside}
+              </p>
             </Reveal>
           )}
 
-          <ul className="flex flex-col gap-4">
+          <ul className="mt-1 flex flex-col gap-4 md:gap-5">
             {about.beats.map((beat, i) => (
               <Reveal key={i} delay={0.28 + i * 0.1}>
                 <li className="flex gap-3">
                   {/* accent marker */}
                   <span
                     className="mt-0.5 flex-shrink-0 font-display text-xs font-bold"
-                    style={{ color: i % 2 === 0 ? 'var(--c-accent)' : 'var(--c-accent2)' }}
+                    style={{
+                      color: i % 2 === 0 ? 'var(--c-accent)' : 'var(--c-accent2)',
+                    }}
                     aria-hidden="true"
                   >
                     0{i + 1}
                   </span>
-                  <p className="text-sm leading-relaxed text-muted">
+                  <p className="text-sm leading-relaxed text-muted md:text-[15px] lg:text-base">
                     <RichText text={beat} />
                   </p>
                 </li>
