@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest'
 import { cases } from '../src/data/cases.js'
 
 describe('cases data', () => {
-  it('has exactly 4 entries', () => {
-    expect(cases).toHaveLength(4)
+  it('has exactly 3 entries (Only Wines removido a pedido del cliente)', () => {
+    expect(cases).toHaveLength(3)
   })
 
   it('no case is flagged as a placeholder (all real now)', () => {
@@ -46,6 +46,6 @@ describe('cases data', () => {
 
   it('case ids match expected values (real clients)', () => {
     const ids = cases.map((c) => c.id)
-    expect(ids).toEqual(['lae', 'dominga', 'onlywines', 'gtelite'])
+    expect(ids).toEqual(['lae', 'dominga', 'gtelite'])
   })
 })

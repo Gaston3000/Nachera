@@ -80,44 +80,7 @@ export const cases = [
         'La marca pasó de una comunicación improvisada a una presencia digital constante y con identidad propia, sostenida semana a semana.',
     },
   },
-  {
-    id: 'onlywines',
-    brand: 'Only Wines',
-    sector: 'Vinoteca · etiquetas de Cuyo',
-    tagline: 'Identidad digital **a tono con el mundo del vino**.',
-    problem:
-      'Comunicación digital desordenada, sin línea editorial clara dentro de un rubro muy expresivo y exigente.',
-    approach: [
-      'Estrategia de contenido personalizada',
-      'Sesión de fotos propia',
-      'Edición visual semanal',
-      'Historias orientadas a recomendaciones y experiencia',
-    ],
-    services: ['Estrategia', 'Contenido', 'Fotografía', 'Historias'],
-    results: [
-      { value: 'Semanal', label: 'cadencia editorial' },
-      { value: '~15', label: 'historias / mes' },
-      { value: 'Cuyo', label: 'foco regional' },
-    ],
-    detail: {
-      challenge:
-        'La marca necesitaba una estrategia de contenido clara que le permitiera ordenar y profesionalizar su comunicación digital. El desafío principal fue desarrollar contenido alineado con su identidad y generar una presencia más sólida dentro del mundo del vino.',
-      strategy: [
-        'Estrategia personalizada de posicionamiento dentro del vino',
-        'Sesión de fotos propia para generar material original',
-        'Calendario semanal de publicaciones',
-        'Historias enfocadas en recomendaciones, experiencias y difusión',
-      ],
-      execution: [
-        'Sesión de fotos completa para banco de contenido',
-        'Publicaciones semanales con edición visual propia',
-        '~15 historias mensuales orientadas a recomendaciones y producto',
-        'Línea editorial sostenida en torno a vinos seleccionados de Cuyo',
-      ],
-      resultsNarrative:
-        'La marca dejó de comunicar de manera desordenada y desarrolló una identidad digital más profesional, alineada con su propuesta de valor.',
-    },
-  },
+  // (Only Wines removido a pedido del cliente: ya no trabajan la marca.)
   {
     id: 'gtelite',
     brand: 'GT Elite Soccer',

@@ -221,3 +221,57 @@ export const SparkLogicIcon = ({ className = '' }) => (
     <path d="M18 4.5c.4 2.2 1.3 3.1 3.5 3.5-2.2.4-3.1 1.3-3.5 3.5-.4-2.2-1.3-3.1-3.5-3.5 2.2-.4 3.1-1.3 3.5-3.5Z" />
   </svg>
 )
+
+/* Megaphone — marketing digital (Da Vinci) */
+export const MegaphoneIcon = ({ className = '' }) => (
+  <svg
+    className={`${base} ${className}`}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.5}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M3 11v2a2 2 0 0 0 2 2h2l8 4V5L7 9H5a2 2 0 0 0-2 2Z" />
+    <path d="M18 8c1.2 1 1.8 2.4 1.8 4s-.6 3-1.8 4" />
+    <path d="M9 15v3.5A1.5 1.5 0 0 0 10.5 20h.5a1.5 1.5 0 0 0 1.5-1.5V17" />
+  </svg>
+)
+
+/* Film/play — edición de video */
+export const VideoIcon = ({ className = '' }) => (
+  <svg
+    className={`${base} ${className}`}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.5}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <rect x="3" y="6" width="18" height="12" rx="2" />
+    <path d="M3 10h3M3 14h3M18 10h3M18 14h3" />
+    <path d="M10 9.5v5l4-2.5-4-2.5Z" fill="currentColor" />
+  </svg>
+)
+
+/* Microphone — periodismo / radio (anchor narrativo) */
+export const MicIcon = ({ className = '' }) => (
+  <svg
+    className={`${base} ${className}`}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.5}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <rect x="9" y="3" width="6" height="11" rx="3" />
+    <path d="M6 11a6 6 0 0 0 12 0" />
+    <path d="M12 17v4M9 21h6" />
+  </svg>
+)

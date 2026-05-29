@@ -7,6 +7,9 @@ import {
   ChartCheckIcon,
   FlagENIcon,
   SparkLogicIcon,
+  MegaphoneIcon,
+  VideoIcon,
+  MicIcon,
 } from './primitives/icons.jsx'
 import { about } from '../data/content.js'
 
@@ -19,6 +22,9 @@ const CRED_ICONS = {
   chartcheck: ChartCheckIcon,
   flagen: FlagENIcon,
   sparklogic: SparkLogicIcon,
+  megaphone: MegaphoneIcon,
+  video: VideoIcon,
+  mic: MicIcon,
 }
 
 const credGridVariants = {
@@ -216,6 +222,12 @@ export function About() {
           <Reveal delay={0.2}>
             <p className="text-sm text-muted">{about.lead}</p>
           </Reveal>
+
+          {about.aside && (
+            <Reveal delay={0.25}>
+              <p className="text-sm text-muted">{about.aside}</p>
+            </Reveal>
+          )}
 
           <ul className="flex flex-col gap-4">
             {about.beats.map((beat, i) => (

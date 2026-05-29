@@ -891,7 +891,7 @@ const tiles = [
   {
     id: 'estrategia',
     title: 'Estrategia de Contenido',
-    value: 'Pilares, tono y calendario armados **a medida de tu marca y de tu público**. Cero plantillas que sirven para cualquiera.',
+    value: 'Pilares, tono y calendario armados **a medida de tu marca y de tu público**.',
     detail: {
       resuelve: 'publicar **sin un norte claro** ni calendario',
       entrega: 'estrategia, calendario y **línea editorial propia**',
@@ -919,7 +919,7 @@ const tiles = [
   {
     id: 'produccion',
     title: 'Producción & Edición',
-    value: 'Reels, video, placas y carruseles. **De la idea al material listo para publicar**, sin parches de último momento.',
+    value: 'Reels, video, placas y carruseles. **De la idea al material listo para publicar**.',
     detail: {
       resuelve: '**piezas hechas a las apuradas** o material que falta',
       entrega: 'reels, video, placas y carruseles **con tu identidad**',
@@ -967,7 +967,7 @@ const tiles = [
     value:
       'Desde la identidad visual hasta la presencia online: **llevamos tu marca al entorno digital** con la misma exigencia con la que la pensamos. Sitio, landing o portfolio: tu marca online, **a la altura**.',
     detail: {
-      resuelve: 'estar online en **una plantilla genérica** que no te representa',
+      resuelve: 'estar online en **un formato genérico** que no te representa',
       entrega: 'sitio, landing o portfolio como **continuidad natural de tu marca**',
       resultado: 'tu marca online **a la altura de lo que querés transmitir**',
     },

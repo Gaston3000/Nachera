@@ -49,7 +49,7 @@ describe('App smoke', () => {
   it('renders the hero headline', () => {
     expect(
       screen.getByRole('heading', {
-        name: /Estrategia y contenido para que tu marca comunique con criterio\./i,
+        name: /Estrategia y contenido para que tu marca evolucione\./i,
       })
     ).toBeInTheDocument()
   })
@@ -93,11 +93,11 @@ describe('App smoke', () => {
     expect(screen.getByText('Experiencias digitales')).toBeInTheDocument()
   })
 
-  it('renders all 4 case brands (real clients)', () => {
+  it('renders all 3 case brands (real clients; Only Wines removido)', () => {
     expect(screen.getByText('LAE SRL')).toBeInTheDocument()
     expect(screen.getByText('Dominga Pastelería')).toBeInTheDocument()
-    expect(screen.getByText('Only Wines')).toBeInTheDocument()
     expect(screen.getByText('GT Elite Soccer')).toBeInTheDocument()
+    expect(screen.queryByText('Only Wines')).not.toBeInTheDocument()
   })
 
   it('shows the cases intro (real selection, no placeholder note)', () => {
@@ -123,7 +123,8 @@ describe('App smoke', () => {
     // icon); match the visible text. Use an end anchor so this doesn't also
     // grab the featured "Ver caso completo" button.
     const btns = screen.getAllByRole('button', { name: /ver caso$/i })
-    expect(btns.length).toBeGreaterThanOrEqual(3)
+    // Tras sacar Only Wines: 1 featured ("Ver caso completo") + 2 secundarios ("Ver caso").
+    expect(btns.length).toBeGreaterThanOrEqual(2)
     fireEvent.click(btns[0])
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument()

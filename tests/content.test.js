@@ -29,7 +29,7 @@ describe('about', () => {
     expect(Array.isArray(about.beats)).toBe(true)
     expect(about.beats).toHaveLength(3)
     expect(Array.isArray(about.credentials)).toBe(true)
-    expect(about.credentials).toHaveLength(4)
+    expect(about.credentials).toHaveLength(6)
     about.credentials.forEach((c) => {
       expect(c.label).toBeTruthy()
       expect(c.micro).toBeTruthy()
@@ -38,9 +38,11 @@ describe('about', () => {
     // icon keys must map to the known in-house credential icon registry
     expect(about.credentials.map((c) => c.icon)).toEqual([
       'diploma',
+      'megaphone',
+      'video',
+      'mic',
       'chartcheck',
       'flagen',
-      'sparklogic',
     ])
   })
   it('pull quote contains the key phrase', () => {
@@ -60,8 +62,8 @@ describe('content', () => {
       expect(s.icon).toBeTruthy()
     })
   })
-  it('has 4 process steps', () => {
-    expect(process).toHaveLength(4)
+  it('has 5 process steps (incluye Revisión 03bis)', () => {
+    expect(process).toHaveLength(5)
   })
   it('has 4 placeholder projects flagged as examples', () => {
     expect(projects).toHaveLength(4)

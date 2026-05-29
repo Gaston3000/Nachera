@@ -1,32 +1,38 @@
 export const hero = {
-  eyebrow: 'Comunicación con criterio',
+  eyebrow: 'Comunicación y Marketing Digital',
   // h1 (string plano) = nombre accesible / SEO / fallback.
-  // h1Parts = render con la palabra clave destacada ("criterio").
-  h1: 'Estrategia y contenido para que tu marca comunique con criterio.',
+  // h1Parts = render con la palabra clave destacada ("evolucione").
+  h1: 'Estrategia y contenido para que tu marca evolucione.',
   h1Parts: [
-    { t: 'Estrategia y contenido para que tu marca comunique con ' },
-    { t: 'criterio', accent: true },
+    { t: 'Estrategia y contenido para que tu marca ' },
+    { t: 'evolucione', accent: true },
     { t: '.' },
   ],
-  sub: 'Trabajo la comunicación digital de marcas y emprendimientos: identidad, contenido y oficio narrativo. **Sin fórmulas mágicas** — con criterio y ejecución real.',
+  sub: 'Me ocupo del marketing digital de tu marca **de forma integral** — desde la estrategia y la identidad visual hasta el contenido y el posicionamiento en redes. Todo en un solo lugar.',
   chips: ['Storytelling', 'Estrategia', 'Reels', 'Email', 'Branding'],
 }
 
+// Barra/marquee de roles y proyectos (pieza que el cliente quiere destacada).
+// Si el espacio solo permite 4 ítems, dejar afuera los marcados con `secondary: true`.
 export const trustBar = [
-  'Founder · Sintonía Digital',
-  'Founder · Focaccheras',
-  'Productor Ejecutivo · Fuego Sagrado Radio',
-  'Lic. en Cs. de la Comunicación (UADE)',
+  'Fundador · Focaccheras',
+  'Fundador · Sintonía Digital',
+  'Nachera Digital',
+  'Bloop Agency',
+  'Periodista',
+  'Lic. en Cs. de la Comunicación',
 ]
 
 export const about = {
-  title: 'Detrás de cada publicación, una decisión.',
+  title: 'Es hora de llevar tu marca al siguiente nivel.',
   pull: 'No vendo humo. Vendo criterio, oficio y comunicación que se entiende.',
-  lead: 'Soy Ignacio Costa —Nachera—, Licenciado en Ciencias de la Comunicación (UADE).',
+  lead: 'Soy Ignacio Costa, Licenciado en Ciencias de la Comunicación, periodista y con formación profesional en edición de video y marketing digital. Trabajo junto a marcas y emprendimientos que quieren crecer y comunicar lo que realmente son.',
+  // Segundo párrafo que cierra la presentación.
+  aside: 'Me dicen Nachera y me formé como profesional en UADE, Da Vinci, Deportea y Google Academy.',
   beats: [
-    'Vengo del **periodismo deportivo y la radio**: aprendí a **contar bien y a escuchar mejor**.',
-    'Hoy aplico ese oficio a la comunicación digital, para que las marcas **decidan con criterio y no con intuición**.',
-    'Fundé **Sintonía Digital** y **Focaccheras**: sé lo que es **construir una marca desde cero**, no en teoría.',
+    'Vengo del **periodismo y la comunicación**: un camino que me enseñó a **expresarme, perderle el miedo y desarrollar mi creatividad** para aplicarla en cada proyecto.',
+    'Hoy aplico ese oficio al **marketing digital** para ayudar a las marcas a **crecer con estrategia y comunicación que conecta de verdad**.',
+    'Hoy trabajo en **Bloop Agency** y llevo adelante **proyectos propios como freelance** — con la misma dedicación y criterio en cada uno.',
   ],
   credentials: [
     {
@@ -35,6 +41,24 @@ export const about = {
       icon: 'diploma',
       accent: 'accent',
       verified: true,
+    },
+    {
+      label: 'Marketing Digital',
+      micro: 'Escuela Da Vinci · Buenos Aires',
+      icon: 'megaphone',
+      accent: 'accent2',
+    },
+    {
+      label: 'Edición de video',
+      micro: 'Escuela Da Vinci · formación profesional',
+      icon: 'video',
+      accent: 'accent',
+    },
+    {
+      label: 'Periodismo deportivo',
+      micro: 'Tecnicatura · Deportea',
+      icon: 'mic',
+      accent: 'accent2',
     },
     {
       label: 'Formación en performance',
@@ -46,20 +70,14 @@ export const about = {
       label: 'Inglés avanzado',
       micro: 'Nivel C1',
       icon: 'flagen',
-      accent: 'accent2',
-      badge: 'C1',
-    },
-    {
-      label: 'Perfil narrativo + analítico',
-      micro: 'Oficio de comunicador, lectura de datos',
-      icon: 'sparklogic',
       accent: 'accent',
+      badge: 'C1',
     },
   ],
 }
 
 export const services = [
-  { icon: '◎', title: 'Estrategia de contenido', desc: 'Pilares, tono, líneas y calendario adaptado a tu marca y a tu público — no plantillas.' },
+  { icon: '◎', title: 'Estrategia de contenido', desc: 'Pilares, tono, líneas y calendario adaptado a tu marca y a tu público.' },
   { icon: '◈', title: 'Marca, voz e identidad', desc: 'Que tu marca se vea y suene como lo que es. Coherencia en cada pieza.' },
   { icon: '◐', title: 'Gestión de redes', desc: 'Comunidad y publicación con intención en IG, FB, TikTok y LinkedIn.' },
   { icon: '🎬', title: 'Producción & edición', desc: 'Reels, video, placas gráficas, carruseles e historias. Idea, guion y pieza terminada.' },
@@ -72,6 +90,8 @@ export const process = [
   { n: '01', title: 'Diagnóstico', desc: 'Entiendo tu marca, tu rubro, tu público y cómo te estás comunicando hoy.' },
   { n: '02', title: 'Estrategia', desc: 'Defino pilares, tono y calendario. Un plan claro, no una corazonada.' },
   { n: '03', title: 'Ejecución', desc: 'Contenido, piezas y publicaciones con identidad y prolijidad.' },
+  // Paso pedido por el cliente: instancia explícita de revisión antes de seguir.
+  { n: '03bis', title: 'Revisión', desc: 'Comparto los resultados, escucho tu feedback y nos aseguramos de que todo esté alineado antes de seguir.' },
   { n: '04', title: 'Ajuste', desc: 'Leo las métricas, ajusto lo que conviene y sostengo la comunicación en el tiempo.' },
 ]
 
@@ -105,6 +125,6 @@ export const tools = [
 ]
 
 export const finalCta = {
-  title: '¿Querés que **tu marca comunique mejor**?',
-  sub: 'Una charla de **20 minutos**, sin vueltas, y te digo qué haría con tu comunicación.',
+  title: '¿Querés llevar **tu marca al siguiente nivel**?',
+  sub: 'Contactame y coordinamos una **reunión** para analizar tu marca y definir juntos el mejor camino a seguir.',
 }
