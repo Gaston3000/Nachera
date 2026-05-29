@@ -959,17 +959,17 @@ const tiles = [
     glowColor: 'var(--c-accent)',
   },
   {
-    // Capstone: capacidad de equipo. El equipo Nachera incorpora la
-    // ejecución web/digital — se comunica en voz plural ("acompañamos"),
-    // como continuidad natural de la identidad al entorno digital.
+    // Capstone: capacidad de equipo. Texto reescrito según el PDF del
+    // cliente ("este apartado no me gusta mucho, lo siento ajeno") —
+    // pasamos a una declaración de posicionamiento + R/E/R nuevos.
     id: 'web',
     title: 'Experiencias digitales',
     value:
-      'Desde la identidad visual hasta la presencia online: **llevamos tu marca al entorno digital** con la misma exigencia con la que la pensamos. Sitio, landing o portfolio: tu marca online, **a la altura**.',
+      'Tu marca **merece estar en el mundo digital** de la misma forma en que la pensás — con **identidad, criterio y una presencia que genera confianza desde el primer clic**.',
     detail: {
-      resuelve: 'estar online en **un formato genérico** que no te representa',
-      entrega: 'sitio, landing o portfolio como **continuidad natural de tu marca**',
-      resultado: 'tu marca online **a la altura de lo que querés transmitir**',
+      resuelve: '**tu ausencia** en el mundo digital',
+      entrega: 'un sitio, landing o portfolio que **representa tu marca con seriedad**',
+      resultado: 'presencia online **profesional y a la altura de tu negocio**',
     },
     Viz: WebViz,
     span: 'md:col-span-6 md:row-span-1',
