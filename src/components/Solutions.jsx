@@ -860,23 +860,79 @@ function WebViz() {
       >
         <div className="mx-auto mt-1 h-1 w-6 rounded-full bg-glassborder" />
         <div className="flex flex-col gap-1 p-1.5">
-          <div className="h-2 w-3/4 rounded" style={{ background: 'var(--c-fg)', opacity: 0.55 }} />
-          <div className="h-1 w-full rounded" style={{ background: 'rgba(255,255,255,0.35)' }} />
-          <div
-            className="mt-1 h-1.5 w-8 rounded-full"
-            style={{
-              background: 'var(--c-accent)',
-              boxShadow: '0 0 6px color-mix(in srgb, var(--c-accent) 50%, transparent)',
-            }}
+          {/* título — anima con el mismo blockVariants, continuando el stagger
+              del browser (custom 6+) para que el celu "se arme" después */}
+          <motion.div
+            className="h-2 w-3/4 rounded"
+            custom={6}
+            variants={reduce ? {} : blockVariants}
+            style={
+              reduce
+                ? { background: 'var(--c-fg)', opacity: 0.55 }
+                : { background: 'var(--c-fg)', opacity: 0.55, scaleY: 0, originY: 0 }
+            }
           />
-          <div className="mt-1 flex flex-col gap-0.5">
+          <motion.div
+            className="h-1 w-full rounded"
+            custom={7}
+            variants={reduce ? {} : blockVariants}
+            style={
+              reduce
+                ? { background: 'rgba(255,255,255,0.35)' }
+                : { background: 'rgba(255,255,255,0.35)', scaleY: 0, originY: 0 }
+            }
+          />
+          {/* CTA — wrapper hace la entrada (scaleY, stagger custom=8);
+              el hijo late suave (eco del cursor del browser) */}
+          {reduce ? (
             <div
-              className="h-4 w-full rounded"
-              style={{ background: 'color-mix(in srgb, var(--c-accent) 20%, transparent)' }}
+              className="mt-1 h-1.5 w-8 rounded-full"
+              style={{
+                background: 'var(--c-accent)',
+                boxShadow: '0 0 6px color-mix(in srgb, var(--c-accent) 50%, transparent)',
+              }}
             />
-            <div
+          ) : (
+            <motion.div
+              className="mt-1 h-1.5 w-8 rounded-full overflow-visible"
+              custom={8}
+              variants={blockVariants}
+              style={{ scaleY: 0, originY: 0 }}
+            >
+              <motion.div
+                className="h-full w-full rounded-full"
+                style={{ background: 'var(--c-accent)' }}
+                animate={{
+                  boxShadow: [
+                    '0 0 4px color-mix(in srgb, var(--c-accent) 40%, transparent)',
+                    '0 0 10px color-mix(in srgb, var(--c-accent) 75%, transparent)',
+                    '0 0 4px color-mix(in srgb, var(--c-accent) 40%, transparent)',
+                  ],
+                }}
+                transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
+              />
+            </motion.div>
+          )}
+          <div className="mt-1 flex flex-col gap-0.5">
+            <motion.div
               className="h-4 w-full rounded"
-              style={{ background: 'color-mix(in srgb, var(--c-accent2) 20%, transparent)' }}
+              custom={9}
+              variants={reduce ? {} : blockVariants}
+              style={
+                reduce
+                  ? { background: 'color-mix(in srgb, var(--c-accent) 20%, transparent)' }
+                  : { background: 'color-mix(in srgb, var(--c-accent) 20%, transparent)', scaleY: 0, originY: 0 }
+              }
+            />
+            <motion.div
+              className="h-4 w-full rounded"
+              custom={10}
+              variants={reduce ? {} : blockVariants}
+              style={
+                reduce
+                  ? { background: 'color-mix(in srgb, var(--c-accent2) 20%, transparent)' }
+                  : { background: 'color-mix(in srgb, var(--c-accent2) 20%, transparent)', scaleY: 0, originY: 0 }
+              }
             />
           </div>
         </div>
