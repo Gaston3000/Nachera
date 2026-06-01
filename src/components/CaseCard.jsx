@@ -5,37 +5,17 @@ import { ArrowUpRight } from './primitives/icons.jsx'
 import { CountUp } from './primitives/CountUp.jsx'
 import { RichText } from './primitives/RichText.jsx'
 import { useCardReplay } from './primitives/useCardReplay.js'
-import { EASE, containerVariants, itemVariants } from './primitives/motionPresets.js'
-
-// mini-viz: sparkline con dot pulsante en el peak (mismo lenguaje visual
-// que el DashboardViz de Soluciones — coherencia del sistema)
-const SPARK_PATH = 'M0 14 L8 11 L16 12 L24 7 L32 9 L40 3'
-
-const sparkContainer = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.3 } },
-}
-const sparkPathVariants = {
-  hidden: { pathLength: 0, opacity: 0 },
-  show: {
-    pathLength: 1,
-    opacity: 0.9,
-    transition: { duration: 0.75, ease: EASE },
-  },
-}
-const sparkDotVariants = {
-  hidden: { opacity: 0, scale: 0 },
-  show: { opacity: 1, scale: 1, transition: { duration: 0.32, ease: EASE } },
-}
+import { containerVariants, itemVariants } from './primitives/motionPresets.js'
 
 // Secondary case card — click/tap repite la animación (mismo patrón que las
 // tarjetas de Soluciones). El botón "Ver caso" sigue abriendo el modal.
+// (Sparkline mini-viz removida a pedido del cliente: era la misma curva en
+// todas las tarjetas — "antes/después con los mismos porcentajes".)
 export function CaseCard({ caseData, index, onOpen, active = false, onActivate }) {
   const { ref, inView, replayKey, replay, reduce } = useCardReplay()
   const isCyan = index % 2 === 0
   const accentClass = isCyan ? 'text-accent' : 'text-accent2'
   const borderClass = isCyan ? 'border-l-2 border-l-accent/50' : 'border-t-2 border-t-accent2/50'
-  const sparkColor = isCyan ? 'var(--c-accent)' : 'var(--c-accent2)'
   const topResult = caseData.results[0]
 
   const activate = () => {
@@ -84,63 +64,12 @@ export function CaseCard({ caseData, index, onOpen, active = false, onActivate }
           animate={reduce ? false : inView ? 'show' : 'hidden'}
         >
           <motion.div
-            className="flex items-start justify-between gap-3"
+            className="flex items-start"
             variants={reduce ? undefined : itemVariants}
           >
             <span className="font-display text-xs font-semibold uppercase tracking-[0.15em] text-muted">
               {caseData.sector}
             </span>
-            {/* mini-viz: sparkline + dot al peak con drop-shadow glow.
-                Misma "voz visual" que el DashboardViz de Soluciones. */}
-            {reduce ? (
-              <svg
-                className="h-6 w-14 shrink-0 overflow-visible"
-                viewBox="-2 -2 44 18"
-                fill="none"
-                aria-hidden="true"
-              >
-                <path
-                  d={SPARK_PATH}
-                  stroke={sparkColor}
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  opacity="0.9"
-                />
-                <circle
-                  cx="40"
-                  cy="3"
-                  r="2"
-                  fill={sparkColor}
-                  style={{ filter: `drop-shadow(0 0 4px ${sparkColor})` }}
-                />
-              </svg>
-            ) : (
-              <motion.svg
-                className="h-6 w-14 shrink-0 overflow-visible"
-                viewBox="-2 -2 44 18"
-                fill="none"
-                aria-hidden="true"
-                variants={sparkContainer}
-              >
-                <motion.path
-                  d={SPARK_PATH}
-                  stroke={sparkColor}
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  variants={sparkPathVariants}
-                />
-                <motion.circle
-                  cx="40"
-                  cy="3"
-                  r="2"
-                  fill={sparkColor}
-                  style={{ filter: `drop-shadow(0 0 4px ${sparkColor})` }}
-                  variants={sparkDotVariants}
-                />
-              </motion.svg>
-            )}
           </motion.div>
 
           <motion.h3
