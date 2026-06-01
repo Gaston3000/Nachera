@@ -73,7 +73,6 @@ export const cases = [
       execution: [
         '2-3 publicaciones semanales en IG y TikTok',
         '~14 historias mensuales para mantener cercanía con la audiencia',
-        'Días dedicados a producción de contenido',
         'Producción y edición de reels',
         'Piezas gráficas con sistema visual coherente',
       ],

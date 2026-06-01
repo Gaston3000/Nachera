@@ -85,6 +85,9 @@ export const services = [
   { icon: '✎', title: 'Copywriting', desc: 'Textos que mantienen tu voz y conectan: publicaciones, campañas y piezas digitales.' },
   { icon: '✉', title: 'Email marketing', desc: 'Planificación, segmentación, automatización y seguimiento — comunicación directa con tu audiencia.' },
   { icon: '📈', title: 'Lectura de métricas', desc: 'Seguimiento honesto que detecta qué funciona y orienta las próximas decisiones.' },
+  // Pedido del cliente: visibilizar el servicio web como algo que se puede
+  // pedir/solicitar. Voz plural (capacidad del equipo, no Nachera codeando).
+  { icon: '◇', title: 'Experiencias digitales', desc: 'Acompañamos tu marca al entorno digital con sitio, landing o portfolio — continuidad natural de tu identidad.' },
 ]
 
 // Descripciones textuales del PDF del cliente ("mantener los titulos").
@@ -125,6 +128,8 @@ export const certifications = [
 export const tools = [
   'Metricool', 'Meta Business Suite', 'Adobe Premiere', 'Canva', 'CapCut',
   'Sony Vegas', 'Trello', 'Brevo', 'Google Analytics', 'Microsoft Office',
+  // Workflow propio, no un soft — pedido del cliente para el grupo Contenido.
+  'Días de producción de contenido',
 ]
 
 export const finalCta = {

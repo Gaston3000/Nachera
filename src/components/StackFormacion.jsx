@@ -20,7 +20,7 @@ const EASE = [0.16, 1, 0.3, 1]
 const TOOL_CATEGORIES = [
   { label: 'Ads & Performance', items: ['Google Ads', 'Meta Business Suite'] },
   { label: 'Analítica & SEO', items: ['Google Analytics', 'SEO', 'Metricool'] },
-  { label: 'Contenido & Edición', items: ['Adobe Premiere', 'Canva', 'CapCut', 'Sony Vegas'] },
+  { label: 'Contenido & Edición', items: ['Adobe Premiere', 'Canva', 'CapCut', 'Sony Vegas', 'Días de producción de contenido'] },
   { label: 'Gestión & Email', items: ['Trello', 'Brevo', 'Microsoft Office'] },
 ]
 
