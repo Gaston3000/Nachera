@@ -25,7 +25,8 @@ export const trustBar = [
 
 export const about = {
   title: 'Es hora de llevar tu marca al siguiente nivel.',
-  pull: 'No vendo humo. Vendo criterio, oficio y comunicación que se entiende.',
+  // (pull quote "No vendo humo..." removida a pedido del cliente — ahora
+  // el lead vive en la columna izquierda, junto al título.)
   lead: 'Soy Ignacio Costa, Licenciado en Ciencias de la Comunicación, periodista y con formación profesional en edición de video y marketing digital. Trabajo junto a marcas y emprendimientos que quieren crecer y comunicar lo que realmente son.',
   // Segundo párrafo que cierra la presentación.
   aside: 'Me dicen Nachera y me formé como profesional en UADE, Da Vinci, Deportea y Google Academy.',

@@ -149,8 +149,12 @@ describe('App smoke', () => {
     expect(resultadoLabels.length).toBeGreaterThanOrEqual(5)
   })
 
-  it('renders the about pull quote', () => {
-    expect(screen.getByText(/vendo criterio/i)).toBeInTheDocument()
+  it('renders the about lead in the section (moved to LEFT col per cliente)', () => {
+    const about = document.getElementById('sobre-mi')
+    expect(about).not.toBeNull()
+    expect(
+      within(about).getByText(/Soy Ignacio Costa, Licenciado/i)
+    ).toBeInTheDocument()
   })
 
   it('renders the about beats with bold emphasis', () => {

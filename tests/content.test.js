@@ -23,8 +23,7 @@ describe('siteConfig', () => {
 })
 
 describe('about', () => {
-  it('has pull, lead, beats and credentials', () => {
-    expect(about.pull).toBeTruthy()
+  it('has lead, beats and credentials', () => {
     expect(about.lead).toBeTruthy()
     expect(Array.isArray(about.beats)).toBe(true)
     expect(about.beats).toHaveLength(3)
@@ -44,9 +43,6 @@ describe('about', () => {
       'chartcheck',
       'flagen',
     ])
-  })
-  it('pull quote contains the key phrase', () => {
-    expect(about.pull).toMatch(/vendo criterio/i)
   })
   it('beats contain bold markers', () => {
     about.beats.forEach((b) => expect(b).toMatch(/\*\*.+\*\*/))

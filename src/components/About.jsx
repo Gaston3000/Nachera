@@ -222,32 +222,21 @@ export function About() {
                   {about.title}
                 </h2>
               </Reveal>
-              <Reveal direction="left" delay={0.1}>
-                <blockquote className="font-display text-2xl font-bold leading-snug text-fg sm:text-3xl md:text-[1.6rem] lg:text-[2rem]">
-                  {/* dos colores acentuando los dos golpes del pull */}
-                  <span style={{ color: 'var(--c-accent)' }}>No vendo humo.</span>
-                  <br />
-                  Vendo criterio, oficio y{' '}
-                  <span style={{ color: 'var(--c-accent2)' }}>
-                    comunicación que se entiende
-                  </span>
-                  .
-                </blockquote>
+              <Reveal delay={0.1}>
+                <p className="text-sm leading-relaxed text-muted md:text-[15px] lg:text-base">
+                  {about.lead}
+                </p>
               </Reveal>
             </div>
           </div>
         </div>
 
-        {/* RIGHT (7/12) — NARRATIVA. Top-aligned, body con más peso en desktop. */}
+        {/* RIGHT (7/12) — NARRATIVA. Top-aligned, body con más peso en desktop.
+            (El lead ahora vive en la columna izquierda, así que acá arrancamos
+            directo con el cierre + las 3 bullets.) */}
         <div className="flex flex-col gap-6 md:col-span-7 md:gap-7 md:pt-2">
-          <Reveal delay={0.2}>
-            <p className="text-sm leading-relaxed text-muted md:text-[15px] lg:text-base">
-              {about.lead}
-            </p>
-          </Reveal>
-
           {about.aside && (
-            <Reveal delay={0.25}>
+            <Reveal delay={0.2}>
               <p className="text-sm leading-relaxed text-muted md:text-[15px] lg:text-base">
                 {about.aside}
               </p>
