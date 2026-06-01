@@ -116,10 +116,12 @@ export const certifications = [
   { name: 'Licenciatura en Ciencias de la Comunicación', org: 'UADE', year: '2020–2023', primary: true },
   { name: 'Google Ads: Search, Display, Video & Measurement', org: 'Google Skillshop', year: '2025', primary: true },
   { name: 'Google Analytics', org: 'Google Skillshop', year: '2025', primary: true },
+  // Coderhouse Google Ads movido acá para que no quede al fondo blurreado
+  // en desktop (pedido del cliente). Cluster de los 3 certs de Google juntos.
+  { name: 'Google Ads', org: 'Coderhouse', year: '2025', primary: false },
   { name: 'Marketing Digital', org: 'Escuela Da Vinci', year: '2024', primary: false },
   { name: 'Video Editing', org: 'Escuela Da Vinci', year: '2024', primary: false },
   { name: 'Tecnicatura en Periodismo Deportivo', org: 'Deportea', year: '2015–2017', primary: false },
-  { name: 'Google Ads', org: 'Coderhouse', year: '2025', primary: false },
 ]
 
 export const tools = [

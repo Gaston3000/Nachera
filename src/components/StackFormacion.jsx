@@ -16,12 +16,18 @@ import { tools, certifications } from '../data/content.js'
 
 const EASE = [0.16, 1, 0.3, 1]
 
-/* presentational grouping of the SAME `tools` data — no tool added/renamed */
+/* presentational grouping of la stack. Las primeras 4 son herramientas
+   reales (`tools` data). La 5ta — "Experiencias Digitales" — son los
+   entregables del servicio web; visible como "tarjeta" en este grid
+   para que el cliente vea que también lo puede pedir, sin romper el
+   vocabulario de CLAUDE.md (categoría = "Experiencias Digitales", no
+   "Diseño Web"). */
 const TOOL_CATEGORIES = [
   { label: 'Ads & Performance', items: ['Google Ads', 'Meta Business Suite'] },
   { label: 'Analítica & SEO', items: ['Google Analytics', 'SEO', 'Metricool'] },
   { label: 'Contenido & Edición', items: ['Adobe Premiere', 'Canva', 'CapCut', 'Sony Vegas', 'Días de producción de contenido'] },
   { label: 'Gestión & Email', items: ['Trello', 'Brevo', 'Microsoft Office'] },
+  { label: 'Experiencias Digitales', items: ['Sitio', 'Landing', 'Portfolio'] },
 ]
 
 // Safety net: surface any tool not explicitly bucketed so data stays complete
