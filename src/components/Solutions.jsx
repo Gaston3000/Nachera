@@ -1020,6 +1020,10 @@ const tiles = [
     // pasamos a una declaración de posicionamiento + R/E/R nuevos.
     id: 'web',
     title: 'Experiencias digitales',
+    // Chips para que la tarjeta se LEA como diseño web a primera vista
+    // (CLAUDE.md: vocabulario "experiencias digitales", nunca "diseño web"
+    // como categoría — pero los chips concretos sí explicitan el entregable).
+    chips: ['Sitio', 'Landing', 'Portfolio'],
     value:
       'Tu marca **merece estar en el mundo digital** de la misma forma en que la pensás — con **identidad, criterio y una presencia que genera confianza desde el primer clic**.',
     detail: {
@@ -1142,6 +1146,18 @@ function SolutionTile({ tile, index, active = false, onActivate }) {
             <Viz inView={true} />
           </div>
           <h3 className="relative mt-5 font-display text-lg font-bold text-fg sm:text-xl">{tile.title}</h3>
+          {tile.chips && (
+            <div className="relative mt-2 flex flex-wrap gap-1.5">
+              {tile.chips.map((c) => (
+                <span
+                  key={c}
+                  className="rounded-full border border-accent/30 bg-accent/10 px-2 py-0.5 font-display text-[10px] font-semibold uppercase tracking-[0.12em] text-accent"
+                >
+                  {c}
+                </span>
+              ))}
+            </div>
+          )}
           <p className="relative mt-2 text-sm leading-relaxed text-muted">
             <RichText text={tile.value} />
           </p>
@@ -1211,6 +1227,22 @@ function SolutionTile({ tile, index, active = false, onActivate }) {
           >
             {tile.title}
           </motion.h3>
+
+          {tile.chips && (
+            <motion.div
+              className="mt-2 flex flex-wrap gap-1.5"
+              variants={itemVariants}
+            >
+              {tile.chips.map((c) => (
+                <span
+                  key={c}
+                  className="rounded-full border border-accent/30 bg-accent/10 px-2 py-0.5 font-display text-[10px] font-semibold uppercase tracking-[0.12em] text-accent"
+                >
+                  {c}
+                </span>
+              ))}
+            </motion.div>
+          )}
 
           <motion.p
             className="mt-2 text-sm leading-relaxed text-muted"
