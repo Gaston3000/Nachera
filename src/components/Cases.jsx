@@ -43,14 +43,8 @@ function PhoneMockup() {
           />
         ))}
       </div>
-      {/* stats row */}
-      <div className="mt-2 flex justify-between px-1 text-center">
-        {['↑38%', '↑24%', '↑↑'].map((s) => (
-          <div key={s}>
-            <div className="font-display text-[9px] font-bold text-accent">{s}</div>
-          </div>
-        ))}
-      </div>
+      {/* (stats row "antes/después" removida — los % eran iguales en todas
+          las tarjetas y no respaldaban data real; pedido del cliente.) */}
     </div>
   )
 }

@@ -31,9 +31,9 @@ export const about = {
   // Segundo párrafo que cierra la presentación.
   aside: 'Me dicen Nachera y me formé como profesional en UADE, Da Vinci, Deportea y Google Academy.',
   beats: [
-    'Vengo del **periodismo y la comunicación**: un camino que me enseñó a **expresarme, perderle el miedo y desarrollar mi creatividad** para aplicarla en cada proyecto.',
-    'Hoy aplico ese oficio al **marketing digital** para ayudar a las marcas a **crecer con estrategia y comunicación que conecta de verdad**.',
-    'Hoy trabajo en **Bloop Agency** y llevo adelante **proyectos propios como freelance** — con la misma dedicación y criterio en cada uno.',
+    'Vengo del **periodismo y la comunicación**: un camino que me enseñó a **expresarme, perder el miedo y desarrollar mi creatividad** para aplicarla en cada proyecto.',
+    'Aplico todo lo que aprendí en el **mundo del marketing digital** para ayudar a las marcas a **crecer con estrategia y comunicación que conecta de verdad**.',
+    'Hoy trabajo en **Bloop Agency** y, además, llevo adelante **proyectos propios como freelance** — con la misma dedicación y criterio en cada uno.',
   ],
   credentials: [
     {
@@ -88,13 +88,13 @@ export const services = [
 ]
 
 // Descripciones textuales del PDF del cliente ("mantener los titulos").
+// El cliente pidió numeración 1→5 corrida (sin "bis" — fue un error suyo).
 export const process = [
   { n: '01', title: 'Diagnóstico', desc: 'Entiendo tu marca, tu rubro, tu público y cómo te estás comunicando hoy.' },
   { n: '02', title: 'Estrategia', desc: 'Defino pilares, tono y calendario. Un plan claro con objetivos concretos.' },
-  { n: '03', title: 'Ejecución', desc: 'Contenido, piezas y publicaciones con identidad y criterio.' },
-  // Paso pedido por el cliente: instancia explícita de revisión antes de seguir.
-  { n: '03bis', title: 'Revisión', desc: 'Comparto los resultados con el cliente, escucho el feedback y nos aseguramos de que todo esté alineado antes de seguir.' },
-  { n: '04', title: 'Ajuste', desc: 'Analizo las métricas, ajusto lo que funciona y mantengo la comunicación activa en el tiempo.' },
+  { n: '03', title: 'Ejecución', desc: 'Contenido, piezas y publicaciones con identidad.' },
+  { n: '04', title: 'Revisión', desc: 'Comparto los resultados con el cliente, escucho el feedback y nos aseguramos de que todo esté alineado.' },
+  { n: '05', title: 'Ajuste', desc: 'Analizo las métricas, ajusto lo que funciona y mantengo la comunicación activa en el tiempo.' },
 ]
 
 export const projects = [
@@ -105,6 +105,7 @@ export const projects = [
 ]
 
 export const experience = [
+  { role: 'Comunicación digital', org: 'Bloop Agency', period: '2025 – Presente', desc: 'Estrategia, contenido y comunicación digital para las marcas del estudio — con criterio narrativo aplicado a cada proyecto.' },
   { role: 'Founder', org: 'Sintonía Digital · Agencia de Marketing', period: 'Ene 2025 – Presente', desc: 'Estrategias de comunicación integrales, gestión de redes data-driven, campañas de email marketing y assets creativos a medida de cada cliente.' },
   { role: 'Founder', org: 'Focaccheras', period: 'Ene 2024 – Presente', desc: 'Desarrollo de marca, automatización de email marketing, gestión de contenido y presencia multicanal (Instagram, Facebook).' },
   { role: 'Operador Técnico de Sonido e Iluminación', org: 'Pulso', period: 'Ene 2024 – May 2025', desc: 'Coordinación y operación de equipos profesionales en eventos de gran escala.' },

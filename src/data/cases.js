@@ -68,11 +68,12 @@ export const cases = [
         'Definición de pilares y tono propio',
         'Calendario semanal de publicaciones',
         'Mix de reels + piezas gráficas + posicionamiento de marca',
-        'Cobertura sostenida con historias',
+        'Cobertura e hincapié en fechas puntuales',
       ],
       execution: [
         '2-3 publicaciones semanales en IG y TikTok',
         '~14 historias mensuales para mantener cercanía con la audiencia',
+        'Días dedicados a producción de contenido',
         'Producción y edición de reels',
         'Piezas gráficas con sistema visual coherente',
       ],
