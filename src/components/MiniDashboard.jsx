@@ -1,5 +1,7 @@
-// Reusable mini dashboard: metric cards + before/after bar pair + narrative.
-// Takes results: [{value, label}] and an optional narrative string.
+// Reusable mini dashboard: metric cards + narrative.
+// (Bloque "Antes → Después" removido a pedido del cliente: los porcentajes
+// eran iguales en todos los casos — 40% → 78% hardcodeados — y no
+// respaldaban data real. Solo quedan las metric cards reales del caso.)
 
 export function MiniDashboard({ results = [], narrative = '' }) {
   return (
@@ -15,33 +17,6 @@ export function MiniDashboard({ results = [], narrative = '' }) {
             <p className="mt-1 text-xs text-muted">{r.label}</p>
           </div>
         ))}
-      </div>
-
-      {/* simple before/after bar pair */}
-      <div className="mb-5 rounded-xl border border-glassborder bg-glass/40 p-4">
-        <p className="mb-3 font-display text-xs font-semibold uppercase tracking-[0.15em] text-muted">
-          Antes → Después
-        </p>
-        <div className="flex flex-col gap-3">
-          <div>
-            <div className="mb-1 flex items-center justify-between text-xs text-muted">
-              <span>Antes</span>
-              <span>40%</span>
-            </div>
-            <div className="h-2 w-full rounded-full bg-glass border border-glassborder">
-              <div className="h-full w-[40%] rounded-full bg-muted/40" />
-            </div>
-          </div>
-          <div>
-            <div className="mb-1 flex items-center justify-between text-xs">
-              <span className="text-accent font-semibold">Después</span>
-              <span className="text-accent font-semibold">78%</span>
-            </div>
-            <div className="h-2 w-full rounded-full bg-glass border border-glassborder">
-              <div className="h-full w-[78%] rounded-full bg-accent" />
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* narrative */}
