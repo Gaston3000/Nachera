@@ -93,10 +93,11 @@ describe('App smoke', () => {
     expect(screen.getByText('Experiencias digitales')).toBeInTheDocument()
   })
 
-  it('renders all 3 case brands (real clients; Only Wines removido)', () => {
+  it('renders all 4 case brands (real clients; Only Wines removido)', () => {
     expect(screen.getByText('LAE SRL')).toBeInTheDocument()
     expect(screen.getByText('Dominga Pastelería')).toBeInTheDocument()
     expect(screen.getByText('GT Elite Soccer')).toBeInTheDocument()
+    expect(screen.getByText('Abelson Express Devoto')).toBeInTheDocument()
     expect(screen.queryByText('Only Wines')).not.toBeInTheDocument()
   })
 

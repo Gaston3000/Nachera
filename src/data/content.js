@@ -131,6 +131,21 @@ export const tools = [
   'Días de producción de contenido',
 ]
 
+// Sección "Lo que hago en Bloop Agency" — pedido del cliente.
+// CLAUDE.md: trabajo bajo paraguas de la agencia, NO se presenta como
+// caso propio. Framing "lo que hago EN Bloop" — descripción del rol
+// sin claimear los clientes de Bloop como portfolio personal.
+// Copy 100% del cliente (3 párrafos, versión larga), bolds preservados.
+export const bloopAgency = {
+  eyebrow: 'Bloop Agency',
+  title: 'Lo que hago en Bloop Agency',
+  paragraphs: [
+    'Participación dentro del equipo de comunicación y marketing digital de Bloop Agency, colaborando en el desarrollo de **estrategias de contenido**, **planificación y calendarización de publicaciones**, **copywriting**, análisis de métricas y elaboración de informes para distintas marcas y empresas de diversos rubros.',
+    'Mi trabajo se desarrolla de manera conjunta con los equipos de **diseño**, **contenido** y **paid media**, acompañando la ejecución de campañas y acciones digitales alineadas con los objetivos de comunicación de cada cliente. Dentro de este proceso, participo en la organización y seguimiento de tareas, aportando en la coordinación de contenidos y en la adaptación de la comunicación según las necesidades de cada marca.',
+    'También participo activamente en la **gestión diaria de la comunicación con clientes**, acompañando procesos de **planificación**, **seguimiento** y toma de decisiones vinculadas a la presencia digital de cada marca, manteniendo un contacto constante para asegurar una comunicación clara, organizada y alineada con las estrategias trabajadas por el equipo.',
+  ],
+}
+
 export const finalCta = {
   title: '¿Querés llevar **tu marca al siguiente nivel**?',
   sub: 'Contactame y coordinamos una **reunión** para analizar tu marca y definir juntos el mejor camino a seguir.',

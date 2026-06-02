@@ -119,4 +119,48 @@ export const cases = [
         'La agencia logró desarrollar una comunicación dinámica y enfocada en dar visibilidad constante a sus futbolistas representados.',
     },
   },
+  {
+    // Caso Abelson — copy 100% derivado del texto que pasó el cliente
+    // (no se inventan datos). Results en chips cualitativos por falta de
+    // métricas numéricas defendibles.
+    id: 'abelson',
+    brand: 'Abelson Express Devoto',
+    sector: 'Supermercado · sucursal con foco en consumo diario',
+    tagline: 'Construcción de marca digital **desde cero**.',
+    problem:
+      'Una sucursal de supermercado orientada al consumo diario y promociones comerciales que necesitaba fortalecer su presencia digital y comunicar ofertas, productos y campañas promocionales con un tono dinámico y cercano.',
+    approach: [
+      'Producción de contenido',
+      'Diseño de piezas gráficas',
+      'Edición audiovisual',
+      'Copywriting',
+      'Manejo de redes sociales',
+      'Colaboraciones con personajes del rubro',
+    ],
+    services: ['Contenido', 'Diseño gráfico', 'Edición audiovisual', 'Copywriting', 'Gestión de redes'],
+    results: [
+      { value: 'Multi-formato', label: 'gráficas, video y copy' },
+      { value: '@Mami.albanil', label: 'colaboración destacada' },
+      { value: 'Promociones', label: 'ofertas y campañas' },
+    ],
+    detail: {
+      challenge:
+        'Express Devoto necesitaba fortalecer su presencia digital como sucursal de supermercado orientada al consumo diario y promociones comerciales. El desafío fue producir contenido y comunicar ofertas, productos y campañas promocionales con un tono dinámico y cercano.',
+      strategy: [
+        'Producción de contenido',
+        'Diseño de piezas gráficas para ofertas, productos y campañas',
+        'Edición audiovisual para campañas promocionales',
+        'Copywriting con tono dinámico y cercano',
+        'Colaboraciones con personajes del rubro',
+      ],
+      execution: [
+        'Manejo de redes sociales',
+        'Piezas gráficas para ofertas, productos y campañas promocionales',
+        'Material audiovisual y copywriting de campañas',
+        'Colaboraciones con personajes del rubro como @Mami.albanil',
+      ],
+      resultsNarrative:
+        'La cuenta sostiene una comunicación digital activa con contenido multi-formato — gráficas, audiovisual y copywriting — y colaboraciones con personajes del rubro como @Mami.albanil, orientadas a generar un mejor engagement y crecimiento de la cuenta en el segmento de consumo diario.',
+    },
+  },
 ]

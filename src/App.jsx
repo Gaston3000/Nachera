@@ -5,6 +5,7 @@ import { About } from './components/About.jsx'
 import { Solutions } from './components/Solutions.jsx'
 import { ProcessTimeline } from './components/ProcessTimeline.jsx'
 import { Cases } from './components/Cases.jsx'
+import { BloopAgency } from './components/BloopAgency.jsx'
 import { StackFormacion } from './components/StackFormacion.jsx'
 import { FinalCTA } from './components/FinalCTA.jsx'
 import { Footer } from './components/Footer.jsx'
@@ -22,6 +23,7 @@ export default function App() {
         <Solutions />
         <ProcessTimeline />
         <Cases />
+        <BloopAgency />
         <StackFormacion />
         <FinalCTA />
       </main>
