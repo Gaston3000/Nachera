@@ -144,6 +144,17 @@ export const bloopAgency = {
     'Mi trabajo se desarrolla de manera conjunta con los equipos de **diseño**, **contenido** y **paid media**, acompañando la ejecución de campañas y acciones digitales alineadas con los objetivos de comunicación de cada cliente. Dentro de este proceso, participo en la organización y seguimiento de tareas, aportando en la coordinación de contenidos y en la adaptación de la comunicación según las necesidades de cada marca.',
     'También participo activamente en la **gestión diaria de la comunicación con clientes**, acompañando procesos de **planificación**, **seguimiento** y toma de decisiones vinculadas a la presencia digital de cada marca, manteniendo un contacto constante para asegurar una comunicación clara, organizada y alineada con las estrategias trabajadas por el equipo.',
   ],
+  // Cuentas que trabaja dentro de Bloop, con el copy del Word del cliente.
+  // Solo M&M tiene copy completo confirmado por ahora; faltan los demás.
+  clients: [
+    {
+      name: 'M&M',
+      desc: 'Participación en el desarrollo de comunicación digital para una marca orientada a soluciones integrales para el hogar, especializada en ventilación, iluminación y equipamiento doméstico. Trabajo enfocado en **planificación de contenido**, **desarrollo de estrategias de comunicación**, **copywriting**, análisis de métricas y coordinación con equipos internos para la ejecución de campañas y contenido digital alineado con la identidad de marca.',
+    },
+    // TODO Climatización HD: el screenshot del Word está cortado.
+    // Pendiente el copy completo + el resto de cuentas que figuren en
+    // la pestaña "Clientes" del documento.
+  ],
 }
 
 export const finalCta = {
