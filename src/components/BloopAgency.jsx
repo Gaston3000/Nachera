@@ -61,20 +61,42 @@ export function BloopAgency() {
           </Reveal>
 
           <div className="grid gap-5 md:grid-cols-2">
-            {clients.map((c, i) => (
-              <Reveal key={c.name} delay={i * 0.08}>
-                <GlassPanel
-                  className="group h-full p-6 border-t-2 border-t-accent2/40 transition-all duration-300 hover:-translate-y-1 hover:border-t-accent2 hover:shadow-[0_0_40px_-12px_var(--c-accent2)]"
-                >
-                  <h4 className="font-display text-lg font-bold text-fg sm:text-xl">
-                    {c.name}
-                  </h4>
-                  <p className="mt-3 text-sm leading-relaxed text-muted lg:text-[15px]">
-                    <RichText text={c.desc} />
-                  </p>
-                </GlassPanel>
-              </Reveal>
-            ))}
+            {clients.map((c, i) => {
+              // Alterno color + posición del borde para romper la monotonía
+              // violeta. Patrón ya usado en CaseCard (coherencia del sistema).
+              // Identidad accent2 mantenida via rail del intro + cards pares.
+              const isViolet = i % 2 === 0
+              const cardAccent = isViolet
+                ? 'var(--c-accent2)'
+                : 'var(--c-accent)'
+              const borderClass = isViolet
+                ? 'border-t-2 border-t-accent2/40 hover:border-t-accent2'
+                : 'border-l-2 border-l-accent/40 hover:border-l-accent'
+              return (
+                <Reveal key={c.name} delay={i * 0.08}>
+                  <GlassPanel
+                    className={`group h-full p-6 ${borderClass} transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_40px_-12px_var(--card-glow)]`}
+                    style={{ '--card-glow': cardAccent }}
+                  >
+                    <div className="flex items-baseline gap-2.5">
+                      <span
+                        className="font-display text-xs font-bold"
+                        style={{ color: cardAccent }}
+                        aria-hidden="true"
+                      >
+                        0{i + 1}
+                      </span>
+                      <h4 className="font-display text-lg font-bold text-fg sm:text-xl">
+                        {c.name}
+                      </h4>
+                    </div>
+                    <p className="mt-3 text-sm leading-relaxed text-muted lg:text-[15px]">
+                      <RichText text={c.desc} />
+                    </p>
+                  </GlassPanel>
+                </Reveal>
+              )
+            })}
           </div>
         </div>
       )}
