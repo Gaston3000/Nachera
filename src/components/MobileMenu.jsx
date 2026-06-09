@@ -170,13 +170,23 @@ export function MobileMenu({ open, onClose, hamburgerRef }) {
     body.style.width = '100%'
     html.style.overflow = 'hidden'
     return () => {
+      // index.css tiene `html { scroll-behavior: smooth }` global. Al
+      // restaurar la posición con scrollTo, el browser animaría el
+      // recorrido — el usuario vería un scroll involuntario hasta su
+      // punto original. Desactivo el smooth solo durante la restauración
+      // para que el salto sea instantáneo e invisible.
+      const prevScrollBehavior = html.style.scrollBehavior
+      html.style.scrollBehavior = 'auto'
+
       body.style.overflow = prev.bodyOverflow
       body.style.position = prev.bodyPosition
       body.style.top = prev.bodyTop
       body.style.width = prev.bodyWidth
       html.style.overflow = prev.htmlOverflow
-      // Restauro el scroll donde estaba el usuario antes de abrir el menú.
       window.scrollTo(0, scrollY)
+
+      // Devuelvo el smooth-scroll para los anchor links del nav.
+      html.style.scrollBehavior = prevScrollBehavior
     }
   }, [open])
 
