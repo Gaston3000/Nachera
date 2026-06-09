@@ -147,12 +147,37 @@ export function MobileMenu({ open, onClose, hamburgerRef }) {
   const firstLinkRef   = useRef(null)
   const CLOSE_DELAY    = prefersReduced ? 160 : 440
 
-  /* Body scroll lock */
+  /* Body scroll lock — overflow:hidden alcanza en desktop, pero iOS
+     Safari lo ignora en body: hay que sumarle position:fixed +
+     top:-scrollY + width:100%, restaurando la posición al cerrar.
+     Mantengo body.style.overflow = 'hidden' para que el lock siga
+     siendo observable desde tests (mobileMenu.test.jsx). */
   useEffect(() => {
     if (!open) return
-    const prev = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => { document.body.style.overflow = prev }
+    const body = document.body
+    const html = document.documentElement
+    const scrollY = window.scrollY
+    const prev = {
+      bodyOverflow: body.style.overflow,
+      bodyPosition: body.style.position,
+      bodyTop: body.style.top,
+      bodyWidth: body.style.width,
+      htmlOverflow: html.style.overflow,
+    }
+    body.style.overflow = 'hidden'
+    body.style.position = 'fixed'
+    body.style.top = `-${scrollY}px`
+    body.style.width = '100%'
+    html.style.overflow = 'hidden'
+    return () => {
+      body.style.overflow = prev.bodyOverflow
+      body.style.position = prev.bodyPosition
+      body.style.top = prev.bodyTop
+      body.style.width = prev.bodyWidth
+      html.style.overflow = prev.htmlOverflow
+      // Restauro el scroll donde estaba el usuario antes de abrir el menú.
+      window.scrollTo(0, scrollY)
+    }
   }, [open])
 
   /* Focus management — move focus into panel when it opens */
