@@ -10,16 +10,18 @@ export function MiniDashboard({ results = [], narrative = '' }) {
           largas (Reactivo / Highlights / Multi-jugador / "open rate
           (real, email)") no overflowen en mobile. h-full + justify-center
           mantiene el contenido centrado vertical aunque el value wrappee. */}
-      <div className="grid grid-cols-3 gap-2 mb-6 items-stretch sm:gap-3">
+      {/* Mobile: 1 col (chips full width, value en grande sin cortarse).
+          sm+ : 3 cols como antes. */}
+      <div className="grid grid-cols-1 gap-2 mb-6 items-stretch sm:grid-cols-3 sm:gap-3">
         {results.map((r) => (
           <div
             key={r.label}
-            className="flex h-full flex-col justify-center rounded-xl border border-glassborder bg-glass/60 p-3 text-center backdrop-blur-sm sm:p-4"
+            className="flex h-full flex-col justify-center rounded-xl border border-glassborder bg-glass/60 p-4 text-center backdrop-blur-sm"
           >
-            <p className="font-display text-lg font-bold text-accent leading-tight break-words sm:text-xl md:text-2xl">
+            <p className="font-display text-xl font-bold text-accent leading-tight break-words md:text-2xl">
               {r.value}
             </p>
-            <p className="mt-1 text-[11px] leading-snug text-muted sm:text-xs">
+            <p className="mt-1 text-xs leading-snug text-muted">
               {r.label}
             </p>
           </div>
