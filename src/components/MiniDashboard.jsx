@@ -6,18 +6,22 @@
 export function MiniDashboard({ results = [], narrative = '' }) {
   return (
     <div>
-      {/* metric cards — h-full + flex-col + justify-center para que el
-          contenido quede vertically-centered cuando los values tienen
-          alturas distintas (ej. "Multi-formato" wrappea a 2 líneas y
-          "Promociones" queda en 1). */}
-      <div className="grid grid-cols-3 gap-3 mb-6 items-stretch">
+      {/* metric cards — escala progresiva del value para que palabras
+          largas (Reactivo / Highlights / Multi-jugador / "open rate
+          (real, email)") no overflowen en mobile. h-full + justify-center
+          mantiene el contenido centrado vertical aunque el value wrappee. */}
+      <div className="grid grid-cols-3 gap-2 mb-6 items-stretch sm:gap-3">
         {results.map((r) => (
           <div
             key={r.label}
-            className="flex h-full flex-col justify-center rounded-xl border border-glassborder bg-glass/60 p-4 text-center backdrop-blur-sm"
+            className="flex h-full flex-col justify-center rounded-xl border border-glassborder bg-glass/60 p-3 text-center backdrop-blur-sm sm:p-4"
           >
-            <p className="font-display text-2xl font-bold text-accent leading-tight">{r.value}</p>
-            <p className="mt-1 text-xs text-muted">{r.label}</p>
+            <p className="font-display text-lg font-bold text-accent leading-tight break-words sm:text-xl md:text-2xl">
+              {r.value}
+            </p>
+            <p className="mt-1 text-[11px] leading-snug text-muted sm:text-xs">
+              {r.label}
+            </p>
           </div>
         ))}
       </div>
