@@ -93,10 +93,65 @@
   background-size: 220% 100%;
   -webkit-background-clip: text;
   background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 16px color-mix(in srgb, var(--c-accent) 30%, transparent));
-  animation: heroAccentShimmer 7s ease-in-out infinite;
+  /* Arranca BLANCA, como el resto de la frase. El remate es que el color la
+     inunde. Ojo: no se declara `-webkit-text-fill-color` a propósito — si se
+     fija en transparent, pisa a `color` y el fundido de blanco a gradiente
+     no ocurre. Sin declararlo, el relleno sigue a `color`. */
+  color: var(--c-fg);
+  /* Tres tiempos, y los tres delays los calcula Hero.jsx para que caigan
+     justo cuando la cascada de palabras llega hasta acá. */
+  animation:
+    heroWordIn 0.6s ease-out both,
+    heroAccentFlood 1.6s cubic-bezier(0.2, 0.7, 0.3, 1) both,
+    heroAccentShimmer 7s ease-in-out infinite;
+}
+
+/* El remate: el gradiente inunda la palabra y se queda.
+   El glow llega al pico al 32% y se SOSTIENE hasta el 52% antes de bajar al
+   reposo. Sin esa meseta el brillo se apagaba de golpe y se leía como un
+   parpadeo en vez de un encendido. */
+@keyframes heroAccentFlood {
+  0% {
+    color: var(--c-fg);
+    filter: drop-shadow(0 0 0 color-mix(in srgb, var(--c-accent) 0%, transparent));
+  }
+  32% {
+    color: transparent;
+    filter: drop-shadow(0 0 22px color-mix(in srgb, var(--c-accent) 65%, transparent));
+  }
+  52% {
+    filter: drop-shadow(0 0 21px color-mix(in srgb, var(--c-accent) 58%, transparent));
+  }
+  100% {
+    color: transparent;
+    filter: drop-shadow(0 0 16px color-mix(in srgb, var(--c-accent) 32%, transparent));
+  }
+}
+
+/* Barrido de luz que revela el título, palabra por palabra.
+   ────────────────────────────────────────────────────────────────
+   Antes esto era una `mask-image` animada sobre el h1 entero. Se veía
+   una banda horizontal clara del ancho del título: para animar la
+   máscara el navegador promueve el h1 a su propia capa de composición,
+   y esa capa se compone distinto que el fondo con grano del sitio.
+   Acá no hay máscara ni capa: cada palabra se enciende con un destello
+   corto que decae, y el escalonado hace que se lea como una luz que
+   recorre el renglón. El delay de cada una lo pone Hero.jsx. */
+.hero-title__w {
+  display: inline-block;
+  animation: heroWordIn 0.6s ease-out both;
+}
+
+/* Solo opacidad. Antes cada palabra traía además un destello de text-shadow;
+   sobre "evolucione" ese destello se sumaba al glow del gradiente y se veían
+   dos brillos encimados, el primero apagándose de golpe. */
+@keyframes heroWordIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 @keyframes heroAccentShimmer {
   0%,
@@ -111,6 +166,14 @@
   .hero-accent-word {
     animation: none;
     background-position: 0% 50%;
+    /* Sin animación el color no llega a inundar: hay que dejarlo transparente
+       a mano o la palabra queda blanca y se pierde el acento. */
+    color: transparent;
+    filter: drop-shadow(0 0 16px color-mix(in srgb, var(--c-accent) 30%, transparent));
+  }
+  .hero-title__w {
+    animation: none;
+    opacity: 1;
   }
 }
 
@@ -500,5 +563,311 @@
     animation: none;
     color: transparent;
     -webkit-text-fill-color: transparent;
+  }
+}
+
+/* Eyebrow del hero — la misma cápsula de vidrio que las palabras que
+   orbitan la cara. Que el eyebrow sea una cápsula más, quieta y anclada
+   arriba, hace que el hero se lea como un sistema y no como dos ideas
+   sueltas. El cyan se va del texto y queda solo en el punto: así el
+   único destacado en color del hero sigue siendo "evolucione". */
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5625rem;
+  border-radius: 9999px;
+  border: 1px solid var(--c-glass-border);
+  background: var(--c-glass);
+  backdrop-filter: blur(12px);
+  /* El padding derecho es menor a propósito: el letter-spacing agrega un
+     espacio fantasma después de la última letra y sin esto la cápsula se
+     ve descentrada. */
+  padding: 0.375rem 0.625rem 0.375rem 0.8125rem;
+  font-family: var(--font-display);
+  /* La etiqueta tiene 32 caracteres: a 12 px con 0.2em de interletrado no
+     entra en un teléfono de 320 px y el texto se parte en dos renglones
+     dentro de la cápsula, que deja de leerse como cápsula. El clamp la
+     achica sola hasta 10 px y el nowrap garantiza que nunca se corte. */
+  font-size: clamp(0.625rem, 3.1vw, 0.75rem);
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--c-fg);
+}
+
+.hero-eyebrow__dot {
+  height: 0.375rem;
+  width: 0.375rem;
+  flex: none;
+  border-radius: 9999px;
+  background: var(--c-accent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--c-accent) 90%, transparent);
+}
+
+/* ───────────────────────────────────────────────────────────────
+   Órbita del hero — las palabras giran alrededor de la cara y
+   pasan por detrás del pelo.
+
+   El anillo es VERTICAL y volcado: las palabras suben por delante
+   de la cara, pasan por arriba y bajan por detrás, sobre un plano
+   inclinado 26°. La versión horizontal quedaba tan aplastada que
+   el movimiento se leía como un vaivén y no como un giro.
+
+   Dos ángulos gobiernan la pieza:
+     --orbit-roll  vuelco del plano del anillo (26°)
+     --orbit-yaw   giro de la escena para dar profundidad (12°)
+   Cada palabra los cancela al final de su cadena de transforms
+   para quedar siempre derecha y mirando a cámara.
+
+   Las medidas van en clamp() y no en breakpoints: el radio se
+   encoge junto con la pantalla, así las palabras nunca llegan al
+   borde en teléfonos angostos.
+   ─────────────────────────────────────────────────────────────── */
+.orbit-scene {
+  /* Lo que decide el margen en pantallas angostas es el coeficiente vw del
+     radio, no su mínimo: en 320 px un 31vw daba 99 px de radio y las
+     cápsulas quedaban a 10 px del borde. Con 26vw quedan a 27 px.
+     --chip-w no baja de 6.5rem porque la palabra más larga
+     ("Storytelling") mide 101 px y se saldría de su contenedor. */
+  --orbit-r: clamp(5rem, 26vw, 10.5rem);
+  --chip-w: clamp(6.5rem, 30vw, 8rem);
+  --head-w: clamp(8.625rem, 46vw, 14rem);
+  --orbit-roll: 26deg;
+  --orbit-yaw: 12deg;
+
+  position: relative;
+  margin-inline: auto;
+  width: clamp(18rem, 82vw, 26rem);
+  /* Alto atado al recorrido real de la órbita, no cuadrado. Como el anillo
+     es vertical y volcado, su extensión vertical es ~1,8× el radio; un
+     cuadrado dejaba ~100 px de aire muerto arriba y abajo, y en celular eso
+     empujaba los botones fuera de la pantalla. */
+  height: calc(1.9 * var(--orbit-r) + 2.25rem);
+  perspective: 1000px;
+}
+
+/* Cuadrada y centrada a mano: con `inset` se deformaba en elipse al dejar
+   de ser cuadrado el contenedor. */
+.orbit-aura {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  height: calc(var(--head-w) * 1.15);
+  width: calc(var(--head-w) * 1.15);
+  transform: translate(-50%, -50%);
+  border-radius: 9999px;
+  filter: blur(48px);
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--c-accent) 35%, transparent),
+    transparent 70%
+  );
+}
+
+.orbit-stage {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+
+/* Giro fijo de la escena. Va en su propia capa para que el parallax
+   del puntero pueda rotar el conjunto sin pisarlo. */
+.orbit-tilt {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(var(--orbit-yaw));
+  transform-style: preserve-3d;
+}
+
+/* translateZ(0) deja la cara en el plano medio del anillo: las
+   palabras de la mitad de atrás quedan tapadas por el pelo. */
+/* REGLA DE ORO DE ESTA PIEZA: sobre .orbit-head y .orbit-words solo se
+   anima `transform`. Animar `opacity` o `filter` sobre una capa 3D hace
+   que el navegador la aplane, y una capa aplanada se pinta entera a una
+   sola profundidad — con lo cual las palabras dejarían de meterse por
+   detrás de la cara y quedarían todas por delante. Los desvanecidos van
+   en los nodos hoja (.orbit-head__float y .orbit-chip), donde aplanar
+   no rompe nada. */
+.orbit-head {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--head-w);
+  aspect-ratio: 730 / 665;
+  transform: translate(-50%, -50%) translateZ(0);
+  transform-style: preserve-3d;
+  animation: orbitHeadScale 1s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+}
+
+/* Nodo hoja: acá viven el flotado y el desvanecido de entrada. */
+.orbit-head__float {
+  height: 100%;
+  width: 100%;
+  animation:
+    orbitHeadFade 1s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both,
+    orbitHeadFloat 6s ease-in-out infinite 1.1s;
+}
+
+.orbit-words {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  transform-style: preserve-3d;
+  animation: orbitEmerge 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.55s both;
+}
+
+.orbit-word {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: flex;
+  justify-content: center;
+  width: var(--chip-w);
+  margin-left: calc(var(--chip-w) / -2);
+  margin-top: -0.85rem;
+  animation: orbitSpin var(--orbit-duration, 20s) linear infinite;
+}
+
+.orbit-chip {
+  animation: orbitChipFade 0.8s ease-out 0.55s both;
+  white-space: nowrap;
+  border-radius: 9999px;
+  border: 1px solid var(--c-glass-border);
+  background: var(--c-glass);
+  backdrop-filter: blur(12px);
+  padding: 0.375rem 0.75rem;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--c-fg);
+}
+
+.orbit-chip__dot {
+  color: var(--c-accent);
+}
+
+/* El recorrido es rotateX: la palabra arranca delante de la cara
+   (translateZ positivo), sube, pasa por arriba y baja por detrás.
+   El segundo rotateX cancela el giro sobre su propio eje para que
+   quede siempre mirando a cámara; el rotateZ y el rotateY finales
+   cancelan el vuelco del anillo y el giro de la escena, así el
+   texto se lee horizontal aunque el plano esté inclinado. */
+@keyframes orbitSpin {
+  from {
+    transform: rotateX(0deg) translateZ(var(--orbit-r)) rotateX(0deg)
+      rotateZ(var(--orbit-roll)) rotateY(calc(-1 * var(--orbit-yaw)));
+  }
+  to {
+    transform: rotateX(360deg) translateZ(var(--orbit-r)) rotateX(-360deg)
+      rotateZ(var(--orbit-roll)) rotateY(calc(-1 * var(--orbit-yaw)));
+  }
+}
+
+/* Escala la capa entera, no cada palabra: al crecer la capa crecen
+   también los translateZ de sus hijos, así las palabras se abren
+   hacia afuera desde detrás de la cara.
+   El rotateZ va acá dentro y no en una regla aparte porque esta
+   capa ya usa `transform` para la entrada: si se pusieran en dos
+   declaraciones distintas, una pisaría a la otra. */
+@keyframes orbitEmerge {
+  from {
+    transform: rotateZ(calc(-1 * var(--orbit-roll))) scale3d(0.12, 0.12, 0.12);
+  }
+  to {
+    transform: rotateZ(calc(-1 * var(--orbit-roll))) scale3d(1, 1, 1);
+  }
+}
+
+/* El desvanecido de cada palabra va acá y no en la capa: .orbit-chip es
+   una hoja, aplanarla no afecta al ordenamiento en profundidad. */
+@keyframes orbitChipFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes orbitHeadScale {
+  from {
+    transform: translate(-50%, -50%) translateZ(0) scale(0.82);
+  }
+  to {
+    transform: translate(-50%, -50%) translateZ(0) scale(1);
+  }
+}
+
+@keyframes orbitHeadFade {
+  from {
+    opacity: 0;
+    filter: blur(9px);
+  }
+  to {
+    opacity: 1;
+    filter: none;
+  }
+}
+
+@keyframes orbitHeadFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-14px);
+  }
+}
+
+/* Rama estática: sin el giro, las palabras caerían todas en la misma
+   posición final del keyframe, apiladas encima de la cara. Acá el
+   anillo se desarma y quedan repartidas, quietas y legibles. */
+@media (prefers-reduced-motion: reduce) {
+  .orbit-head,
+  .orbit-head__float,
+  .orbit-words,
+  .orbit-chip {
+    animation: none;
+    opacity: 1;
+  }
+  .orbit-head {
+    transform: translate(-50%, -50%);
+  }
+  .orbit-words {
+    transform: none;
+  }
+  .orbit-tilt {
+    transform: none;
+  }
+  .orbit-word {
+    animation: none;
+    transform: none;
+    margin: 0;
+  }
+  .orbit-word:nth-child(1) {
+    left: 0;
+    top: 10%;
+  }
+  .orbit-word:nth-child(2) {
+    left: auto;
+    right: 0;
+    top: 26%;
+  }
+  .orbit-word:nth-child(3) {
+    left: auto;
+    right: 2%;
+    top: 62%;
+  }
+  .orbit-word:nth-child(4) {
+    left: 0;
+    top: 74%;
+  }
+  .orbit-word:nth-child(5) {
+    left: 50%;
+    margin-left: calc(var(--chip-w) / -2);
+    top: 92%;
   }
 }
