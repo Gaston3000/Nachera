@@ -8,7 +8,10 @@ export const hero = {
     { t: 'evolucione', accent: true },
     { t: '.' },
   ],
-  sub: 'Me ocupo del marketing digital de tu marca **de forma integral** — desde la estrategia y la identidad visual hasta el contenido y el posicionamiento en redes. Todo en un solo lugar.',
+  // Los dos puntos hacen el trabajo que hacían "desde/hasta": la bajada pasa
+  // de 177 a 110 caracteres y queda en 2 renglones en escritorio y 3 en
+  // celular, los mismos que el h1. Antes pesaba más que el propio titular.
+  sub: 'Me ocupo del marketing digital de tu marca **de forma integral**: estrategia, identidad visual, contenido y redes.',
   chips: ['Storytelling', 'Estrategia', 'Reels', 'Email', 'Branding'],
 }
 
