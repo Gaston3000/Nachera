@@ -45,13 +45,15 @@ function HamburgerIcon({ open, reduced }) {
       strokeLinecap="round"
       aria-hidden="true"
     >
-      {/* Top line → top-left arm of X */}
+      {/* Top line → top-left arm of X.
+          `initial` no es decorativo: sin un valor de partida definido, motion
+          escribe `undefined` en x1/y1/x2/y2 en el primer cuadro y el navegador
+          llena la consola con "Expected length, undefined" cada vez que monta
+          el ícono. Los atributos estáticos no le alcanzan como punto de
+          partida porque son strings y el destino son números. */}
       <motion.line
-        x1="3"
-        y1="6"
-        x2="15"
-        y2="6"
         strokeWidth="1.7"
+        initial={{ x1: 3, y1: 6, x2: 15, y2: 6 }}
         animate={
           open
             ? { x1: 3, y1: 3, x2: 15, y2: 15 }
@@ -61,11 +63,8 @@ function HamburgerIcon({ open, reduced }) {
       />
       {/* Bottom line → top-right arm of X */}
       <motion.line
-        x1="3"
-        y1="12"
-        x2="15"
-        y2="12"
         strokeWidth="1.7"
+        initial={{ x1: 3, y1: 12, x2: 15, y2: 12 }}
         animate={
           open
             ? { x1: 15, y1: 3, x2: 3, y2: 15 }
