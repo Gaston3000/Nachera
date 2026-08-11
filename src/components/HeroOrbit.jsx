@@ -66,13 +66,19 @@ export function HeroOrbit({ chips }) {
         <div className="orbit-tilt">
           <div className="orbit-head">
             <div className="orbit-head__float">
+              {/* Sin `drop-shadow`. Era el único filtro permanente dentro del
+                  contexto 3D, y en iOS Safari eso promueve la imagen a una capa
+                  propia que se dibujaba como un rectángulo claro alrededor de
+                  la cara. En Chrome de escritorio no se veía. La profundidad la
+                  sigue dando el halo de .orbit-aura, que ahora es un gradiente
+                  y no un blur. */}
               <img
                 src="/nachera-head.webp"
                 alt="Ignacio Costa — Nachera"
                 width={730}
                 height={665}
                 decoding="async"
-                className="h-full w-full object-contain drop-shadow-[0_30px_60px_rgba(0,0,0,0.5)]"
+                className="h-full w-full object-contain"
               />
             </div>
           </div>

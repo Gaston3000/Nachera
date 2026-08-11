@@ -649,19 +649,25 @@
 
 /* Cuadrada y centrada a mano: con `inset` se deformaba en elipse al dejar
    de ser cuadrado el contenedor. */
+/* El difuminado lo hace el propio gradiente, NO un `filter: blur()`.
+   Con blur, iOS Safari rasteriza el elemento en una capa y recorta el
+   desenfoque a sus bordes: se veía un cuadrado claro detrás de la cara.
+   En Chrome de escritorio no pasaba. Un radial-gradient que muere en
+   transparente da el mismo halo sin crear capa ni recortarse. */
 .orbit-aura {
   position: absolute;
   left: 50%;
   top: 50%;
-  height: calc(var(--head-w) * 1.15);
-  width: calc(var(--head-w) * 1.15);
+  height: calc(var(--head-w) * 1.7);
+  width: calc(var(--head-w) * 1.7);
   transform: translate(-50%, -50%);
   border-radius: 9999px;
-  filter: blur(48px);
   background: radial-gradient(
     circle,
-    color-mix(in srgb, var(--c-accent) 35%, transparent),
-    transparent 70%
+    color-mix(in srgb, var(--c-accent) 32%, transparent) 0%,
+    color-mix(in srgb, var(--c-accent) 20%, transparent) 22%,
+    color-mix(in srgb, var(--c-accent) 8%, transparent) 45%,
+    transparent 68%
   );
 }
 
@@ -736,8 +742,12 @@
   white-space: nowrap;
   border-radius: 9999px;
   border: 1px solid var(--c-glass-border);
+  /* Sin `backdrop-filter`: dentro del contexto 3D, iOS Safari le arma a cada
+     cápsula una raíz de fondo propia y termina muestreando la cara que tiene
+     detrás — las palabras se teñían de marrón al pasar sobre el pelo. El
+     fondo translúcido y el borde ya dan el efecto de vidrio, y encima evita
+     tener cinco elementos con backdrop-filter moviéndose todo el tiempo. */
   background: var(--c-glass);
-  backdrop-filter: blur(12px);
   padding: 0.375rem 0.75rem;
   font-family: var(--font-display);
   font-size: 0.75rem;
@@ -801,14 +811,17 @@
   }
 }
 
+/* Solo opacidad. Tenía además un `blur(9px)` que se disipaba, pero un filter
+   dentro del contexto 3D hace que iOS Safari promueva la cara a una capa
+   propia — y esa capa se quedaba promovida después de terminar la animación,
+   dibujando un rectángulo claro alrededor del rostro. El escalado de
+   orbitHeadScale ya da bastante sensación de "materializarse". */
 @keyframes orbitHeadFade {
   from {
     opacity: 0;
-    filter: blur(9px);
   }
   to {
     opacity: 1;
-    filter: none;
   }
 }
 
