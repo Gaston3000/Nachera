@@ -1,4 +1,11 @@
-import { motion, useReducedMotion } from 'motion/react'
+import { useId, useLayoutEffect, useRef, useState } from 'react'
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+} from 'motion/react'
 import { Reveal } from './primitives/Reveal.jsx'
 import { RichText } from './primitives/RichText.jsx'
 import {
@@ -11,11 +18,15 @@ import {
   MicIcon,
 } from './primitives/icons.jsx'
 import { about } from '../data/content.js'
+import {
+  activationWindows,
+  buildSegments,
+} from './primitives/credentialsCircuit.js'
 
-/* premium ease — matches Solutions / Reveal */
-const EASE = [0.16, 1, 0.3, 1]
-
-/* maps the data `icon` key → in-house icon component */
+/* maps the data `icon` key → in-house icon component.
+   Se mantienen megaphone/mic/sparklogic aunque los 4 pilares actuales no
+   los usen: el registro es del componente, no de los datos, y así cambiar
+   un `icon` en content.js no obliga a tocar acá. */
 const CRED_ICONS = {
   diploma: DiplomaIcon,
   chartcheck: ChartCheckIcon,
@@ -26,30 +37,288 @@ const CRED_ICONS = {
   mic: MicIcon,
 }
 
-const credGridVariants = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.08 } },
+/* ── Credenciales clave — bento + circuito que se enciende con el scroll ───
+ *
+ * POR QUÉ ESTE RECURSO Y NO UN HILO VERTICAL:
+ * StackFormacion ya tiene un riel cyan de 1px que baja cosiendo e
+ * iluminando credenciales con el scroll (StackFormacion.jsx:330-399). Meter
+ * acá otro hilo vertical scroll-driven sería el mismo recurso dos veces en
+ * la misma página — y encima About.jsx ya usa un rail cyan→violeta vertical
+ * 60px más arriba (el de la columna izquierda). Así que este módulo usa la
+ * OTRA mitad del vocabulario de la casa: los `pathLength` 0→1 de las vizs
+ * de Solutions, pero enrutados en ángulo recto por las canaletas del bento.
+ * Se lee como circuito, no como hilo. La gramática de encendido de las
+ * tarjetas (opacity .42→1, blur 3→0, y 8→0, borde y glow que suben) sí es
+ * la misma que StackFormacion: eso es coherencia, no repetición.
+ *
+ * El recorrido NO está hardcodeado: se mide el DOM real de las tarjetas y
+ * se enrutan los tramos entre ellas. Por eso el bento puede cambiar de
+ * spans o de breakpoint sin tocar la geometría.
+ */
+
+/* Bento pinwheel: ancha-angosta arriba, angosta-ancha abajo. Los dos
+   pilares con más sustancia se quedan con las celdas anchas, en diagonal.
+   Grilla de 6 para que entre 2 columnas en celular (3+3) y el 2:1 en
+   escritorio (4+2) sin cambiar de sistema. */
+const PILLAR_SPANS = [
+  'col-span-6 lg:col-span-4',
+  'col-span-3 lg:col-span-2',
+  'col-span-3 lg:col-span-2',
+  'col-span-6 lg:col-span-4',
+]
+
+/* Mide el bento real y devuelve caja + tramos, re-midiendo ante cualquier
+   reflow (resize, fuentes que cargan tarde, texto que salta de renglón).
+   No corre con reduced-motion: ahí no hay circuito que dibujar. */
+function useCircuitGeometry({ wrapRef, cardRefs, count, enabled }) {
+  const [geometry, setGeometry] = useState(null)
+
+  useLayoutEffect(() => {
+    if (!enabled) return undefined
+    const wrap = wrapRef.current
+    if (!wrap || typeof ResizeObserver === 'undefined') return undefined
+
+    const measure = () => {
+      const wrapBox = wrap.getBoundingClientRect()
+      if (!wrapBox.width || !wrapBox.height) return
+      const cards = cardRefs.current.slice(0, count)
+      if (cards.length < count || cards.some((el) => !el)) return
+      const rects = cards.map((el) => {
+        const r = el.getBoundingClientRect()
+        return {
+          x: r.left - wrapBox.left,
+          y: r.top - wrapBox.top,
+          w: r.width,
+          h: r.height,
+        }
+      })
+      /* Los anclajes salen del ícono real y no de un padding hardcodeado:
+         el padding cambia de p-4 a p-5 en `sm` y no queremos que la
+         geometría dependa de recordar ese breakpoint. */
+      const icons = cards.map((el) => el.querySelector('[data-cred-icon]'))
+      if (icons.some((el) => !el)) return
+      const anchors = icons.map((el) => {
+        const r = el.getBoundingClientRect()
+        return {
+          x: r.left - wrapBox.left + r.width / 2,
+          y: r.top - wrapBox.top + r.height / 2,
+        }
+      })
+      setGeometry({
+        w: wrapBox.width,
+        h: wrapBox.height,
+        segments: buildSegments(rects, anchors),
+      })
+    }
+
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(wrap)
+    cardRefs.current.forEach((el) => el && observer.observe(el))
+    return () => observer.disconnect()
+  }, [wrapRef, cardRefs, count, enabled])
+
+  return geometry
 }
 
-const credCardVariants = {
-  hidden: { opacity: 0, y: 16, scale: 0.97 },
-  show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5, ease: EASE } },
+/* Un tramo del circuito: la línea que se dibuja entre dos pilares.
+   Sin nodos en las puntas a propósito — las puntas caen sobre los íconos,
+   que van por delante del SVG, así que un punto ahí quedaría tapado. El
+   "nodo" que se ve es el halo del propio ícono al encenderse. */
+function CircuitSegment({ segment, window: range, progress, gradientId }) {
+  const pathLength = useTransform(progress, range, [0, 1])
+
+  return (
+    <motion.path
+      d={segment.d}
+      fill="none"
+      stroke={`url(#${gradientId})`}
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      style={{
+        pathLength,
+        // Glow estático: el filtro no se recalcula por cuadro, solo se anima
+        // el largo del trazo (mismo criterio que el peak dot de las vizs de
+        // Solutions, donde el drop-shadow va fijo en `style`).
+        filter: 'drop-shadow(0 0 5px color-mix(in srgb, var(--c-accent) 55%, transparent))',
+      }}
+    />
+  )
 }
 
-/* one credential badge-card */
-function CredentialCard({ cred }) {
-  const reduce = useReducedMotion()
+/* Capa del circuito. Va detrás de las tarjetas (z-0 contra z-10): donde el
+   trazo pasa por debajo de una tarjeta, el `bg-glass` + `backdrop-blur` lo
+   difumina en vez de taparlo, y se lee como luz atrás del vidrio. */
+function CircuitLayer({ geometry, windows, progress }) {
+  const gradientId = `${useId()}-cred-circuit`
+
+  return (
+    <svg
+      data-cred-circuit
+      className="pointer-events-none absolute inset-0 h-full w-full"
+      viewBox={`0 0 ${geometry.w} ${geometry.h}`}
+      fill="none"
+      aria-hidden="true"
+    >
+      <defs>
+        <linearGradient
+          id={gradientId}
+          gradientUnits="userSpaceOnUse"
+          x1="0"
+          y1="0"
+          x2={geometry.w}
+          y2={geometry.h}
+        >
+          <stop offset="0%" stopColor="var(--c-accent)" />
+          <stop offset="100%" stopColor="var(--c-accent2)" />
+        </linearGradient>
+      </defs>
+
+      {/* circuito apagado — siempre visible, para que el bento se lea como
+          una placa aun antes de que el scroll lo encienda */}
+      {geometry.segments.map((segment, i) => (
+        <path
+          key={`base-${i}`}
+          d={segment.d}
+          fill="none"
+          stroke="color-mix(in srgb, var(--c-fg) 9%, transparent)"
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      ))}
+
+      {geometry.segments.map((segment, i) => (
+        <CircuitSegment
+          key={`lit-${i}`}
+          segment={segment}
+          window={windows.segments[i]}
+          progress={progress}
+          gradientId={gradientId}
+        />
+      ))}
+    </svg>
+  )
+}
+
+/* Un pilar: la tarjeta que el circuito enciende cuando le llega la
+   corriente. Toda la gramática de encendido (opacidad, desenfoque,
+   desplazamiento, borde, glow, color del título) es exactamente la misma
+   que usa el timeline de StackFormacion. Que se sientan hermanas es
+   deliberado: lo que cambia entre las dos secciones es el recorrido, no
+   el idioma. */
+function PillarCard({ cred, span, progress, window: range, reduce, cardRef }) {
   const Icon = CRED_ICONS[cred.icon]
   const tint = cred.accent === 'accent2' ? 'var(--c-accent2)' : 'var(--c-accent)'
 
-  const card = (
-    <div
-      className="relative h-full overflow-hidden rounded-2xl border bg-glass p-4 backdrop-blur-md sm:p-5"
+  const rawLit = useTransform(progress, range, [0, 1])
+  const lit = useSpring(rawLit, { stiffness: 90, damping: 22, mass: 0.4 })
+
+  const opacity = useTransform(lit, [0, 1], [0.42, 1])
+  const blurPx = useTransform(lit, [0, 1], [3, 0])
+  const filter = useTransform(blurPx, (b) => `blur(${b}px)`)
+  const y = useTransform(lit, [0, 1], [8, 0])
+  const borderColor = useTransform(
+    lit,
+    [0, 1],
+    [
+      'color-mix(in srgb, var(--c-fg) 10%, var(--c-glassborder))',
+      `color-mix(in srgb, ${tint} 38%, transparent)`,
+    ]
+  )
+  const boxShadow = useTransform(
+    lit,
+    [0, 1],
+    [
+      'inset 0 1px 0 0 rgba(255,255,255,0.04)',
+      `inset 0 1px 0 0 rgba(255,255,255,0.07), 0 0 30px -14px ${tint}`,
+    ]
+  )
+  const titleColor = useTransform(
+    lit,
+    [0, 1],
+    ['color-mix(in srgb, var(--c-fg) 60%, transparent)', 'var(--c-fg)']
+  )
+  /* El halo del ícono ya no late en bucle: se enciende cuando el circuito
+     llega y se queda. Cuatro halos pulsando a destiempo eran ruido, no
+     vida — y competían justo con el trazo, que es lo que hay que mirar. */
+  const haloOpacity = useTransform(lit, [0, 1], [0, 0.85])
+  /* El tick de verificado se DIBUJA (pathLength 0→1) en vez de aparecer
+     hecho: trazarse se lee como validación; parpadear, como decoración. */
+  const tickDraw = useTransform(lit, [0.45, 1], [0, 1])
+  const badgeScale = useTransform(lit, [0.4, 1], [0.72, 1])
+
+  const halo = reduce ? (
+    <span
+      className="pointer-events-none absolute -inset-2 rounded-full blur-md"
+      aria-hidden="true"
+      style={{ background: `color-mix(in srgb, ${tint} 22%, transparent)`, opacity: 0.85 }}
+    />
+  ) : (
+    <motion.span
+      className="pointer-events-none absolute -inset-2 rounded-full blur-md"
+      aria-hidden="true"
       style={{
-        borderColor: `color-mix(in srgb, ${tint} 28%, transparent)`,
-        boxShadow: `inset 0 1px 0 0 rgba(255,255,255,0.06), 0 0 28px -16px ${tint}`,
+        background: `color-mix(in srgb, ${tint} 22%, transparent)`,
+        opacity: haloOpacity,
       }}
+    />
+  )
+
+  const tickPath = (
+    <path d="m5 13 4 4L19 7" pathLength={1} />
+  )
+
+  const tick = cred.verified ? (
+    <span
+      className="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full"
+      aria-hidden="true"
+      style={{ color: tint, background: `color-mix(in srgb, ${tint} 18%, transparent)` }}
     >
+      <svg
+        viewBox="0 0 24 24"
+        className="h-2.5 w-2.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={3}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        {reduce ? tickPath : <motion.path d="m5 13 4 4L19 7" style={{ pathLength: tickDraw }} />}
+      </svg>
+    </span>
+  ) : null
+
+  const badge = cred.badge ? (
+    reduce ? (
+      <span
+        className="ml-0.5 shrink-0 rounded-md px-1.5 py-0.5 font-display text-[10px] font-bold leading-none"
+        style={{
+          color: tint,
+          background: `color-mix(in srgb, ${tint} 16%, transparent)`,
+          border: `1px solid color-mix(in srgb, ${tint} 30%, transparent)`,
+        }}
+      >
+        {cred.badge}
+      </span>
+    ) : (
+      <motion.span
+        className="ml-0.5 shrink-0 rounded-md px-1.5 py-0.5 font-display text-[10px] font-bold leading-none"
+        style={{
+          color: tint,
+          background: `color-mix(in srgb, ${tint} 16%, transparent)`,
+          border: `1px solid color-mix(in srgb, ${tint} 30%, transparent)`,
+          scale: badgeScale,
+        }}
+      >
+        {cred.badge}
+      </motion.span>
+    )
+  ) : null
+
+  const inner = (
+    <>
       {/* permanent soft tint — active at rest, no hover needed */}
       <div
         className="pointer-events-none absolute inset-0"
@@ -60,24 +329,11 @@ function CredentialCard({ cred }) {
       />
 
       <div className="relative flex flex-col gap-2.5">
-        {/* icon + permanent halo (optional gentle pulse on the halo) */}
+        {/* ícono + halo que se enciende al llegar la corriente */}
         <div className="relative w-fit">
-          {reduce ? (
-            <span
-              className="pointer-events-none absolute -inset-2 rounded-full blur-md"
-              aria-hidden="true"
-              style={{ background: `color-mix(in srgb, ${tint} 22%, transparent)` }}
-            />
-          ) : (
-            <motion.span
-              className="pointer-events-none absolute -inset-2 rounded-full blur-md"
-              aria-hidden="true"
-              style={{ background: `color-mix(in srgb, ${tint} 22%, transparent)` }}
-              animate={{ opacity: [0.55, 0.9, 0.55], scale: [1, 1.06, 1] }}
-              transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
-            />
-          )}
+          {halo}
           <span
+            data-cred-icon
             className="relative inline-flex h-10 w-10 items-center justify-center rounded-xl border"
             style={{
               color: tint,
@@ -89,73 +345,90 @@ function CredentialCard({ cred }) {
           </span>
         </div>
 
-        {/* label + verified / badge details */}
+        {/* título + tick de verificado / badge */}
         <div className="flex items-center gap-1.5">
-          <h3 className="font-display text-sm font-bold leading-snug text-fg sm:text-base">
-            {cred.label}
-          </h3>
-          {cred.verified &&
-            (reduce ? (
-              <span
-                className="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full"
-                aria-hidden="true"
-                style={{
-                  color: tint,
-                  background: `color-mix(in srgb, ${tint} 18%, transparent)`,
-                }}
-              >
-                <svg viewBox="0 0 24 24" className="h-2.5 w-2.5" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
-                  <path d="m5 13 4 4L19 7" />
-                </svg>
-              </span>
-            ) : (
-              <motion.span
-                className="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full"
-                aria-hidden="true"
-                style={{
-                  color: tint,
-                  background: `color-mix(in srgb, ${tint} 18%, transparent)`,
-                }}
-                animate={{ opacity: [0.75, 1, 0.75] }}
-                transition={{ duration: 3.4, repeat: Infinity, ease: 'easeInOut' }}
-              >
-                <svg viewBox="0 0 24 24" className="h-2.5 w-2.5" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
-                  <path d="m5 13 4 4L19 7" />
-                </svg>
-              </motion.span>
-            ))}
-          {cred.badge && (
-            <span
-              className="ml-0.5 shrink-0 rounded-md px-1.5 py-0.5 font-display text-[10px] font-bold leading-none"
-              style={{
-                color: tint,
-                background: `color-mix(in srgb, ${tint} 16%, transparent)`,
-                border: `1px solid color-mix(in srgb, ${tint} 30%, transparent)`,
-              }}
+          {reduce ? (
+            <h3 className="font-display text-sm font-bold leading-snug text-fg sm:text-base">
+              {cred.label}
+            </h3>
+          ) : (
+            <motion.h3
+              className="font-display text-sm font-bold leading-snug sm:text-base"
+              style={{ color: titleColor }}
             >
-              {cred.badge}
-            </span>
+              {cred.label}
+            </motion.h3>
           )}
+          {tick}
+          {badge}
         </div>
 
-        {/* micro-line */}
+        {/* micro-línea: los títulos reales que respaldan el pilar */}
         <p className="text-[11px] leading-snug text-muted sm:text-xs">{cred.micro}</p>
       </div>
-    </div>
+    </>
   )
 
-  if (reduce) return <div className="h-full">{card}</div>
+  /* La tarjeta va en dos capas anidadas a propósito: la de afuera lleva el
+     estado del scroll (opacity/filter/y como MotionValues) y la de adentro
+     el hover de CSS. Si el translate del hover viviera en el mismo nodo,
+     el `transform` inline de motion lo pisaría y la tarjeta no se movería. */
+  if (reduce) {
+    return (
+      <div ref={cardRef} className={`${span} h-full`}>
+        <div
+          className="cred-pillar relative h-full overflow-hidden rounded-2xl border bg-glass p-4 backdrop-blur-md sm:p-5"
+          style={{
+            borderColor: `color-mix(in srgb, ${tint} 38%, transparent)`,
+            boxShadow: `inset 0 1px 0 0 rgba(255,255,255,0.07), 0 0 30px -14px ${tint}`,
+          }}
+        >
+          {inner}
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <motion.div className="h-full" variants={credCardVariants}>
-      {card}
+    <motion.div ref={cardRef} className={`${span} h-full`} style={{ opacity, filter, y }}>
+      <motion.div
+        className="cred-pillar relative h-full overflow-hidden rounded-2xl border bg-glass p-4 backdrop-blur-md sm:p-5"
+        style={{ borderColor, boxShadow }}
+      >
+        {inner}
+      </motion.div>
     </motion.div>
   )
 }
 
-/* "credenciales clave" mini-module — replaces the old plain pill row */
+/* "credenciales clave" — 4 pilares en bento, cosidos por el circuito */
 function CredentialsModule() {
   const reduce = useReducedMotion()
+  const wrapRef = useRef(null)
+  const cardRefs = useRef([])
+  const pillars = about.credentials
+  const count = pillars.length
+
+  /* El objetivo del scroll es el propio bento y no la sección entera: el
+     módulo vive al final de "Sobre mí", así que atarlo a la sección haría
+     que el circuito ya estuviera dibujado antes de que se lo vea. */
+  const { scrollYProgress } = useScroll({
+    target: wrapRef,
+    offset: ['start 0.9', 'end 0.6'],
+  })
+  const progress = useSpring(scrollYProgress, {
+    stiffness: 80,
+    damping: 26,
+    mass: 0.5,
+  })
+
+  const windows = activationWindows(count)
+  const geometry = useCircuitGeometry({
+    wrapRef,
+    cardRefs,
+    count,
+    enabled: !reduce,
+  })
 
   return (
     <div className="mt-12">
@@ -165,25 +438,27 @@ function CredentialsModule() {
         </p>
       </Reveal>
 
-      {reduce ? (
-        <div className="mt-4 grid grid-cols-2 gap-3 sm:gap-4">
-          {about.credentials.map((cred) => (
-            <CredentialCard key={cred.label} cred={cred} />
+      <div ref={wrapRef} className="relative mt-4">
+        {!reduce && geometry && (
+          <CircuitLayer geometry={geometry} windows={windows} progress={progress} />
+        )}
+
+        <div className="relative z-10 grid grid-cols-6 gap-3 sm:gap-4">
+          {pillars.map((cred, i) => (
+            <PillarCard
+              key={cred.label}
+              cred={cred}
+              span={PILLAR_SPANS[i] ?? 'col-span-3'}
+              progress={progress}
+              window={windows.cards[i]}
+              reduce={reduce}
+              cardRef={(el) => {
+                cardRefs.current[i] = el
+              }}
+            />
           ))}
         </div>
-      ) : (
-        <motion.div
-          className="mt-4 grid grid-cols-2 gap-3 sm:gap-4"
-          variants={credGridVariants}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.3 }}
-        >
-          {about.credentials.map((cred) => (
-            <CredentialCard key={cred.label} cred={cred} />
-          ))}
-        </motion.div>
-      )}
+      </div>
     </div>
   )
 }

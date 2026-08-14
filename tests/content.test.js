@@ -28,7 +28,7 @@ describe('about', () => {
     expect(Array.isArray(about.beats)).toBe(true)
     expect(about.beats).toHaveLength(3)
     expect(Array.isArray(about.credentials)).toBe(true)
-    expect(about.credentials).toHaveLength(6)
+    expect(about.credentials).toHaveLength(4)
     about.credentials.forEach((c) => {
       expect(c.label).toBeTruthy()
       expect(c.micro).toBeTruthy()
@@ -37,12 +37,23 @@ describe('about', () => {
     // icon keys must map to the known in-house credential icon registry
     expect(about.credentials.map((c) => c.icon)).toEqual([
       'diploma',
-      'megaphone',
       'video',
-      'mic',
       'chartcheck',
       'flagen',
     ])
+  })
+
+  // Los 4 pilares resumen la formación; el detalle vive en `certifications`
+  // y lo renderiza StackFormacion. Este test existe para que no se vuelva a
+  // colar la lista de certificados acá: antes 5 de 6 credenciales repetían
+  // textualmente un ítem de `certifications` en la misma página.
+  it('credentials are pillars, not a second copy of the certifications list', () => {
+    const certNames = certifications.map((c) => c.name.toLowerCase())
+    about.credentials.forEach((cred) => {
+      expect(certNames).not.toContain(cred.label.toLowerCase())
+    })
+    // y son menos que los certificados: agrupan, no enumeran
+    expect(about.credentials.length).toBeLessThan(certifications.length)
   })
   it('beats contain bold markers', () => {
     about.beats.forEach((b) => expect(b).toMatch(/\*\*.+\*\*/))

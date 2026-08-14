@@ -38,35 +38,43 @@ export const about = {
     'Aplico todo lo que aprendí en el **mundo del marketing digital** para ayudar a las marcas a **crecer con estrategia y comunicación que conecta de verdad**.',
     'Hoy trabajo en **Bloop Agency** y, además, llevo adelante **proyectos propios como freelance** — con la misma dedicación y criterio en cada uno.',
   ],
+  // ── Credenciales clave — PILARES, no certificados ────────────────────
+  // Ojo al cambiar esto: la lista de títulos y certificados vive en
+  // `certifications` (abajo) y la renderiza el timeline de StackFormacion.
+  // Antes este bloque repetía esos mismos ítems uno por uno: 5 de 6
+  // credenciales volvían a aparecer, casi con el mismo texto, cinco
+  // secciones más abajo. Ahora agrupa esa formación en 4 pilares —
+  // categorías de criterio, no diplomas sueltos.
+  //
+  // Cada pilar nombra en su micro-línea los títulos REALES que lo
+  // respaldan: no se inventa nada, se agrupa lo que ya existe en
+  // `certifications`. Si se suma un certificado nuevo, va en
+  // `certifications`; acá solo se toca si cambia el agrupamiento.
+  //
+  // "Performance y medición" se enuncia como FORMACIÓN, nunca como
+  // servicio: CLAUDE.md es explícito en que Ads/SEO no se ofrecen como
+  // propuesta comercial. Por eso la micro-línea nombra las
+  // certificaciones y no una capacidad de venta.
   credentials: [
     {
-      label: 'Formación universitaria',
-      micro: 'Lic. en Cs. de la Comunicación · UADE',
+      // "Periodismo deportivo" se nombra tal cual y no como "Tecnicatura":
+      // es el diferencial de marca que CLAUDE.md manda usar siempre como
+      // ancla, y además le dice algo al visitante — "Tecnicatura" solo no.
+      label: 'Comunicación y periodismo',
+      micro: 'Lic. en Cs. de la Comunicación (UADE) · Periodismo deportivo (Deportea)',
       icon: 'diploma',
       accent: 'accent',
       verified: true,
     },
     {
-      label: 'Marketing Digital',
-      micro: 'Escuela Da Vinci · Buenos Aires',
-      icon: 'megaphone',
-      accent: 'accent2',
-    },
-    {
-      label: 'Edición de video',
-      micro: 'Escuela Da Vinci · formación profesional',
+      label: 'Producción audiovisual',
+      micro: 'Edición de video · Escuela Da Vinci',
       icon: 'video',
-      accent: 'accent',
-    },
-    {
-      label: 'Periodismo deportivo',
-      micro: 'Tecnicatura · Deportea',
-      icon: 'mic',
       accent: 'accent2',
     },
     {
-      label: 'Formación en performance',
-      micro: 'Google Ads & Analytics · Skillshop',
+      label: 'Performance y medición',
+      micro: 'Google Ads & Analytics · Skillshop y Coderhouse',
       icon: 'chartcheck',
       accent: 'accent2',
     },

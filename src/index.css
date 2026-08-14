@@ -937,3 +937,29 @@
     top: 92%;
   }
 }
+
+/* ── Credenciales clave: los pilares reaccionan al puntero ────────────────
+   El translate vive acá, en CSS, y sobre el nodo INTERNO de la tarjeta.
+   El nodo externo ya tiene un `transform` inline que escribe motion con el
+   estado del scroll (opacity/filter/y): si el hover se declarara ahí, el
+   inline lo pisaría y la tarjeta no se movería. Mismo easing que los
+   botones (.btn-premium) para que todo el sitio tenga una sola física.
+
+   Solo se transiciona `transform`. El borde y el box-shadow los reescribe
+   motion cuadro a cuadro mientras el circuito avanza; ponerles transición
+   los haría pelear entre sí. */
+.cred-pillar {
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cred-pillar:hover {
+  transform: translateY(-3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cred-pillar {
+    transition: none;
+  }
+  .cred-pillar:hover {
+    transform: none;
+  }
+}
