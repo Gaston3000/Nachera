@@ -163,6 +163,55 @@ export const tools = [
   'Días de producción de contenido',
 ]
 
+/* Agrupación de la stack por área de trabajo — es lo que rendea el carrusel
+   de Herramientas (una tarjeta por área). Las primeras 4 agrupan las
+   herramientas reales de `tools`. La 5ta — "Experiencias Digitales" — son
+   los entregables del servicio web, en voz plural de equipo (CLAUDE.md).
+
+   Las bajadas describen el terreno de cada área, NO ofrecen un servicio:
+   Ads y SEO figuran como stack y formación, nunca como propuesta comercial.
+
+   `icon` es una clave; el componente la mapea al ícono propio (mismo patrón
+   que `about.credentials`). */
+export const toolCategories = [
+  {
+    label: 'Ads & Performance',
+    desc: 'El terreno de la pauta: dónde se compra, cómo se configura y qué devuelve.',
+    icon: 'target',
+    items: ['Google Ads', 'Meta Business Suite'],
+  },
+  {
+    label: 'Analítica & SEO',
+    desc: 'Los números que confirman —o desmienten— una decisión de contenido.',
+    icon: 'chartsearch',
+    items: ['Google Analytics', 'SEO', 'Metricool'],
+  },
+  {
+    label: 'Contenido & Edición',
+    desc: 'Donde se produce la pieza: guion, edición, placas y jornadas de rodaje.',
+    icon: 'clapper',
+    items: [
+      'Adobe Premiere',
+      'Canva',
+      'CapCut',
+      'Sony Vegas',
+      'Días de producción de contenido',
+    ],
+  },
+  {
+    label: 'Gestión & Email',
+    desc: 'Planificación, envíos y seguimiento, para que nada dependa de la memoria.',
+    icon: 'checklist',
+    items: ['Trello', 'Brevo', 'Microsoft Office'],
+  },
+  {
+    label: 'Experiencias Digitales',
+    desc: 'Llevamos la identidad de la marca al entorno digital: sitio, landing y portfolio.',
+    icon: 'browser',
+    items: ['Sitio', 'Landing', 'Portfolio'],
+  },
+]
+
 // Sección "Lo que hago en Bloop Agency" — pedido del cliente.
 // CLAUDE.md: trabajo bajo paraguas de la agencia, NO se presenta como
 // caso propio. Framing "lo que hago EN Bloop" — descripción del rol

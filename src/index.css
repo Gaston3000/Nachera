@@ -320,6 +320,48 @@
   }
 }
 
+/* ── Carrusel de herramientas: barrido specular al tomar el foco ─────────
+   El mismo recurso que el sheen de los botones, pero disparado por estado
+   (`data-active`) en vez de por hover: cuando una tarjeta pasa a ser la
+   central del carrusel, una luz diagonal la recorre una sola vez. La regla
+   empieza a matchear recién en ese momento, así que la animación se
+   reinicia sola cada vez que la tarjeta vuelve al centro. */
+.tool-card__sheen {
+  position: absolute;
+  inset: -1px;
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 38%,
+    color-mix(in srgb, #ffffff 18%, transparent) 50%,
+    transparent 62%
+  );
+  transform: translateX(-130%);
+}
+.tool-card[data-active='true'] .tool-card__sheen {
+  animation: toolCardSheen 1.05s cubic-bezier(0.22, 1, 0.36, 1) 0.06s;
+}
+@keyframes toolCardSheen {
+  0% {
+    opacity: 0;
+    transform: translateX(-130%);
+  }
+  14% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(130%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tool-card__sheen {
+    display: none;
+  }
+}
+
 /* ── Nav premium: links en blanco + indicador activo deslizante +
    pulso de energía al clic + subrayado-hint al hover ─────────────────── */
 .nav-link {

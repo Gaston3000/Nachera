@@ -9,144 +9,22 @@ import {
 import { SectionHeading } from './primitives/SectionHeading.jsx'
 import { Reveal } from './primitives/Reveal.jsx'
 import { Parallax } from './primitives/Parallax.jsx'
-import { GlassPanel } from './primitives/GlassPanel.jsx'
-import { tools, certifications } from '../data/content.js'
+import { ToolsCarousel } from './ToolsCarousel.jsx'
+import { certifications } from '../data/content.js'
 
 /* ─── shared constants ───────────────────────────────────────────────────── */
 
 const EASE = [0.16, 1, 0.3, 1]
 
-/* presentational grouping of la stack. Las primeras 4 son herramientas
-   reales (`tools` data). La 5ta — "Experiencias Digitales" — son los
-   entregables del servicio web; visible como "tarjeta" en este grid
-   para que el cliente vea que también lo puede pedir, sin romper el
-   vocabulario de CLAUDE.md (categoría = "Experiencias Digitales", no
-   "Diseño Web"). */
-const TOOL_CATEGORIES = [
-  { label: 'Ads & Performance', items: ['Google Ads', 'Meta Business Suite'] },
-  { label: 'Analítica & SEO', items: ['Google Analytics', 'SEO', 'Metricool'] },
-  { label: 'Contenido & Edición', items: ['Adobe Premiere', 'Canva', 'CapCut', 'Sony Vegas', 'Días de producción de contenido'] },
-  { label: 'Gestión & Email', items: ['Trello', 'Brevo', 'Microsoft Office'] },
-  { label: 'Experiencias Digitales', items: ['Sitio', 'Landing', 'Portfolio'] },
-]
+/* ─── Herramientas — carrusel coverflow por área de trabajo ──────────────── */
 
-// Safety net: surface any tool not explicitly bucketed so data stays complete
-const KNOWN = new Set(TOOL_CATEGORIES.flatMap((c) => c.items))
-const UNCATEGORIZED = tools.filter((t) => !KNOWN.has(t))
-const CATEGORIES = UNCATEGORIZED.length
-  ? [...TOOL_CATEGORIES, { label: 'Otras', items: UNCATEGORIZED }]
-  : TOOL_CATEGORIES
-
-/* ─── motion variants ────────────────────────────────────────────────────── */
-
-const moduleListVariants = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.12 } },
-}
-
-const moduleVariants = {
-  hidden: { opacity: 0, y: 22 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } },
-}
-
-const pillRowVariants = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.045, delayChildren: 0.08 } },
-}
-
-const pillVariants = {
-  hidden: { opacity: 0, y: 10, scale: 0.95 },
-  show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.45, ease: EASE } },
-}
-
-/* ─── Herramientas — premium technical stack ─────────────────────────────── */
-
-/* a worked pill: subtle gradient surface + permanent inner highlight +
-   permanent cyan-tinted border. Looks intentional at rest, polishes on hover. */
-function ToolPill({ label, reduce }) {
-  return (
-    <motion.span
-      variants={reduce ? undefined : pillVariants}
-      className="group/pill relative cursor-default rounded-lg border border-[color-mix(in_srgb,var(--c-accent)_28%,var(--c-glassborder))] px-3 py-1.5 font-display text-xs font-medium text-fg/85 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.07),0_1px_2px_-1px_rgba(0,0,0,0.4)] transition-[color,border-color,transform,box-shadow] duration-300 will-change-transform hover:-translate-y-0.5 hover:border-[color-mix(in_srgb,var(--c-accent)_70%,transparent)] hover:text-fg hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12),0_8px_22px_-8px_color-mix(in_srgb,var(--c-accent)_60%,transparent)]"
-      style={{
-        background:
-          'linear-gradient(160deg, color-mix(in srgb, var(--c-accent) 9%, var(--c-bg2)) 0%, color-mix(in srgb, var(--c-bg2) 92%, transparent) 70%)',
-      }}
-    >
-      {label}
-    </motion.span>
-  )
-}
-
-function ToolModule({ category, reduce, isLast }) {
-  return (
-    <motion.div
-      className="relative pl-7 sm:pl-8"
-      variants={reduce ? undefined : moduleVariants}
-    >
-      {/* rail node — permanent glowing cyan marker linking the modules */}
-      <span
-        className="absolute left-0 top-3 grid h-3.5 w-3.5 -translate-x-1/2 place-items-center rounded-full border border-[color-mix(in_srgb,var(--c-accent)_55%,transparent)] bg-bg2 shadow-[0_0_0_3px_color-mix(in_srgb,var(--c-accent)_12%,transparent),0_0_12px_-1px_color-mix(in_srgb,var(--c-accent)_55%,transparent)]"
-        aria-hidden="true"
-      >
-        <span
-          className="h-1.5 w-1.5 rounded-full bg-accent"
-          style={{ boxShadow: '0 0 6px 0 color-mix(in srgb, var(--c-accent) 90%, transparent)' }}
-        />
-      </span>
-
-      {/* the module surface — glass + permanent faint cyan border + soft glow */}
-      <div
-        className="relative overflow-hidden rounded-xl border border-[color-mix(in_srgb,var(--c-accent)_16%,var(--c-glassborder))] bg-glass p-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)] backdrop-blur-md"
-      >
-        {/* permanent very soft cyan glow anchored to the header corner */}
-        <div
-          className="pointer-events-none absolute -left-10 -top-12 h-28 w-28 rounded-full blur-2xl"
-          aria-hidden="true"
-          style={{
-            background:
-              'radial-gradient(circle, color-mix(in srgb, var(--c-accent) 18%, transparent), transparent 70%)',
-            opacity: 0.55,
-          }}
-        />
-
-        {/* category header: accent node + label + thin connector line */}
-        <div className="relative mb-3 flex items-center gap-2.5">
-          <span
-            className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-accent"
-            aria-hidden="true"
-            style={{ boxShadow: '0 0 7px 0 color-mix(in srgb, var(--c-accent) 80%, transparent)' }}
-          />
-          <span className="font-display text-[11px] font-semibold uppercase tracking-[0.22em] text-accent">
-            {category.label}
-          </span>
-          <span
-            className="h-px flex-1"
-            aria-hidden="true"
-            style={{
-              background:
-                'linear-gradient(to right, color-mix(in srgb, var(--c-accent) 42%, transparent), transparent)',
-            }}
-          />
-        </div>
-
-        <motion.div
-          className="flex flex-wrap gap-2"
-          variants={reduce ? undefined : pillRowVariants}
-        >
-          {category.items.map((t) => (
-            <ToolPill key={t} label={t} reduce={reduce} />
-          ))}
-        </motion.div>
-      </div>
-    </motion.div>
-  )
-}
-
+/* El agrupado de la stack, las bajadas y los íconos viven en
+   ToolsCarousel.jsx: acá queda sólo el encabezado del bloque y la
+   ambientación de fondo. */
 function Herramientas({ reduce }) {
   return (
     <div className="relative">
-      {/* depth: faint coordinate dot-grid + soft cyan radial glow */}
+      {/* profundidad: grilla de puntos + glow cyan suave */}
       <div
         className="pointer-events-none absolute -inset-x-4 -top-6 -bottom-2 -z-10 rounded-3xl opacity-[0.5]"
         aria-hidden="true"
@@ -174,38 +52,16 @@ function Herramientas({ reduce }) {
         <p className="mb-1 font-display text-xs font-semibold uppercase tracking-[0.2em] text-accent">
           Herramientas
         </p>
-        <p className="mb-7 text-sm text-muted">
+        <p className="mb-8 text-sm text-muted">
           El stack con el que ejecuto, por área de trabajo.
         </p>
       </Reveal>
 
-      {/* connector rail linking the category modules (dashboard / system feel) */}
-      <motion.div
-        className="relative"
-        variants={reduce ? undefined : moduleListVariants}
-        initial={reduce ? undefined : 'hidden'}
-        whileInView={reduce ? undefined : 'show'}
-        viewport={{ once: true, amount: 0.2 }}
-      >
-        <span
-          className="absolute bottom-4 left-0 top-4 w-px"
-          aria-hidden="true"
-          style={{
-            background:
-              'linear-gradient(to bottom, transparent, color-mix(in srgb, var(--c-accent) 40%, transparent) 10%, color-mix(in srgb, var(--c-accent) 26%, transparent) 90%, transparent)',
-          }}
-        />
-        <div className="flex flex-col gap-5">
-          {CATEGORIES.map((category, i) => (
-            <ToolModule
-              key={category.label}
-              category={category}
-              reduce={reduce}
-              isLast={i === CATEGORIES.length - 1}
-            />
-          ))}
-        </div>
-      </motion.div>
+      {/* la entrada la maneja Reveal, no el carrusel: las tarjetas ya llegan
+          colocadas y sólo sube el conjunto */}
+      <Reveal delay={0.06}>
+        <ToolsCarousel reduce={reduce} />
+      </Reveal>
     </div>
   )
 }
@@ -429,24 +285,23 @@ export function StackFormacion() {
         />
       </Reveal>
 
-      <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-0">
-        {/* LEFT — categorized tools (wider) */}
-        <div className="lg:col-span-7 lg:pr-12">
-          <Herramientas reduce={reduce} />
-        </div>
+      {/* El carrusel necesita ancho completo para que las tarjetas laterales
+          se vayan de perspectiva y sangren en los bordes: por eso los dos
+          bloques quedan apilados y ya no en dos columnas. */}
+      <Herramientas reduce={reduce} />
 
-        {/* thin divider */}
-        <div
-          className="hidden lg:col-span-1 lg:flex lg:justify-center"
-          aria-hidden="true"
-        >
-          <span className="w-px bg-gradient-to-b from-transparent via-glassborder to-transparent" />
-        </div>
+      {/* misma hairline que separaba las columnas, ahora horizontal */}
+      <div
+        className="my-14 h-px w-full md:my-16"
+        aria-hidden="true"
+        style={{
+          background:
+            'linear-gradient(to right, transparent, var(--c-glass-border) 18%, var(--c-glass-border) 82%, transparent)',
+        }}
+      />
 
-        {/* RIGHT — credential timeline */}
-        <div className="lg:col-span-4">
-          <Formacion reduce={reduce} sectionRef={sectionRef} />
-        </div>
+      <div className="max-w-3xl">
+        <Formacion reduce={reduce} sectionRef={sectionRef} />
       </div>
     </section>
   )

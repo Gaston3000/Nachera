@@ -222,6 +222,145 @@ export const SparkLogicIcon = ({ className = '' }) => (
   </svg>
 )
 
+/* ── Chevrons — navegación del carrusel de herramientas ─────────────────── */
+
+export const ChevronLeft = ({ className = '' }) => (
+  <svg
+    className={`${base} ${className}`}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.5}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="m14.5 6-6 6 6 6" />
+  </svg>
+)
+
+export const ChevronRight = ({ className = '' }) => (
+  <svg
+    className={`${base} ${className}`}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.5}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="m9.5 6 6 6-6 6" />
+  </svg>
+)
+
+/* ── Íconos de área del stack ────────────────────────────────────────────
+   Uno por categoría del carrusel de herramientas. Mismo sistema que el
+   resto: 24×24, sin relleno, trazo currentColor 1.5, puntas redondeadas.
+   Se eligió el set propio y NO los logos de cada marca: el sistema de
+   íconos del sitio es monocromo (la bandera de FlagENIcon es la única
+   excepción justificada), y además cinco de los ítems del stack no son
+   marcas ("SEO", "Días de producción de contenido", "Sitio", "Landing",
+   "Portfolio"), con lo cual una grilla de logos quedaría incompleta.
+   ────────────────────────────────────────────────────────────────────── */
+
+/* Diana atravesada por una flecha — "Ads & Performance" (objetivo + impacto) */
+export const TargetIcon = ({ className = '' }) => (
+  <svg
+    className={`${base} ${className}`}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.5}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <circle cx="11" cy="13" r="8" />
+    <circle cx="11" cy="13" r="3.8" />
+    <circle cx="11" cy="13" r="0.9" />
+    {/* flecha que entra en diagonal y clava en el centro */}
+    <path d="M21 3 12.6 11.4" />
+    <path d="M16.6 3H21v4.4" />
+  </svg>
+)
+
+/* Lupa con barras adentro — "Analítica & SEO" (buscar + medir) */
+export const SearchChartIcon = ({ className = '' }) => (
+  <svg
+    className={`${base} ${className}`}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.5}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <circle cx="10.5" cy="10.5" r="6.5" />
+    <path d="m15.3 15.3 4.5 4.5" />
+    <path d="M8 12.6v-1.7M10.5 12.6v-4.2M13 12.6v-2.9" />
+  </svg>
+)
+
+/* Claqueta con play — "Contenido & Edición" (producción audiovisual) */
+export const ClapperIcon = ({ className = '' }) => (
+  <svg
+    className={`${base} ${className}`}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.5}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <rect x="3" y="4.5" width="18" height="15" rx="2.5" />
+    <path d="M3 9.5h18" />
+    <path d="m7.5 4.6-1.6 4.9M13 4.6l-1.6 4.9M18.5 4.6l-1.6 4.9" />
+    <path d="M11 12.4v4.6l4-2.3z" />
+  </svg>
+)
+
+/* Panel con checklist — "Gestión & Email" (planificar y seguir) */
+export const ChecklistIcon = ({ className = '' }) => (
+  <svg
+    className={`${base} ${className}`}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.5}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <rect x="3.5" y="4.5" width="17" height="15" rx="2.5" />
+    <path d="m6.6 9.4 1.3 1.3 2.5-2.6" />
+    <path d="M13.6 9.6h3.8" />
+    <path d="M6.6 13.6h10.8" />
+    <path d="M6.6 16.8h7.2" />
+  </svg>
+)
+
+/* Ventana de navegador con cursor — "Experiencias Digitales" */
+export const WindowCursorIcon = ({ className = '' }) => (
+  <svg
+    className={`${base} ${className}`}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.5}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <rect x="3" y="4.5" width="18" height="14" rx="2.5" />
+    <path d="M3 9h18" />
+    <path d="M6.1 6.75h.01M8.5 6.75h.01M10.9 6.75h.01" />
+    <path d="m10.5 11.4 6.5 2.6-2.7.9-.9 2.6z" />
+  </svg>
+)
+
 /* Megaphone — marketing digital (Da Vinci) */
 export const MegaphoneIcon = ({ className = '' }) => (
   <svg

@@ -39,7 +39,7 @@ vi.mock('motion/react', () => {
 })
 
 import { StackFormacion } from '../src/components/StackFormacion.jsx'
-import { certifications } from '../src/data/content.js'
+import { certifications, tools } from '../src/data/content.js'
 
 describe('StackFormacion', () => {
   it('renders the formacion section anchor', () => {
@@ -56,13 +56,29 @@ describe('StackFormacion', () => {
     ).toBeInTheDocument()
   })
 
-  it('renders all 4 tool category labels', () => {
+  it('renders all 5 tool category labels', () => {
     render(<StackFormacion />)
-    ;['Ads & Performance', 'Analítica & SEO', 'Contenido & Edición', 'Gestión & Email'].forEach(
-      (label) => {
-        expect(screen.getByText(label)).toBeInTheDocument()
-      }
-    )
+    ;[
+      'Ads & Performance',
+      'Analítica & SEO',
+      'Contenido & Edición',
+      'Gestión & Email',
+      'Experiencias Digitales',
+    ].forEach((label) => {
+      expect(screen.getByRole('heading', { name: label })).toBeInTheDocument()
+    })
+  })
+
+  it('keeps every tool from content.js visible in the stack block', () => {
+    const { container } = render(<StackFormacion />)
+    // Se busca dentro de las tarjetas del stack: algunos nombres (p. ej.
+    // "Google Analytics") también son certificaciones reales del timeline.
+    const cards = Array.from(container.querySelectorAll('.tool-card'))
+    expect(cards.length).toBeGreaterThan(0)
+    const stackText = cards.map((el) => el.textContent).join(' | ')
+    tools.forEach((t) => {
+      expect(stackText, `falta "${t}"`).toContain(t)
+    })
   })
 
   it('renders all 7 certification names in the timeline (full, not just 3)', () => {
