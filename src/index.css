@@ -21,9 +21,19 @@
 }
 
 @layer base {
+  /* `clip` y no `hidden`, en html y en body.
+     Cumplen lo mismo (que los glows decorativos no generen scroll
+     horizontal) pero `overflow-x: hidden` obliga al navegador a computar
+     `overflow-y: auto`, y eso convierte al body en contenedor de scroll:
+     un `position: sticky` adentro se queda midiendo contra un scrollport
+     que nunca se mueve y nunca pega. Es lo que sostiene la sección
+     anclada de Proceso. `clip` no crea contenedor de scroll, así que el
+     scroller sigue siendo la ventana.
+     Soporte: Chrome 90+, Firefox 81+, Safari 16+ — por debajo del piso
+     que el sitio ya pide con `color-mix()`. */
   html {
     scroll-behavior: smooth;
-    overflow-x: hidden;
+    overflow-x: clip;
   }
   @media (prefers-reduced-motion: reduce) {
     html {
@@ -32,8 +42,9 @@
   }
   body {
     margin: 0;
-    /* guard: glows/elementos decorativos absolutos nunca generan scroll horizontal */
-    overflow-x: hidden;
+    /* guard: glows/elementos decorativos absolutos nunca generan scroll
+       horizontal. Ver la nota de `html` sobre clip vs hidden. */
+    overflow-x: clip;
     background-color: var(--c-bg);
     background-image: radial-gradient(
         circle at 20% 25%,
