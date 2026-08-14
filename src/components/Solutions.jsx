@@ -5,6 +5,8 @@ import { SectionHeading } from './primitives/SectionHeading.jsx'
 import { Reveal } from './primitives/Reveal.jsx'
 import { Parallax } from './primitives/Parallax.jsx'
 import { RichText } from './primitives/RichText.jsx'
+import { SolutionsScroll } from './SolutionsScroll.jsx'
+import { useCanPin } from './solutions/useCanPin.js'
 
 /* ─── shared constants ───────────────────────────────────────────────────── */
 
@@ -1260,34 +1262,82 @@ function SolutionTile({ tile, index, active = false, onActivate }) {
   )
 }
 
+/* ─── recorrido anclado ──────────────────────────────────────────────────── */
+
+/* Lo único que el recorrido necesita y la grilla no. El copy NO se duplica:
+   sale de `tiles`, que sigue siendo la única fuente de verdad.
+
+   - `n`         número que se muestra arriba del título
+   - `vizBox`    alto MÍNIMO de la caja, nunca fijo, para que ninguna viz se
+                 pueda recortar
+   - `vizClass`  ancho + escala de la viz dentro del panel
+   - `fullBleed` el capstone abre a ancho completo en vez de partir en dos
+
+   Ojo con FeedViz: su grilla es de celdas `aspect-square`, así que su alto
+   sigue al ancho (mide ~ancho + 51). Por eso lleva menos ancho y menos escala
+   que el resto; con el 74% × 1.3 de las demás se iría a ~500px de alto. */
+const PANEL_EXTRA = {
+  estrategia: { n: '01', vizBox: 'min-h-[19rem]', vizClass: 'w-[74%] scale-[1.3]' },
+  marca: { n: '02', vizBox: 'min-h-[24rem]', vizClass: 'w-[68%] scale-[1.12]' },
+  produccion: { n: '03', vizBox: 'min-h-[19rem]', vizClass: 'w-[74%] scale-[1.3]' },
+  email: { n: '04', vizBox: 'min-h-[19rem]', vizClass: 'w-[74%] scale-[1.3]' },
+  analytics: { n: '05', vizBox: 'min-h-[19rem]', vizClass: 'w-[74%] scale-[1.3]' },
+  // full-bleed: el panel es el doble de ancho, así que la viz se maqueta a la
+  // mitad y se escala fuerte — si no, sus detalles quedan minúsculos.
+  web: { n: '06', vizBox: 'min-h-[17rem]', vizClass: 'w-[56%] scale-[1.7]', fullBleed: true },
+}
+
+const panels = tiles.map((tile) => ({ ...tile, ...PANEL_EXTRA[tile.id] }))
+
 /* ─── section ────────────────────────────────────────────────────────────── */
+
+/* La sección tiene dos formas de la misma lista de 6 tiles:
+
+   - ventana lo bastante grande (ancho Y alto, ver useCanPin) y motion activo
+     → recorrido anclado: un panel por vez, y su viz corre desde cero al
+     activarse.
+   - mobile, ventana baja o reduced-motion → la grilla de siempre, con el
+     clic/tap para repetir la animación.
+
+   Nunca las dos: si se montaran juntas, cada viz arrancaría por duplicado. */
 
 export function Solutions() {
   const [activeId, setActiveId] = useState(null)
+  const reduce = useReducedMotion()
+  const canPin = useCanPin()
+  const pinned = canPin && !reduce
 
   return (
-    <section id="soluciones" className="relative mx-auto w-full max-w-6xl overflow-hidden px-5 py-20 sm:px-8 md:py-28">
-      <Parallax speed={-50} className="pointer-events-none absolute -right-32 top-0 h-96 w-96 rounded-full blur-3xl opacity-20">
-        <div
-          className="h-full w-full rounded-full"
-          style={{ background: 'radial-gradient(circle, var(--c-accent2), transparent 70%)' }}
-          aria-hidden="true"
-        />
-      </Parallax>
+    <section id="soluciones" className="relative mx-auto w-full max-w-6xl px-5 py-20 sm:px-8 md:py-28">
+      {/* el glow se clipea en su propia caja: la sección NO puede llevar
+          overflow-hidden o el sticky del recorrido deja de pegarse */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+        <Parallax speed={-50} className="absolute -right-32 top-0 h-96 w-96 rounded-full blur-3xl opacity-20">
+          <div
+            className="h-full w-full rounded-full"
+            style={{ background: 'radial-gradient(circle, var(--c-accent2), transparent 70%)' }}
+            aria-hidden="true"
+          />
+        </Parallax>
+      </div>
       <Reveal>
         <SectionHeading eyebrow="SOLUCIONES" title="Lo que puedo resolver por tu marca." />
       </Reveal>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-6 md:auto-rows-[minmax(200px,auto)]">
-        {tiles.map((tile, i) => (
-          <SolutionTile
-            key={tile.id}
-            tile={tile}
-            index={i}
-            active={activeId === tile.id}
-            onActivate={() => setActiveId(tile.id)}
-          />
-        ))}
-      </div>
+      {pinned ? (
+        <SolutionsScroll panels={panels} DetailBlock={DetailBlock} />
+      ) : (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-6 md:auto-rows-[minmax(200px,auto)]">
+          {tiles.map((tile, i) => (
+            <SolutionTile
+              key={tile.id}
+              tile={tile}
+              index={i}
+              active={activeId === tile.id}
+              onActivate={() => setActiveId(tile.id)}
+            />
+          ))}
+        </div>
+      )}
     </section>
   )
 }
