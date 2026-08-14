@@ -60,11 +60,19 @@ describe('About — credenciales clave', () => {
     expect(container.querySelectorAll('.cred-pillar')).toHaveLength(6)
   })
 
-  it('con reduced-motion no pasa el barrido de luz', () => {
+  it('con reduced-motion no hay recorrido de luz', () => {
     const { container } = render(<About />)
-    expect(container.querySelector('[data-cred-sheen]')).toBeNull()
+    expect(container.querySelector('[data-cred-beam]')).toBeNull()
     // pero las tarjetas siguen ahí y completas
     expect(container.querySelectorAll('.cred-pillar')).toHaveLength(6)
+  })
+
+  it('con reduced-motion las tarjetas quedan en su estado encendido', () => {
+    const { container } = render(<About />)
+    container.querySelectorAll('.cred-pillar').forEach((card) => {
+      // sin recorrido que las encienda, arrancan ya en el estado final
+      expect(card.style.borderColor).toContain('46%')
+    })
   })
 
   /* La regla de la pieza, tras dos intentos descartados: la animación no
