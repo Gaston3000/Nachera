@@ -92,12 +92,41 @@ export const services = [
 
 // Descripciones textuales del PDF del cliente ("mantener los titulos").
 // El cliente pidió numeración 1→5 corrida (sin "bis" — fue un error suyo).
+/* `deliver` = qué se lleva el cliente al terminar cada paso. Es una
+   reformulación del propio `desc` (no promete nada nuevo ni agrega
+   números): existe para que el acordeón de Proceso responda la pregunta
+   comercial "¿y yo qué recibo?" en cada paso, no sólo "qué hace él". */
 export const process = [
-  { n: '01', title: 'Diagnóstico', desc: 'Entiendo tu marca, tu rubro, tu público y cómo te estás comunicando hoy.' },
-  { n: '02', title: 'Estrategia', desc: 'Defino pilares, tono y calendario. Un plan claro con objetivos concretos.' },
-  { n: '03', title: 'Ejecución', desc: 'Contenido, piezas y publicaciones con identidad.' },
-  { n: '04', title: 'Revisión', desc: 'Comparto los resultados con el cliente, escucho el feedback y nos aseguramos de que todo esté alineado.' },
-  { n: '05', title: 'Ajuste', desc: 'Analizo las métricas, ajusto lo que funciona y mantengo la comunicación activa en el tiempo.' },
+  {
+    n: '01',
+    title: 'Diagnóstico',
+    desc: 'Entiendo tu marca, tu rubro, tu público y cómo te estás comunicando hoy.',
+    deliver: 'Una lectura clara de cómo se está comunicando tu marca hoy.',
+  },
+  {
+    n: '02',
+    title: 'Estrategia',
+    desc: 'Defino pilares, tono y calendario. Un plan claro con objetivos concretos.',
+    deliver: 'Pilares, tono y calendario por escrito, con objetivos concretos.',
+  },
+  {
+    n: '03',
+    title: 'Ejecución',
+    desc: 'Contenido, piezas y publicaciones con identidad.',
+    deliver: 'Las piezas producidas y publicadas, con tu identidad.',
+  },
+  {
+    n: '04',
+    title: 'Revisión',
+    desc: 'Comparto los resultados con el cliente, escucho el feedback y nos aseguramos de que todo esté alineado.',
+    deliver: 'Una devolución conjunta antes de seguir avanzando.',
+  },
+  {
+    n: '05',
+    title: 'Ajuste',
+    desc: 'Analizo las métricas, ajusto lo que funciona y mantengo la comunicación activa en el tiempo.',
+    deliver: 'La lectura de métricas y los ajustes del próximo ciclo.',
+  },
 ]
 
 export const projects = [
