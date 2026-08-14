@@ -32,9 +32,16 @@ import { process } from '../data/content.js'
    3. "Qué recibís" en cada paso: responde qué se lleva el cliente,
       que es para lo que existe el sitio.
 
-   Abajo de `lg` NO se ancla nada: pinnear una sección en mobile es
-   la forma más rápida de que alguien sienta que no puede scrolear.
-   Ahí va el mismo acordeón, apilado, y se abre tocando.
+   En mobile el gesto es el mismo — el scroll manda — pero la forma
+   cambia: las tarjetas suben desde abajo y se apilan una sobre otra,
+   dejando asomar el encabezado de las anteriores. Mientras leés el
+   paso 04 seguís viendo arriba "01 Diagnóstico · 02 Estrategia ·
+   03 Ejecución": el recorrido queda a la vista.
+
+   Un acordeón horizontal no entra en 400px, y pinnear la sección en un
+   teléfono se siente como que la página se colgó. El apilado no
+   secuestra el scroll: la página sigue corriendo normal, las tarjetas
+   sólo se quedan pegadas mientras la siguiente las tapa.
    ─────────────────────────────────────────────────────────────── */
 
 /* Cuánto scroll cuesta cada paso, en viewports. La pista mide
@@ -55,6 +62,17 @@ const GAP = '0.5rem'
    Parallax y ScrollProgress, hecho a mano porque acá hay que escribir
    5 anchos por frame y un motion value por panel sería peor. */
 const SMOOTH_TAU = 70
+
+/* Mobile — alto de la fila de encabezado de cada tarjeta, que es también
+   el escalón del apilado: cada tarjeta se clava un encabezado más abajo
+   que la anterior, así lo que asoma de las ya recorridas es su número y
+   su título, legibles.
+   Con 5 pasos, las 4 tiras de arriba ocupan 4 × 3.5rem = 224px. Más alto
+   que eso y en un teléfono no queda lugar para leer la tarjeta abierta. */
+const STACK_HEADER = '3.5rem'
+
+/* Dónde se clava la primera tarjeta. Despeja el nav fijo. */
+const STACK_TOP = '5.5rem'
 
 const EASE_CSS = 'cubic-bezier(0.16,1,0.3,1)'
 
@@ -317,8 +335,10 @@ function GhostNumber({ n, className = '', style }) {
 /* El lomo: número arriba, punto de estado, título rotado abajo.
    El punto lleno = paso ya recorrido. Es lo que convierte el acordeón
    en una línea de tiempo y no en un menú de pestañas. */
-function Spine({ step, index, active, vertical = false }) {
-  const done = index <= active
+/* `done` y `current` llegan explícitos y no derivados de un índice
+   activo: en el acordeón hay un paso actual, pero en la pila de mobile
+   están los 5 abiertos a la vez y ninguno es "el actual". */
+function Spine({ step, index, done, current = false, vertical = false }) {
   const accent = accentOf(index)
   return (
     <div
@@ -341,7 +361,7 @@ function Spine({ step, index, active, vertical = false }) {
         style={{
           background: done ? accent : 'transparent',
           border: done ? 'none' : '1px solid var(--c-glass-border)',
-          boxShadow: index === active ? `0 0 10px ${accent}` : 'none',
+          boxShadow: current ? `0 0 10px ${accent}` : 'none',
         }}
       />
 
@@ -436,7 +456,12 @@ function ScrollAccordion({ steps }) {
                     boxShadow: `0 0 60px -22px color-mix(in srgb, ${accent} calc(var(--open) * 100%), transparent), inset 0 1px 0 0 rgba(255,255,255,0.06)`,
                   }}
                 >
-                  <Spine step={step} index={i} active={active} />
+                  <Spine
+                    step={step}
+                    index={i}
+                    done={i <= active}
+                    current={i === active}
+                  />
 
                   {/* Ancho fijo: al angostarse el panel el texto se recorta
                       en vez de reflowear. Si se re-acomodara mientras el
@@ -488,19 +513,24 @@ function ScrollAccordion({ steps }) {
   )
 }
 
-/* ─── mobile / tablet: acordeón vertical, se abre tocando ───────── */
+/* ─── mobile: tarjetas que suben y se apilan con el scroll ──────── */
 
-/* Abajo de `lg` no se ancla ni se secuestra el scroll: en un teléfono
-   eso se siente como que la página se colgó. Mismo acordeón, apilado,
-   y se abre tocando. */
-function TapAccordion({ steps }) {
+/* Cada tarjeta se clava un encabezado más abajo que la anterior, así lo
+   que queda a la vista de las ya recorridas no es un borde sino su fila
+   de encabezado entera: número y título legibles, apilados arriba.
+
+   Ese detalle es el que hace que el patrón sirva para un proceso y no
+   sólo para una galería. Mientras leés el paso 04 seguís viendo, arriba,
+   "01 Diagnóstico · 02 Estrategia · 03 Ejecución": el recorrido queda a
+   la vista en vez de haber que recordarlo.
+
+   Es CSS puro, sin un solo frame de JS. Se probó una versión con rAF que
+   achicaba y apagaba las tapadas para dar profundidad, y se descartó:
+   escalar una tarjeta clavada le cambia el ancho a su tira de encabezado
+   y la pila deja de alinearse. La profundidad ya la dan el borde, la
+   sombra y el fondo propio de cada tarjeta. */
+function StackedCards({ steps }) {
   const count = steps.length
-  const [active, setActive] = useState(0)
-  const onKeyDown = useArrowKeys({
-    count,
-    active,
-    onGo: (i) => setActive(i),
-  })
 
   return (
     <div className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8 lg:hidden">
@@ -508,77 +538,68 @@ function TapAccordion({ steps }) {
         <SectionHeading eyebrow="Proceso" title="Cómo trabajo, paso a paso." />
       </Reveal>
 
-      <div
-        role="tablist"
-        aria-label="Pasos del proceso"
-        data-accordion="vertical"
-        onKeyDown={onKeyDown}
-        className="flex flex-col gap-[var(--gap)]"
-        style={{ '--spine': SPINE, '--gap': GAP }}
-      >
+      {/* `ol` y no tablist: acá no hay nada que elegir. Los 5 pasos están
+          abiertos y se leen en orden, que es justo lo que la sección
+          quiere contar — y deja el marcado más simple.
+          El padding de abajo le da a la última tarjeta su momento clavada
+          antes de que la pila se suelte. */}
+      <ol data-stack="proceso" className="relative pb-[25vh]">
         {steps.map((step, i) => {
-          const open = i === active
           const accent = accentOf(i)
           return (
-            <div
+            <li
               key={step.n}
-              role="tab"
-              aria-selected={open}
-              tabIndex={open ? 0 : -1}
-              aria-label={`Paso ${step.n}: ${step.title}`}
-              onClick={() => setActive(i)}
-              onKeyDown={activationKeys(() => setActive(i))}
-              className="relative flex w-full cursor-pointer overflow-hidden rounded-2xl border backdrop-blur-md"
+              className="sticky"
               style={{
-                borderColor: open
-                  ? `color-mix(in srgb, ${accent} 45%, transparent)`
-                  : 'var(--c-glass-border)',
-                background: open
-                  ? `linear-gradient(135deg, color-mix(in srgb, ${accent} 9%, var(--c-glass)), var(--c-glass))`
-                  : 'var(--c-glass)',
-                boxShadow: open
-                  ? `0 0 50px -22px ${accent}, inset 0 1px 0 0 rgba(255,255,255,0.06)`
-                  : 'inset 0 1px 0 0 rgba(255,255,255,0.06)',
-                transition:
-                  'border-color 0.5s ease, background 0.5s ease, box-shadow 0.5s ease',
+                top: `calc(${STACK_TOP} + ${i} * ${STACK_HEADER})`,
+                zIndex: i + 1,
               }}
             >
-              <Spine step={step} index={i} active={active} vertical />
-
-              <div className="relative flex-1 py-5 pr-5">
-                <StepHead step={step} index={i} count={count} />
-
-                {/* 0fr → 1fr: la forma limpia de animar alto automático sin
-                    fijar un max-height a ojo. */}
+              <article
+                style={{
+                  borderColor: `color-mix(in srgb, ${accent} 45%, transparent)`,
+                  /* Fondo opaco, no `bg-glass`: son tarjetas que se tapan
+                     entre sí. Con fondo translúcido se transparentarían las
+                     de abajo y la pila se leería como un borrón. */
+                  background: `linear-gradient(160deg, color-mix(in srgb, ${accent} 12%, var(--c-bg2)), var(--c-bg))`,
+                  boxShadow: `0 -8px 40px -12px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.03)`,
+                }}
+                className="relative flex min-h-[22rem] flex-col overflow-hidden rounded-2xl border"
+              >
+                {/* La tira que queda asomando cuando la tapa la siguiente.
+                    Su alto es exactamente el escalón del apilado. */}
                 <div
-                  className={`grid transition-[grid-template-rows] duration-500 ${
-                    open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
-                  }`}
-                  style={{ transitionTimingFunction: 'cubic-bezier(0.16,1,0.3,1)' }}
+                  className="flex flex-none items-center gap-3 px-5"
+                  style={{ height: STACK_HEADER }}
                 >
-                  <div className="overflow-hidden">
-                    <div
-                      aria-hidden={!open}
-                      className={`pt-3 transition-opacity duration-500 ${
-                        open ? 'opacity-100 delay-150' : 'opacity-0'
-                      }`}
-                    >
-                      <StepDetail step={step} index={i} />
-                    </div>
-                  </div>
+                  <span
+                    className="font-mono text-[11px] tracking-widest"
+                    style={{ color: accent }}
+                  >
+                    {step.n}
+                  </span>
+                  <span
+                    aria-hidden="true"
+                    className="h-1.5 w-1.5 flex-none rounded-full"
+                    style={{ background: accent, boxShadow: `0 0 10px ${accent}` }}
+                  />
+                  <h3 className="font-display text-lg font-bold text-fg">
+                    {step.title}
+                  </h3>
+                  <span className="ml-auto font-mono text-[10px] text-muted">
+                    {step.n}/{pad2(count)}
+                  </span>
                 </div>
 
-                <GhostNumber
-                  n={step.n}
-                  className={`-top-1 right-0 text-[5rem] transition-opacity duration-700 ${
-                    open ? 'opacity-100' : 'opacity-0'
-                  }`}
-                />
-              </div>
-            </div>
+                <div className="relative flex-1 px-5 pb-6">
+                  <StepDetail step={step} index={i} />
+                  <GhostNumber n={step.n} className="-top-6 right-2 text-[6rem]" />
+                </div>
+              </article>
+            </li>
           )
         })}
-      </div>
+      </ol>
     </div>
   )
 }
@@ -626,7 +647,7 @@ export function ProcessTimeline() {
   return (
     <section id="proceso">
       <ScrollAccordion steps={steps} />
-      <TapAccordion steps={steps} />
+      <StackedCards steps={steps} />
     </section>
   )
 }

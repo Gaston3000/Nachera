@@ -184,28 +184,80 @@ describe('ProcessTimeline — acordeón por scroll (desktop)', () => {
   })
 })
 
-describe('ProcessTimeline — acordeón por toque (mobile)', () => {
+describe('ProcessTimeline — pila de tarjetas (mobile)', () => {
   beforeEach(() => {
     motionState.reduce = false
     window.scrollTo = vi.fn()
     render(<ProcessTimeline />)
   })
 
-  it('renderiza un panel por paso', () => {
-    expect(tabsOf('vertical')).toHaveLength(process.length)
+  const stack = () => {
+    const el = document.querySelector('[data-stack="proceso"]')
+    expect(el, 'pila de tarjetas ausente').not.toBeNull()
+    return el
+  }
+
+  it('es una lista ordenada con una tarjeta por paso', () => {
+    expect(stack().tagName).toBe('OL')
+    expect(stack().querySelectorAll(':scope > li')).toHaveLength(process.length)
   })
 
-  it('el toque abre ese paso, sin tocar el scroll', () => {
-    fireEvent.click(tabsOf('vertical')[3])
-    const tabs = tabsOf('vertical')
-    expect(tabs[3]).toHaveAttribute('aria-selected', 'true')
-    expect(tabs[0]).toHaveAttribute('aria-selected', 'false')
+  it('no hay nada que elegir: los 5 pasos están abiertos y legibles', () => {
+    const items = [...stack().querySelectorAll(':scope > li')]
+    items.forEach((li, i) => {
+      expect(within(li).getByRole('heading', { name: process[i].title })).toBeInTheDocument()
+      expect(within(li).getByText(process[i].desc)).toBeInTheDocument()
+      expect(within(li).getByText(process[i].deliver)).toBeInTheDocument()
+    })
+    // sin tabs ni estado que sincronizar
+    expect(within(stack()).queryAllByRole('tab')).toHaveLength(0)
+  })
+
+  it('cada tarjeta se clava un encabezado más abajo que la anterior', () => {
+    const items = [...stack().querySelectorAll(':scope > li')]
+    items.forEach((li, i) => {
+      expect(li).toHaveClass('sticky')
+      // jsdom resuelve el calc a un solo valor (5.5rem, 9rem, 12.5rem…),
+      // así que se afirma la posición real de cada escalón.
+      const rem = Number(li.style.top.match(/([\d.]+)rem/)[1])
+      expect(rem).toBeCloseTo(5.5 + i * 3.5, 5)
+      // apiladas en orden: la última por encima
+      expect(Number(li.style.zIndex)).toBe(i + 1)
+    })
+  })
+
+  it('lo que asoma de una tarjeta tapada es su número y su título', () => {
+    const items = [...stack().querySelectorAll(':scope > li')]
+    items.forEach((li, i) => {
+      // la fila de encabezado mide exactamente el escalón del apilado,
+      // que es lo que la deja legible cuando la tapan
+      const header = li.querySelector('article > div')
+      expect(header.style.height).toBe('3.5rem')
+      expect(within(header).getByText(process[i].n)).toBeInTheDocument()
+      expect(
+        within(header).getByRole('heading', { name: process[i].title })
+      ).toBeInTheDocument()
+    })
+  })
+
+  it('las tarjetas son opacas: si no, se transparentarían entre sí', () => {
+    stack()
+      .querySelectorAll('article')
+      .forEach((card) => {
+        expect(card.className).not.toContain('bg-glass')
+        expect(card.className).not.toContain('backdrop-blur')
+        expect(card.style.background).toContain('var(--c-bg')
+      })
+  })
+
+  it('es CSS puro: sin estado, sin vars pintadas por JS, sin tocar el scroll', () => {
+    fireEvent.click(stack().querySelector('article'))
     expect(window.scrollTo).not.toHaveBeenCalled()
-  })
-
-  it('las flechas mueven el paso abierto', () => {
-    fireEvent.keyDown(tabsOf('vertical')[0], { key: 'ArrowDown' })
-    expect(tabsOf('vertical')[1]).toHaveAttribute('aria-selected', 'true')
+    stack()
+      .querySelectorAll('article')
+      .forEach((card) => {
+        expect(card.style.getPropertyValue('--covered')).toBe('')
+      })
   })
 })
 
@@ -217,16 +269,17 @@ describe('ProcessTimeline — contenido', () => {
   })
 
   it('muestra el entregable ("Qué recibís") de cada paso en ambas variantes', () => {
+    // una vez en el acordeón de desktop, otra en la pila de mobile
     expect(screen.getAllByText('Qué recibís')).toHaveLength(process.length * 2)
     process.forEach((step) => {
-      expect(screen.getAllByText(step.deliver).length).toBeGreaterThan(0)
+      expect(screen.getAllByText(step.deliver)).toHaveLength(2)
     })
   })
 
   it('no mete contenido de flujo adentro de un <button> (HTML inválido)', () => {
-    document.querySelectorAll('[role="tab"]').forEach((tab) => {
-      expect(tab.tagName).toBe('DIV')
-    })
+    const tabs = document.querySelectorAll('[role="tab"]')
+    expect(tabs.length).toBeGreaterThan(0)
+    tabs.forEach((tab) => expect(tab.tagName).toBe('DIV'))
   })
 })
 
