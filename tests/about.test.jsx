@@ -60,18 +60,35 @@ describe('About — credenciales clave', () => {
     expect(container.querySelectorAll('.cred-pillar')).toHaveLength(6)
   })
 
-  it('con reduced-motion no dibuja el circuito', () => {
+  it('con reduced-motion no pasa el barrido de luz', () => {
     const { container } = render(<About />)
-    expect(container.querySelector('[data-cred-circuit]')).toBeNull()
-    // pero las tarjetas siguen ahí y legibles, no atenuadas
+    expect(container.querySelector('[data-cred-sheen]')).toBeNull()
+    // pero las tarjetas siguen ahí y completas
     expect(container.querySelectorAll('.cred-pillar')).toHaveLength(6)
   })
 
-  it('cada credencial expone su ícono como ancla del circuito', () => {
+  /* La regla de la pieza, tras dos intentos descartados: la animación no
+     puede restarle legibilidad a la sección.
+
+     OJO con el alcance de este caso: el mock de motion fuerza
+     `useReducedMotion() === true` y además descarta `style` y `variants`,
+     así que esto verifica la rama de reduced-motion — que es justamente
+     donde el intento anterior dejaba las tarjetas en opacity .42 + blur 3px
+     de forma permanente. La rama animada no se puede cubrir desde jsdom. */
+  it('con reduced-motion las 6 tarjetas se renderizan completas y sin atenuar', () => {
     const { container } = render(<About />)
-    // el enrutado mide estos nodos: si se pierde el data-attr, el circuito
-    // deja de dibujarse en silencio
-    expect(container.querySelectorAll('[data-cred-icon]')).toHaveLength(6)
+    const cards = container.querySelectorAll('.cred-pillar')
+    expect(cards).toHaveLength(6)
+    cards.forEach((card) => {
+      const wrapper = card.parentElement
+      expect(card.style.filter || '').not.toContain('blur')
+      expect(wrapper.style.filter || '').not.toContain('blur')
+      const opacity = wrapper.style.opacity
+      expect(opacity === '' || Number(opacity) === 1).toBe(true)
+      // el contenido completo, no un esqueleto
+      expect(card.querySelector('h3')).not.toBeNull()
+      expect(card.querySelector('p')).not.toBeNull()
+    })
   })
 
   it('muestra el badge C1 en la credencial de inglés', () => {
