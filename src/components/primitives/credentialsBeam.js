@@ -110,3 +110,27 @@ export function buildBeamRoute(rects, radius = CARD_RADIUS) {
   }
   return { order, outlines, hops }
 }
+
+/* Reparte los retrasos de una tanda de tarjetas que se encendieron juntas.
+ *
+ * En escritorio la grilla entra entera, así que la tanda son las 6 y el
+ * resultado es la serpentina completa. En celular la grilla mide el 59% de
+ * la pantalla y entra de a una fila, así que cada fila es su propia tanda y
+ * arranca su reloj de cero — que es lo que evita que las últimas tarjetas se
+ * enciendan fuera de pantalla.
+ *
+ * `groups` es { idDeTanda: [índices] } y `order` el orden serpentina. Dentro
+ * de cada tanda el reparto respeta ese orden, así la fila que va de derecha
+ * a izquierda se enciende de derecha a izquierda. */
+export function beamDelays(groups, order, step) {
+  const delays = {}
+  Object.values(groups).forEach((group) => {
+    group
+      .slice()
+      .sort((a, b) => order.indexOf(a) - order.indexOf(b))
+      .forEach((cardIndex, position) => {
+        delays[cardIndex] = position * step
+      })
+  })
+  return delays
+}

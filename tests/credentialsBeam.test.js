@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import {
+  beamDelays,
   buildBeamRoute,
   cardOutline,
   hopPath,
@@ -101,6 +102,49 @@ describe('hopPath', () => {
 
   it('funciona en los dos sentidos', () => {
     expect(hopPath(DESKTOP[1], DESKTOP[0])).toBe('M 368 70.5 L 352 70.5')
+  })
+})
+
+/* El reparto de retrasos por tanda es lo que hace que el módulo funcione en
+   celular: la grilla mide el 59% de la pantalla, así que entra de a una fila
+   y cada fila tiene que arrancar su reloj de cero. Con una largada única, las
+   dos últimas tarjetas se encendían 210px por debajo del pliegue. */
+describe('beamDelays', () => {
+  const STEP = 0.08
+  const DESKTOP_ORDER = serpentineOrder(DESKTOP)
+  const MOBILE_ORDER = serpentineOrder(MOBILE)
+
+  it('escritorio: las 6 entran juntas y se encadenan en orden serpentina', () => {
+    const delays = beamDelays({ 0: [0, 1, 2, 3, 4, 5] }, DESKTOP_ORDER, STEP)
+    // order = [0,1,2,5,4,3] → la 3 es la última en encenderse
+    expect(delays[0]).toBeCloseTo(0)
+    expect(delays[1]).toBeCloseTo(STEP)
+    expect(delays[2]).toBeCloseTo(STEP * 2)
+    expect(delays[5]).toBeCloseTo(STEP * 3)
+    expect(delays[4]).toBeCloseTo(STEP * 4)
+    expect(delays[3]).toBeCloseTo(STEP * 5)
+  })
+
+  it('celular: cada fila es su propia tanda y arranca de cero', () => {
+    const delays = beamDelays({ 0: [0, 1], 1: [2, 3], 2: [4, 5] }, MOBILE_ORDER, STEP)
+    // ninguna tarjeta espera más de un paso: nada se enciende fuera de pantalla
+    Object.values(delays).forEach((d) => expect(d).toBeLessThanOrEqual(STEP))
+    expect(Object.keys(delays)).toHaveLength(6)
+  })
+
+  it('celular: la fila que va de derecha a izquierda se enciende en ese sentido', () => {
+    // order = [0,1,3,2,4,5] → en la fila del medio, la 3 va antes que la 2
+    const delays = beamDelays({ 1: [2, 3] }, MOBILE_ORDER, STEP)
+    expect(delays[3]).toBeCloseTo(0)
+    expect(delays[2]).toBeCloseTo(STEP)
+  })
+
+  it('una tarjeta sola no espera nada', () => {
+    expect(beamDelays({ 7: [4] }, MOBILE_ORDER, STEP)).toEqual({ 4: 0 })
+  })
+
+  it('sin tandas no reparte nada', () => {
+    expect(beamDelays({}, DESKTOP_ORDER, STEP)).toEqual({})
   })
 })
 

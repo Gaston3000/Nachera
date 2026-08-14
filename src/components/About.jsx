@@ -12,7 +12,7 @@ import {
   MicIcon,
 } from './primitives/icons.jsx'
 import { about } from '../data/content.js'
-import { buildBeamRoute } from './primitives/credentialsBeam.js'
+import { beamDelays, buildBeamRoute } from './primitives/credentialsBeam.js'
 
 /* premium ease — matches Solutions / Reveal */
 const EASE = [0.16, 1, 0.3, 1]
@@ -74,8 +74,6 @@ const BEAM_START = 0.18
 const BEAM_STEP = 0.08
 const BEAM_DURATION = 0.4
 const HOP_DURATION = 0.1
-
-const containerVariants = { hidden: {}, show: {} }
 
 const cardVariants = {
   hidden: { opacity: 0, y: 14 },
@@ -174,7 +172,7 @@ function useBeamRoute({ wrapRef, cardRefs, count, enabled }) {
    recorrido cae exactamente sobre el borde de 1px y sobre las canaletas, así
    que no hay nada que pueda tapar. Por debajo, el bg-glass de la tarjeta la
    apagaría justo donde tiene que brillar. */
-function BeamLayer({ route }) {
+function BeamLayer({ route, delays }) {
   const gradientId = `${useId()}-cred-beam`
 
   return (
@@ -200,73 +198,87 @@ function BeamLayer({ route }) {
       </defs>
 
       {/* el pulso que da la vuelta al contorno de cada tarjeta */}
-      {route.outlines.map((outline, position) => (
-        <motion.path
-          key={`outline-${outline.cardIndex}`}
-          d={outline.d}
-          stroke={`url(#${gradientId})`}
-          strokeWidth={2}
-          strokeLinecap="round"
-          fill="none"
-          custom={BEAM_START + position * BEAM_STEP}
-          variants={{
-            hidden: { pathLength: 0.24, pathOffset: 0, opacity: 0 },
-            show: (delay) => ({
-              pathLength: 0.24,
-              pathOffset: 1,
-              opacity: [0, 1, 1, 0],
-              transition: {
-                duration: BEAM_DURATION,
-                delay,
-                ease: 'linear',
-                opacity: { duration: BEAM_DURATION, delay, times: [0, 0.12, 0.75, 1] },
-              },
-            }),
-          }}
-          style={{
-            // glow fijo: no se recalcula por cuadro, solo se mueve el trazo
-            filter:
-              'drop-shadow(0 0 6px color-mix(in srgb, var(--c-accent) 70%, transparent))',
-          }}
-        />
-      ))}
+      {route.outlines.map((outline) => {
+        const delay = delays[outline.cardIndex]
+        return (
+          <motion.path
+            key={`outline-${outline.cardIndex}`}
+            className="cred-beam-glow"
+            d={outline.d}
+            stroke={`url(#${gradientId})`}
+            strokeWidth={2}
+            strokeLinecap="round"
+            fill="none"
+            initial="hidden"
+            animate={delay === undefined ? 'hidden' : 'show'}
+            custom={BEAM_START + (delay ?? 0)}
+            variants={{
+              hidden: { pathLength: 0.24, pathOffset: 0, opacity: 0 },
+              show: (start) => ({
+                pathLength: 0.24,
+                pathOffset: 1,
+                opacity: [0, 1, 1, 0],
+                transition: {
+                  duration: BEAM_DURATION,
+                  delay: start,
+                  ease: 'linear',
+                  opacity: {
+                    duration: BEAM_DURATION,
+                    delay: start,
+                    times: [0, 0.12, 0.75, 1],
+                  },
+                },
+              }),
+            }}
+          />
+        )
+      })}
 
-      {/* el salto de una tarjeta a la vecina, por la canaleta */}
-      {route.hops.map((hop, position) => (
-        <motion.path
-          key={`hop-${hop.from}-${hop.to}`}
-          d={hop.d}
-          stroke={`url(#${gradientId})`}
-          strokeWidth={2}
-          strokeLinecap="round"
-          fill="none"
-          custom={BEAM_START + position * BEAM_STEP + BEAM_DURATION * 0.72}
-          variants={{
-            hidden: { pathLength: 0, opacity: 0 },
-            show: (delay) => ({
-              pathLength: 1,
-              opacity: [0, 1, 0],
-              transition: {
-                duration: HOP_DURATION,
-                delay,
-                ease: 'linear',
-                opacity: { duration: HOP_DURATION * 2.2, delay, times: [0, 0.35, 1] },
-              },
-            }),
-          }}
-          style={{
-            filter:
-              'drop-shadow(0 0 6px color-mix(in srgb, var(--c-accent) 70%, transparent))',
-          }}
-        />
-      ))}
+      {/* El salto a la vecina, por la canaleta. Se dispara con la tarjeta de
+          DESTINO y apenas antes que ella: así la luz se lee entrando a la
+          tarjeta que se va a encender, y en celular el salto entre filas
+          espera a que la fila siguiente esté en pantalla. */}
+      {route.hops.map((hop) => {
+        const target = delays[hop.to]
+        return (
+          <motion.path
+            key={`hop-${hop.from}-${hop.to}`}
+            className="cred-beam-glow"
+            d={hop.d}
+            stroke={`url(#${gradientId})`}
+            strokeWidth={2}
+            strokeLinecap="round"
+            fill="none"
+            initial="hidden"
+            animate={target === undefined ? 'hidden' : 'show'}
+            custom={Math.max(0, BEAM_START + (target ?? 0) - HOP_DURATION * 0.8)}
+            variants={{
+              hidden: { pathLength: 0, opacity: 0 },
+              show: (start) => ({
+                pathLength: 1,
+                opacity: [0, 1, 0],
+                transition: {
+                  duration: HOP_DURATION,
+                  delay: start,
+                  ease: 'linear',
+                  opacity: {
+                    duration: HOP_DURATION * 2.2,
+                    delay: start,
+                    times: [0, 0.35, 1],
+                  },
+                },
+              }),
+            }}
+          />
+        )
+      })}
     </svg>
   )
 }
 
 /* Una credencial. Legible siempre: lo único que cambia al encenderse es la
    intensidad del borde y del glow. */
-function CredentialCard({ cred, entryIndex, beamPosition, reduce, cardRef }) {
+function CredentialCard({ cred, entryIndex, beamDelay, reduce, cardRef, onEnter }) {
   const Icon = CRED_ICONS[cred.icon]
   const tint = cred.accent === 'accent2' ? 'var(--c-accent2)' : 'var(--c-accent)'
 
@@ -365,17 +377,29 @@ function CredentialCard({ cred, entryIndex, beamPosition, reduce, cardRef }) {
     )
   }
 
+  /* Cada tarjeta se dispara sola al entrar en pantalla, en vez de colgar de
+     una largada única del contenedor. En escritorio las 6 entran en el mismo
+     cuadro, así que se sigue leyendo como un solo gesto; en celular, donde la
+     grilla mide el 59% de la pantalla, cada fila se enciende cuando llega y
+     no antes. Con una largada global, las dos últimas se prendían 210px por
+     debajo del pliegue y el usuario nunca las veía encenderse. */
   return (
     <motion.div
       ref={cardRef}
       className={`${CRED_SPAN} h-full`}
       variants={cardVariants}
       custom={entryIndex}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, amount: 0.5 }}
+      onViewportEnter={onEnter}
     >
       <motion.div
         className={cardClass}
         variants={borderVariants(tint)}
-        custom={BEAM_START + beamPosition * BEAM_STEP + BEAM_DURATION * 0.55}
+        initial="hidden"
+        animate={beamDelay === undefined ? 'hidden' : 'show'}
+        custom={BEAM_START + (beamDelay ?? 0) + BEAM_DURATION * 0.55}
       >
         {inner}
       </motion.div>
@@ -392,23 +416,60 @@ function CredentialsModule() {
 
   const route = useBeamRoute({ wrapRef, cardRefs, count, enabled: !reduce })
 
-  /* Hasta que se mide, cada tarjeta usa su propio índice como posición en el
-     recorrido: el orden serpentina solo se puede saber con el layout real. */
-  const beamPosition = (i) => {
-    const position = route ? route.order.indexOf(i) : -1
-    return position === -1 ? i : position
+  /* Qué tarjeta entró en pantalla y en qué tanda.
+     El agrupado no usa reloj: las tarjetas que aparecen juntas llegan en una
+     misma entrega del IntersectionObserver, o sea en la misma tarea, así que
+     acumular y volcar en un microtask las deja solas en la misma tanda. La
+     fila que aparece después cae en otra entrega y abre tanda nueva.
+     Todo pasa en el manejador del evento y no dentro del setState: los
+     updaters tienen que ser puros y React puede llamarlos dos veces. */
+  const [batches, setBatches] = useState({})
+  const batchesRef = useRef({})
+  const pendingRef = useRef([])
+  const nextBatchRef = useRef(0)
+
+  const handleEnter = (cardIndex) => {
+    if (batchesRef.current[cardIndex] !== undefined) return
+    if (pendingRef.current.includes(cardIndex)) return
+    pendingRef.current.push(cardIndex)
+    if (pendingRef.current.length > 1) return
+
+    queueMicrotask(() => {
+      const group = pendingRef.current
+      pendingRef.current = []
+      if (!group.length) return
+      const batchId = nextBatchRef.current
+      nextBatchRef.current += 1
+      const next = { ...batchesRef.current }
+      group.forEach((index) => {
+        next[index] = batchId
+      })
+      batchesRef.current = next
+      setBatches(next)
+    })
   }
+
+  /* Del mapa tarjeta→tanda a los retrasos concretos. Sin recorrido medido
+     todavía, el orden de referencia es el de lectura. */
+  const order = route ? route.order : creds.map((_, i) => i)
+  const groups = {}
+  Object.entries(batches).forEach(([cardIndex, batchId]) => {
+    groups[batchId] = groups[batchId] || []
+    groups[batchId].push(Number(cardIndex))
+  })
+  const delays = beamDelays(groups, order, BEAM_STEP)
 
   const cards = creds.map((cred, i) => (
     <CredentialCard
       key={cred.label}
       cred={cred}
       entryIndex={i}
-      beamPosition={beamPosition(i)}
+      beamDelay={delays[i]}
       reduce={reduce}
       cardRef={(el) => {
         cardRefs.current[i] = el
       }}
+      onEnter={() => handleEnter(i)}
     />
   ))
 
@@ -423,17 +484,10 @@ function CredentialsModule() {
       {reduce ? (
         <div className="mt-4 grid grid-cols-6 gap-3 sm:gap-4">{cards}</div>
       ) : (
-        <motion.div
-          ref={wrapRef}
-          className="relative mt-4 grid grid-cols-6 gap-3 sm:gap-4"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.25 }}
-        >
+        <div ref={wrapRef} className="relative mt-4 grid grid-cols-6 gap-3 sm:gap-4">
           {cards}
-          {route && <BeamLayer route={route} />}
-        </motion.div>
+          {route && <BeamLayer route={route} delays={delays} />}
+        </div>
       )}
     </div>
   )

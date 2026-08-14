@@ -951,8 +951,14 @@
 .cred-pillar {
   transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.cred-pillar:hover {
-  transform: translateY(-3px);
+
+/* El hover va detrás de `hover: hover`. En pantallas táctiles el `:hover` se
+   queda pegado después de tocar: sin este guard, tocar una tarjeta la dejaba
+   corrida 3px hasta que tocaras otra cosa. */
+@media (hover: hover) and (pointer: fine) {
+  .cred-pillar:hover {
+    transform: translateY(-3px);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -961,5 +967,21 @@
   }
   .cred-pillar:hover {
     transform: none;
+  }
+}
+
+/* Glow del recorrido de luz. Es un filtro FIJO: no se recalcula por cuadro,
+   solo se mueve el trazo por debajo.
+   En celular se apaga: son 11 paths animando a la vez, y con un filtro
+   activo el navegador vuelve a rasterizar cada cuadro. El gradiente ya lleva
+   el color, así que sin el halo se pierde poco y se gana fluidez donde más
+   escasea. */
+.cred-beam-glow {
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--c-accent) 70%, transparent));
+}
+@media (max-width: 640px) {
+  .cred-beam-glow {
+    filter: none;
+    stroke-width: 2.5;
   }
 }
