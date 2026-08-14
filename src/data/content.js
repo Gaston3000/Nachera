@@ -38,43 +38,46 @@ export const about = {
     'Aplico todo lo que aprendí en el **mundo del marketing digital** para ayudar a las marcas a **crecer con estrategia y comunicación que conecta de verdad**.',
     'Hoy trabajo en **Bloop Agency** y, además, llevo adelante **proyectos propios como freelance** — con la misma dedicación y criterio en cada uno.',
   ],
-  // ── Credenciales clave — PILARES, no certificados ────────────────────
-  // Ojo al cambiar esto: la lista de títulos y certificados vive en
-  // `certifications` (abajo) y la renderiza el timeline de StackFormacion.
-  // Antes este bloque repetía esos mismos ítems uno por uno: 5 de 6
-  // credenciales volvían a aparecer, casi con el mismo texto, cinco
-  // secciones más abajo. Ahora agrupa esa formación en 4 pilares —
-  // categorías de criterio, no diplomas sueltos.
+  // ── Credenciales clave ───────────────────────────────────────────────
+  // Las 6 van acá por decisión del cliente. Ojo: 5 de las 6 vuelven a
+  // aparecer, con otro texto, en `certifications` (abajo), que es lo que
+  // renderiza el timeline de StackFormacion cinco secciones más abajo.
+  // Esa repetición es deliberada — este bloque es el resumen que se ve
+  // temprano; el timeline es el detalle con fechas. Si algún día se decide
+  // desduplicar, la salida limpia es agrupar estas 6 en pilares
+  // (categorías de criterio) y dejar los diplomas sueltos sólo abajo.
   //
-  // Cada pilar nombra en su micro-línea los títulos REALES que lo
-  // respaldan: no se inventa nada, se agrupa lo que ya existe en
-  // `certifications`. Si se suma un certificado nuevo, va en
-  // `certifications`; acá solo se toca si cambia el agrupamiento.
-  //
-  // "Performance y medición" se enuncia como FORMACIÓN, nunca como
-  // servicio: CLAUDE.md es explícito en que Ads/SEO no se ofrecen como
-  // propuesta comercial. Por eso la micro-línea nombra las
-  // certificaciones y no una capacidad de venta.
+  // El orden importa: es el recorrido del circuito que las cose en
+  // About.jsx (serpentina por filas, en orden de lectura).
   credentials: [
     {
-      // "Periodismo deportivo" se nombra tal cual y no como "Tecnicatura":
-      // es el diferencial de marca que CLAUDE.md manda usar siempre como
-      // ancla, y además le dice algo al visitante — "Tecnicatura" solo no.
-      label: 'Comunicación y periodismo',
-      micro: 'Lic. en Cs. de la Comunicación (UADE) · Periodismo deportivo (Deportea)',
+      label: 'Formación universitaria',
+      micro: 'Lic. en Cs. de la Comunicación · UADE',
       icon: 'diploma',
       accent: 'accent',
       verified: true,
     },
     {
-      label: 'Producción audiovisual',
-      micro: 'Edición de video · Escuela Da Vinci',
-      icon: 'video',
+      label: 'Marketing Digital',
+      micro: 'Escuela Da Vinci · Buenos Aires',
+      icon: 'megaphone',
       accent: 'accent2',
     },
     {
-      label: 'Performance y medición',
-      micro: 'Google Ads & Analytics · Skillshop y Coderhouse',
+      label: 'Edición de video',
+      micro: 'Escuela Da Vinci · formación profesional',
+      icon: 'video',
+      accent: 'accent',
+    },
+    {
+      label: 'Periodismo deportivo',
+      micro: 'Tecnicatura · Deportea',
+      icon: 'mic',
+      accent: 'accent2',
+    },
+    {
+      label: 'Formación en performance',
+      micro: 'Google Ads & Analytics · Skillshop',
       icon: 'chartcheck',
       accent: 'accent2',
     },

@@ -21,12 +21,10 @@ import { about } from '../data/content.js'
 import {
   activationWindows,
   buildSegments,
+  CIRCUIT_MARGIN,
 } from './primitives/credentialsCircuit.js'
 
-/* maps the data `icon` key → in-house icon component.
-   Se mantienen megaphone/mic/sparklogic aunque los 4 pilares actuales no
-   los usen: el registro es del componente, no de los datos, y así cambiar
-   un `icon` en content.js no obliga a tocar acá. */
+/* maps the data `icon` key → in-house icon component */
 const CRED_ICONS = {
   diploma: DiplomaIcon,
   chartcheck: ChartCheckIcon,
@@ -37,7 +35,7 @@ const CRED_ICONS = {
   mic: MicIcon,
 }
 
-/* ── Credenciales clave — bento + circuito que se enciende con el scroll ───
+/* ── Credenciales clave — circuito que se enciende con el scroll ───────────
  *
  * POR QUÉ ESTE RECURSO Y NO UN HILO VERTICAL:
  * StackFormacion ya tiene un riel cyan de 1px que baja cosiendo e
@@ -46,28 +44,47 @@ const CRED_ICONS = {
  * la misma página — y encima About.jsx ya usa un rail cyan→violeta vertical
  * 60px más arriba (el de la columna izquierda). Así que este módulo usa la
  * OTRA mitad del vocabulario de la casa: los `pathLength` 0→1 de las vizs
- * de Solutions, pero enrutados en ángulo recto por las canaletas del bento.
- * Se lee como circuito, no como hilo. La gramática de encendido de las
- * tarjetas (opacity .42→1, blur 3→0, y 8→0, borde y glow que suben) sí es
- * la misma que StackFormacion: eso es coherencia, no repetición.
+ * de Solutions, pero enrutados en ángulo recto. Se lee como circuito, no
+ * como hilo. La gramática de encendido de las tarjetas (opacity .42→1,
+ * blur 3→0, y 8→0, borde y glow que suben) sí es la misma que
+ * StackFormacion: eso es coherencia, no repetición.
  *
  * El recorrido NO está hardcodeado: se mide el DOM real de las tarjetas y
- * se enrutan los tramos entre ellas. Por eso el bento puede cambiar de
- * spans o de breakpoint sin tocar la geometría.
+ * se enruta entre ellas, así que la grilla puede cambiar de columnas o de
+ * breakpoint sin tocar la geometría. Las reglas del enrutado —y por qué
+ * ningún tramo cruza texto— están en primitives/credentialsCircuit.js.
  */
 
-/* Bento pinwheel: ancha-angosta arriba, angosta-ancha abajo. Los dos
-   pilares con más sustancia se quedan con las celdas anchas, en diagonal.
-   Grilla de 6 para que entre 2 columnas en celular (3+3) y el 2:1 en
-   escritorio (4+2) sin cambiar de sistema. */
-const PILLAR_SPANS = [
-  'col-span-6 lg:col-span-4',
-  'col-span-3 lg:col-span-2',
-  'col-span-3 lg:col-span-2',
-  'col-span-6 lg:col-span-4',
-]
+/* 2 columnas en celular, 3 en escritorio, todas iguales. Sobre grilla de 6
+   para que el mismo sistema sirva a los dos anchos. Las 6 credenciales
+   entran en 3 filas / 2 filas respectivamente, y el circuito las cose en
+   serpentina siguiendo el orden de lectura. */
+const CRED_SPAN = 'col-span-3 lg:col-span-2'
 
-/* Mide el bento real y devuelve caja + tramos, re-midiendo ante cualquier
+/* Posición de LAYOUT de `el` dentro de `ancestor`, sumando la cadena de
+   offsetParent.
+
+   Va por `offsetTop/offsetLeft` y no por `getBoundingClientRect()` a
+   propósito: las tarjetas entran con un `translateY(8px)` que motion baja a
+   0 al encenderlas, y `getBoundingClientRect()` lo incluye. Midiendo así, el
+   circuito se dibujaba 8px por debajo de donde terminaban los íconos y se
+   descolgaba a medida que la sección se encendía. Los offsets ignoran los
+   transforms, que es exactamente lo que necesitamos: queremos dónde VA a
+   estar la tarjeta, no dónde está a mitad de la animación. */
+function offsetWithin(el, ancestor) {
+  let x = 0
+  let y = 0
+  let node = el
+  while (node && node !== ancestor) {
+    x += node.offsetLeft
+    y += node.offsetTop
+    node = node.offsetParent
+  }
+  // si nunca llegamos al ancestro, la medición no es confiable
+  return node === ancestor ? { x, y } : null
+}
+
+/* Mide la grilla real y devuelve caja + tramos, re-midiendo ante cualquier
    reflow (resize, fuentes que cargan tarde, texto que salta de renglón).
    No corre con reduced-motion: ahí no hay circuito que dibujar. */
 function useCircuitGeometry({ wrapRef, cardRefs, count, enabled }) {
@@ -79,36 +96,29 @@ function useCircuitGeometry({ wrapRef, cardRefs, count, enabled }) {
     if (!wrap || typeof ResizeObserver === 'undefined') return undefined
 
     const measure = () => {
-      const wrapBox = wrap.getBoundingClientRect()
-      if (!wrapBox.width || !wrapBox.height) return
+      if (!wrap.offsetWidth || !wrap.offsetHeight) return
       const cards = cardRefs.current.slice(0, count)
       if (cards.length < count || cards.some((el) => !el)) return
-      const rects = cards.map((el) => {
-        const r = el.getBoundingClientRect()
-        return {
-          x: r.left - wrapBox.left,
-          y: r.top - wrapBox.top,
-          w: r.width,
-          h: r.height,
-        }
-      })
-      /* Los anclajes salen del ícono real y no de un padding hardcodeado:
-         el padding cambia de p-4 a p-5 en `sm` y no queremos que la
-         geometría dependa de recordar ese breakpoint. */
-      const icons = cards.map((el) => el.querySelector('[data-cred-icon]'))
-      if (icons.some((el) => !el)) return
-      const anchors = icons.map((el) => {
-        const r = el.getBoundingClientRect()
-        return {
-          x: r.left - wrapBox.left + r.width / 2,
-          y: r.top - wrapBox.top + r.height / 2,
-        }
-      })
-      setGeometry({
-        w: wrapBox.width,
-        h: wrapBox.height,
-        segments: buildSegments(rects, anchors),
-      })
+
+      const rects = []
+      const anchors = []
+      for (const card of cards) {
+        const at = offsetWithin(card, wrap)
+        /* El anclaje sale del ícono real y no de un padding hardcodeado: el
+           padding cambia de p-4 a p-5 en `sm` y no queremos que la
+           geometría dependa de recordar ese breakpoint. */
+        const icon = card.querySelector('[data-cred-icon]')
+        const iconAt = icon && offsetWithin(icon, wrap)
+        if (!at || !iconAt) return
+        rects.push({ x: at.x, y: at.y, w: card.offsetWidth, h: card.offsetHeight })
+        anchors.push({
+          x: iconAt.x + icon.offsetWidth / 2,
+          y: iconAt.y + icon.offsetHeight / 2,
+        })
+      }
+
+      const box = { width: wrap.offsetWidth, height: wrap.offsetHeight }
+      setGeometry({ ...box, segments: buildSegments(rects, anchors, box) })
     }
 
     measure()
@@ -147,17 +157,24 @@ function CircuitSegment({ segment, window: range, progress, gradientId }) {
   )
 }
 
-/* Capa del circuito. Va detrás de las tarjetas (z-0 contra z-10): donde el
-   trazo pasa por debajo de una tarjeta, el `bg-glass` + `backdrop-blur` lo
-   difumina en vez de taparlo, y se lee como luz atrás del vidrio. */
+/* Capa del circuito.
+   Va detrás de las tarjetas (z-0 contra z-10): donde el trazo pasa por
+   debajo de una tarjeta, el `bg-glass` + `backdrop-blur` lo difumina en vez
+   de taparlo, y se lee como luz atrás del vidrio.
+   El SVG se extiende CIRCUIT_MARGIN px a cada lado de la grilla — ahí
+   corren las bajadas del circuito, fuera de las tarjetas. El viewBox
+   arranca en x negativo para que ese margen exista sin desplazar el
+   origen, así la geometría se sigue escribiendo relativa a la grilla. */
 function CircuitLayer({ geometry, windows, progress }) {
   const gradientId = `${useId()}-cred-circuit`
+  const boxWidth = geometry.width + CIRCUIT_MARGIN * 2
 
   return (
     <svg
       data-cred-circuit
-      className="pointer-events-none absolute inset-0 h-full w-full"
-      viewBox={`0 0 ${geometry.w} ${geometry.h}`}
+      className="pointer-events-none absolute inset-y-0"
+      style={{ left: -CIRCUIT_MARGIN, width: boxWidth }}
+      viewBox={`${-CIRCUIT_MARGIN} 0 ${boxWidth} ${geometry.height}`}
       fill="none"
       aria-hidden="true"
     >
@@ -167,15 +184,15 @@ function CircuitLayer({ geometry, windows, progress }) {
           gradientUnits="userSpaceOnUse"
           x1="0"
           y1="0"
-          x2={geometry.w}
-          y2={geometry.h}
+          x2={geometry.width}
+          y2={geometry.height}
         >
           <stop offset="0%" stopColor="var(--c-accent)" />
           <stop offset="100%" stopColor="var(--c-accent2)" />
         </linearGradient>
       </defs>
 
-      {/* circuito apagado — siempre visible, para que el bento se lea como
+      {/* circuito apagado — siempre visible, para que la grilla se lea como
           una placa aun antes de que el scroll lo encienda */}
       {geometry.segments.map((segment, i) => (
         <path
@@ -202,13 +219,13 @@ function CircuitLayer({ geometry, windows, progress }) {
   )
 }
 
-/* Un pilar: la tarjeta que el circuito enciende cuando le llega la
+/* Una credencial: la tarjeta que el circuito enciende cuando le llega la
    corriente. Toda la gramática de encendido (opacidad, desenfoque,
    desplazamiento, borde, glow, color del título) es exactamente la misma
    que usa el timeline de StackFormacion. Que se sientan hermanas es
    deliberado: lo que cambia entre las dos secciones es el recorrido, no
    el idioma. */
-function PillarCard({ cred, span, progress, window: range, reduce, cardRef }) {
+function CredentialCard({ cred, span, progress, window: range, reduce, cardRef }) {
   const Icon = CRED_ICONS[cred.icon]
   const tint = cred.accent === 'accent2' ? 'var(--c-accent2)' : 'var(--c-accent)'
 
@@ -406,8 +423,8 @@ function CredentialsModule() {
   const reduce = useReducedMotion()
   const wrapRef = useRef(null)
   const cardRefs = useRef([])
-  const pillars = about.credentials
-  const count = pillars.length
+  const creds = about.credentials
+  const count = creds.length
 
   /* El objetivo del scroll es el propio bento y no la sección entera: el
      módulo vive al final de "Sobre mí", así que atarlo a la sección haría
@@ -444,11 +461,11 @@ function CredentialsModule() {
         )}
 
         <div className="relative z-10 grid grid-cols-6 gap-3 sm:gap-4">
-          {pillars.map((cred, i) => (
-            <PillarCard
+          {creds.map((cred, i) => (
+            <CredentialCard
               key={cred.label}
               cred={cred}
-              span={PILLAR_SPANS[i] ?? 'col-span-3'}
+              span={CRED_SPAN}
               progress={progress}
               window={windows.cards[i]}
               reduce={reduce}
