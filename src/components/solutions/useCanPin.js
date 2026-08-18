@@ -20,9 +20,15 @@ import { useEffect, useState } from 'react'
    Se usa para elegir ENTRE dos árboles, no para esconder uno con CSS: los dos
    no pueden montarse juntos porque cada viz arrancaría su animación duplicada.
 
+   El ancho es 1024 y no 768 para que coincida con el breakpoint en el que
+   Proceso pasa a su pila (`lg:hidden`). Si no coinciden, en tablet queda
+   Soluciones anclada y Proceso apilado — y el riel que conecta las dos
+   aparece huérfano, arrancando de la nada. Además, a 800px de ancho el
+   panel partido en dos columnas queda apretado: la pila se lee mejor.
+
    Sin matchMedia (jsdom) devuelve false: los tests ven la grilla apilada, que
    es la rama que ya cubren. */
-const QUERY = '(min-width: 768px) and (min-height: 600px)'
+const QUERY = '(min-width: 1024px) and (min-height: 600px)'
 
 const supported = () => typeof window !== 'undefined' && typeof window.matchMedia === 'function'
 

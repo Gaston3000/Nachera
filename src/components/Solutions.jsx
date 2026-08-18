@@ -7,6 +7,7 @@ import { Parallax } from './primitives/Parallax.jsx'
 import { RichText } from './primitives/RichText.jsx'
 import { SolutionsScroll } from './SolutionsScroll.jsx'
 import { SolutionsStack } from './SolutionsStack.jsx'
+import { SectionBridge } from './SectionBridge.jsx'
 import { useCanPin } from './solutions/useCanPin.js'
 
 /* ─── shared constants ───────────────────────────────────────────────────── */
@@ -1362,7 +1363,16 @@ export function Solutions() {
       {pinned ? (
         <SolutionsScroll panels={panels} DetailBlock={DetailBlock} />
       ) : !reduce ? (
-        <SolutionsStack panels={panels} DetailBlock={DetailBlock} />
+        <>
+          <SolutionsStack panels={panels} DetailBlock={DetailBlock} />
+          {/* el pase a Proceso: cierra el qué y abre el cómo. Sin esto el
+              hueco entre las dos no dice nada y, como usan el mismo
+              mecanismo, se leen como lo mismo dos veces. */}
+          <SectionBridge
+            desde="Eso es lo que puedo resolver."
+            hasta="Ahora, cómo lo trabajo."
+          />
+        </>
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-6 md:auto-rows-[minmax(200px,auto)]">
           {tiles.map((tile, i) => (

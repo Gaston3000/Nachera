@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useReducedMotion } from 'motion/react'
 import { SectionHeading } from './primitives/SectionHeading.jsx'
 import { Reveal } from './primitives/Reveal.jsx'
+import { RAIL_PAD, StackRail } from './primitives/StackRail.jsx'
 import { process } from '../data/content.js'
 
 /* ───────────────────────────────────────────────────────────────
@@ -534,6 +535,13 @@ function StackedCards({ steps }) {
 
   return (
     <div className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8 lg:hidden">
+      {/* El riel va en un contenedor interno y no en este: `absolute` se
+          posiciona contra la caja del borde, así que colgado del wrapper
+          ignoraría su padding horizontal y la línea caería 20px a la
+          izquierda de la de Soluciones. Tienen que coincidir o el eje se
+          quiebra en el pase. */}
+      <div className={`relative ${RAIL_PAD}`}>
+      <StackRail />
       <Reveal>
         <SectionHeading eyebrow="Proceso" title="Cómo trabajo, paso a paso." />
       </Reveal>
@@ -564,7 +572,7 @@ function StackedCards({ steps }) {
                   background: `linear-gradient(160deg, color-mix(in srgb, ${accent} 12%, var(--c-bg2)), var(--c-bg))`,
                   boxShadow: `0 -8px 40px -12px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.03)`,
                 }}
-                className="relative flex min-h-[22rem] flex-col overflow-hidden rounded-2xl border"
+                className="relative flex min-h-[17rem] flex-col overflow-hidden rounded-2xl border"
               >
                 {/* La tira que queda asomando cuando la tapa la siguiente.
                     Su alto es exactamente el escalón del apilado. */}
@@ -583,7 +591,7 @@ function StackedCards({ steps }) {
                     className="h-1.5 w-1.5 flex-none rounded-full"
                     style={{ background: accent, boxShadow: `0 0 10px ${accent}` }}
                   />
-                  <h3 className="font-display text-lg font-bold text-fg">
+                  <h3 className="font-display text-base font-bold text-fg">
                     {step.title}
                   </h3>
                   <span className="ml-auto font-mono text-[10px] text-muted">
@@ -600,6 +608,7 @@ function StackedCards({ steps }) {
           )
         })}
       </ol>
+      </div>
     </div>
   )
 }

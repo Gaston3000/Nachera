@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, useScroll } from 'motion/react'
 import { RichText } from './primitives/RichText.jsx'
+import { RAIL_PAD, StackRail } from './primitives/StackRail.jsx'
 
 /* Soluciones en celular: las tarjetas suben y se apilan con el scroll.
 
@@ -97,14 +98,9 @@ export function SolutionsStack({ panels, DetailBlock }) {
   const desde = Math.max(0, active - ventana)
 
   return (
-    <div ref={trackRef} className="relative pl-7">
-      {/* riel: hilo pegado al borde, se llena con el avance real */}
-      <div className="pointer-events-none absolute inset-y-0 left-1 w-px bg-glassborder" aria-hidden="true">
-        <motion.div
-          className="absolute inset-0 origin-top bg-accent"
-          style={{ scaleY: scrollYProgress }}
-        />
-      </div>
+    <div ref={trackRef} className={`relative ${RAIL_PAD}`}>
+      {/* el riel no es de esta sección: sigue en el puente y en Proceso */}
+      <StackRail progress={scrollYProgress} />
       <div
         className="pointer-events-none sticky left-0 z-20 font-mono text-[11px] tabular-nums text-accent"
         style={{ top: `calc(${TOP} + 1rem)`, marginLeft: '-1.75rem' }}
