@@ -6,6 +6,7 @@ import { Reveal } from './primitives/Reveal.jsx'
 import { Parallax } from './primitives/Parallax.jsx'
 import { RichText } from './primitives/RichText.jsx'
 import { SolutionsScroll } from './SolutionsScroll.jsx'
+import { SolutionsStack } from './SolutionsStack.jsx'
 import { useCanPin } from './solutions/useCanPin.js'
 
 /* ─── shared constants ───────────────────────────────────────────────────── */
@@ -1329,7 +1330,9 @@ const panels = tiles.map((tile) => ({ ...tile, ...PANEL_EXTRA[tile.id] }))
    - ventana lo bastante grande (ancho Y alto, ver useCanPin) y motion activo
      → recorrido anclado: un panel por vez, y su viz corre desde cero al
      activarse.
-   - mobile, ventana baja o reduced-motion → la grilla de siempre, con el
+   - ventana chica y motion activo → las tarjetas suben y se apilan con el
+     scroll, mismo patrón que Proceso en celular.
+   - reduced-motion → la grilla de siempre, todo visible y quieto, con el
      clic/tap para repetir la animación.
 
    Nunca las dos: si se montaran juntas, cada viz arrancaría por duplicado. */
@@ -1358,6 +1361,8 @@ export function Solutions() {
       </Reveal>
       {pinned ? (
         <SolutionsScroll panels={panels} DetailBlock={DetailBlock} />
+      ) : !reduce ? (
+        <SolutionsStack panels={panels} DetailBlock={DetailBlock} />
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-6 md:auto-rows-[minmax(200px,auto)]">
           {tiles.map((tile, i) => (
