@@ -85,27 +85,33 @@ function PanelTitle({ panel, dir }) {
   )
 }
 
-function PanelValue({ panel, dir, className = '' }) {
+function PanelValue({ panel, dir, className = '', withChips = true }) {
   return (
     <motion.div custom={dir} variants={copyItem} className={className}>
       <p className="max-w-xl text-sm leading-relaxed text-muted [@media(min-height:800px)]:lg:text-base">
         <RichText text={panel.value} />
       </p>
-      {/* los chips del capstone ("Sitio · Landing · Portfolio") viven en la
-          data del tile; si están, se muestran igual que en la tarjeta */}
-      {panel.chips && (
-        <div className="mt-4 flex flex-wrap gap-2">
-          {panel.chips.map((c) => (
-            <span
-              key={c}
-              className="rounded-full border border-glassborder bg-bg/50 px-3 py-1 text-xs font-semibold text-accent"
-            >
-              {c}
-            </span>
-          ))}
-        </div>
-      )}
+      {withChips && <PanelChips panel={panel} />}
     </motion.div>
+  )
+}
+
+/* Los chips del capstone ("Sitio · Landing · Portfolio") viven en la data del
+   tile. Van separados del párrafo porque en el panel full-bleed cada uno cae
+   en una columna distinta. */
+function PanelChips({ panel, className = '' }) {
+  if (!panel.chips) return null
+  return (
+    <div className={`flex flex-wrap gap-2 ${className}`}>
+      {panel.chips.map((c) => (
+        <span
+          key={c}
+          className="rounded-full border border-glassborder bg-bg/50 px-3 py-1 text-xs font-semibold text-accent"
+        >
+          {c}
+        </span>
+      ))}
+    </div>
   )
 }
 
@@ -222,12 +228,18 @@ export function SolutionsScroll({ panels, DetailBlock }) {
                    recién al final el dibujo. */
                 <div className="flex flex-col gap-4 [@media(min-height:800px)]:gap-6">
                   <div className="grid grid-cols-2 items-start gap-10 lg:gap-16">
+                    {/* el párrafo va debajo del título y no en la otra columna:
+                        si no, la izquierda queda con un hueco muerto del alto
+                        del bloque de la derecha */}
                     <div>
                       <PanelNumber panel={panel} dir={dir} />
                       <PanelTitle panel={panel} dir={dir} />
+                      <PanelValue panel={panel} dir={dir} className="mt-5" withChips={false} />
                     </div>
                     <div>
-                      <PanelValue panel={panel} dir={dir} />
+                      <motion.div custom={dir} variants={copyItem}>
+                        <PanelChips panel={panel} />
+                      </motion.div>
                       <motion.div custom={dir} variants={copyItem} className="mt-5 max-w-xl">
                         <DetailBlock detail={panel.detail} />
                       </motion.div>

@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react'
-import { motion, useMotionValueEvent, useScroll } from 'motion/react'
+import { useEffect, useRef, useState } from 'react'
+import { motion, useScroll } from 'motion/react'
 import { RichText } from './primitives/RichText.jsx'
 
 /* Soluciones en celular: las tarjetas suben y se apilan con el scroll.
@@ -27,8 +27,12 @@ import { RichText } from './primitives/RichText.jsx'
    le cambia el ancho a su tira de encabezado y la pila deja de alinearse.
    La profundidad la dan el borde, la sombra y el fondo opaco. */
 
-const HEADER = '3.5rem'   // alto de la tira que queda asomando
-const TOP = '5.5rem'      // donde se clava la primera, despejando el nav
+/* En px porque hay que comparar contra rects, y de ahí salen las medidas
+   en rem: si estuvieran declaradas dos veces podrían quedar desfasadas. */
+const HEADER_PX = 56      // alto de la tira que queda asomando
+const TOP_PX = 88         // donde se clava la primera, despejando el nav
+const HEADER = `${HEADER_PX / 16}rem`
+const TOP = `${TOP_PX / 16}rem`
 const EASE_CSS = 'cubic-bezier(0.16,1,0.3,1)'
 
 /* Cuántos encabezados quedan clavados a la vez. En pantallas cortas la pila
@@ -41,20 +45,55 @@ const pad2 = (n) => String(n).padStart(2, '0')
 
 export function SolutionsStack({ panels, DetailBlock }) {
   const trackRef = useRef(null)
+  const tarjetasRef = useRef([])
   const [active, setActive] = useState(0)
+  const [ventana, setVentana] = useState(WINDOW)
 
+  // el riel se llena con el avance del scroll sobre la pista
   const { scrollYProgress } = useScroll({
     target: trackRef,
     offset: ['start start', 'end end'],
   })
 
-  useMotionValueEvent(scrollYProgress, 'change', (p) => {
-    const i = Math.min(panels.length - 1, Math.max(0, Math.floor(p * panels.length)))
-    setActive((prev) => (prev === i ? prev : i))
-  })
+  /* Cuál es la tarjeta del frente.
 
-  const ventana =
-    typeof window !== 'undefined' && window.innerHeight < 700 ? WINDOW_CORTO : WINDOW
+     Sale de la geometría, NO de una regla de tres sobre el progreso. Antes se
+     calculaba como `progreso * cantidad`, que asume que cada tarjeta consume
+     la misma porción de scroll — y no es cierto: tienen alturas distintas
+     según su contenido, más el respiro del final. El índice quedaba
+     desfasado, así que había tarjetas que se abrían sin su dibujo y la
+     ventana de la pila salteaba una.
+
+     El frente es la última que ya llegó a la línea de clavado más profunda:
+     las recorridas quedaron por encima, las que faltan están por debajo. No
+     hace falta suponer nada sobre cuánto mide cada una. */
+  useEffect(() => {
+    let raf = 0
+    const leer = () => {
+      raf = 0
+      const v = window.innerHeight < 700 ? WINDOW_CORTO : WINDOW
+      const linea = TOP_PX + v * HEADER_PX + 8
+      let frente = 0
+      for (let i = 0; i < tarjetasRef.current.length; i++) {
+        const el = tarjetasRef.current[i]
+        if (el && el.getBoundingClientRect().top <= linea) frente = i
+      }
+      setVentana((prev) => (prev === v ? prev : v))
+      setActive((prev) => (prev === frente ? prev : frente))
+    }
+    const alScrollear = () => {
+      if (!raf) raf = requestAnimationFrame(leer)
+    }
+    alScrollear()
+    window.addEventListener('scroll', alScrollear, { passive: true })
+    window.addEventListener('resize', alScrollear)
+    return () => {
+      if (raf) cancelAnimationFrame(raf)
+      window.removeEventListener('scroll', alScrollear)
+      window.removeEventListener('resize', alScrollear)
+    }
+  }, [])
+
   const desde = Math.max(0, active - ventana)
 
   return (
@@ -83,6 +122,9 @@ export function SolutionsStack({ panels, DetailBlock }) {
           return (
             <li
               key={panel.id}
+              ref={(el) => {
+                tarjetasRef.current[i] = el
+              }}
               className="sticky"
               style={{
                 top: `calc(${TOP} + ${escalon} * ${HEADER})`,

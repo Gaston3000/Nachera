@@ -94,6 +94,24 @@ describe('SolutionsScroll — recorrido anclado', () => {
     }
   })
 
+  it('en el capstone el párrafo va en la misma columna que el título', () => {
+    const { container } = render(<Solutions />)
+    act(() => __setProgress(1)) // último panel: el full-bleed
+    expect(contador()).toBe('06 / 06')
+
+    const titulo = screen.getByText('Experiencias digitales', { selector: 'h3' })
+    const columnaIzq = titulo.parentElement
+    // el párrafo cuelga del título, no de la otra columna: si no, la izquierda
+    // queda con un hueco muerto del alto del bloque de la derecha
+    expect(columnaIzq.textContent).toContain('merece estar en el mundo digital')
+
+    // y los chips quedan del otro lado, con el bloque Resuelve/Entrega/Resultado
+    const chip = screen.getByText('Landing')
+    expect(columnaIzq.contains(chip)).toBe(false)
+    const columnaDer = chip.closest('div').parentElement.parentElement
+    expect(columnaDer.textContent).toContain('Resuelve')
+  })
+
   it('el avance del scroll cambia el panel activo', () => {
     render(<Solutions />)
     expect(contador()).toBe('01 / 06')
