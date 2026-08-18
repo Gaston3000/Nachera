@@ -88,7 +88,7 @@ function PanelTitle({ panel, dir }) {
 function PanelValue({ panel, dir, className = '' }) {
   return (
     <motion.div custom={dir} variants={copyItem} className={className}>
-      <p className="max-w-xl text-sm leading-relaxed text-muted lg:text-base">
+      <p className="max-w-xl text-sm leading-relaxed text-muted [@media(min-height:800px)]:lg:text-base">
         <RichText text={panel.value} />
       </p>
       {/* los chips del capstone ("Sitio · Landing · Portfolio") viven en la
@@ -192,10 +192,15 @@ export function SolutionsScroll({ panels, DetailBlock }) {
       className="relative"
       style={{ height: `calc(${panels.length * PANEL_VH}vh + 100vh)` }}
     >
-      {/* pt deja pasar el nav fijo. Sin alto mínimo en el escenario: en
-          pantallas bajas tiene que poder achicarse, no empujar el contenido
-          abajo del nav. El piso real lo pone useCanPin. */}
-      <div className="sticky top-0 flex h-screen flex-col justify-center pb-10 pt-24">
+      {/* pt deja pasar el nav fijo (68px con la página scrolleada). Sin alto
+          mínimo en el escenario: en pantallas bajas tiene que poder achicarse,
+          no empujar el contenido abajo del nav.
+
+          Todo lo que sigue tiene dos tallas. Por defecto va la compacta, y a
+          partir de 800px de alto de ventana se agranda. Es al revés de lo
+          habitual a propósito: si el default fuera el grande, cualquier
+          notebook quedaría afuera. El piso lo pone useCanPin. */}
+      <div className="sticky top-0 flex h-screen flex-col justify-center pb-6 pt-20 [@media(min-height:800px)]:pb-10 [@media(min-height:800px)]:pt-24">
         <div className="relative min-h-0 flex-1">
           <AnimatePresence initial={false} custom={dir}>
             <motion.div
@@ -215,7 +220,7 @@ export function SolutionsScroll({ panels, DetailBlock }) {
                    El orden se mantiene igual que en los otros paneles: primero
                    el texto, después el bloque Resuelve/Entrega/Resultado, y
                    recién al final el dibujo. */
-                <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-4 [@media(min-height:800px)]:gap-6">
                   <div className="grid grid-cols-2 items-start gap-10 lg:gap-16">
                     <div>
                       <PanelNumber panel={panel} dir={dir} />
@@ -252,7 +257,7 @@ export function SolutionsScroll({ panels, DetailBlock }) {
             renglones y se comía ~80px de alto, que es justo lo que falta en
             pantallas bajas. Cada segmento es el botón de salto y lleva el
             título en aria-label y en el tooltip. */}
-        <div className="mt-6 flex w-full shrink-0 items-center gap-5">
+        <div className="mt-4 flex w-full shrink-0 items-center gap-5 [@media(min-height:800px)]:mt-6">
           <div className="flex flex-1 items-center gap-1.5">
             {panels.map((p, i) => (
               <button

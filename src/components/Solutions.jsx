@@ -1271,21 +1271,54 @@ function SolutionTile({ tile, index, active = false, onActivate }) {
    - `vizBox`    alto MÍNIMO de la caja, nunca fijo, para que ninguna viz se
                  pueda recortar
    - `vizClass`  ancho + escala de la viz dentro del panel
+
+   `vizBox` y `vizClass` traen DOS tallas: la compacta por defecto y la
+   grande a partir de 800px de alto de ventana. Sin eso, el recorrido no
+   entra en un notebook y la sección entera se cae a la grilla.
    - `fullBleed` el capstone abre a ancho completo en vez de partir en dos
 
    Ojo con FeedViz: su grilla es de celdas `aspect-square`, así que su alto
    sigue al ancho (mide ~ancho + 51). Por eso lleva menos ancho y menos escala
    que el resto; con el 74% × 1.3 de las demás se iría a ~500px de alto. */
+/* Las clases van LITERALES y completas a propósito: Tailwind extrae mirando
+   el código fuente como texto, así que cualquier `${...}` las vuelve
+   invisibles y la regla nunca se genera. Verificado en el CSS compilado. */
 const PANEL_EXTRA = {
-  estrategia: { n: '01', vizBox: 'min-h-[19rem]', vizClass: 'w-[74%] scale-[1.3]' },
-  marca: { n: '02', vizBox: 'min-h-[24rem]', vizClass: 'w-[68%] scale-[1.12]' },
-  produccion: { n: '03', vizBox: 'min-h-[19rem]', vizClass: 'w-[74%] scale-[1.3]' },
-  email: { n: '04', vizBox: 'min-h-[19rem]', vizClass: 'w-[74%] scale-[1.3]' },
-  analytics: { n: '05', vizBox: 'min-h-[19rem]', vizClass: 'w-[74%] scale-[1.3]' },
+  estrategia: {
+    n: '01',
+    vizBox: 'min-h-[15rem] [@media(min-height:800px)]:min-h-[19rem]',
+    vizClass: 'w-[74%] scale-[1.08] [@media(min-height:800px)]:scale-[1.3]',
+  },
+  marca: {
+    n: '02',
+    vizBox: 'min-h-[19rem] [@media(min-height:800px)]:min-h-[24rem]',
+    vizClass: 'w-[58%] scale-[1] [@media(min-height:800px)]:w-[68%] [@media(min-height:800px)]:scale-[1.12]',
+  },
+  produccion: {
+    n: '03',
+    vizBox: 'min-h-[15rem] [@media(min-height:800px)]:min-h-[19rem]',
+    vizClass: 'w-[74%] scale-[1.08] [@media(min-height:800px)]:scale-[1.3]',
+  },
+  email: {
+    n: '04',
+    vizBox: 'min-h-[15rem] [@media(min-height:800px)]:min-h-[19rem]',
+    vizClass: 'w-[74%] scale-[1.08] [@media(min-height:800px)]:scale-[1.3]',
+  },
+  analytics: {
+    n: '05',
+    vizBox: 'min-h-[15rem] [@media(min-height:800px)]:min-h-[19rem]',
+    vizClass: 'w-[74%] scale-[1.08] [@media(min-height:800px)]:scale-[1.3]',
+  },
   // full-bleed: el panel es el doble de ancho, así que la viz se maqueta a la
   // mitad y se escala fuerte — si no, sus detalles quedan minúsculos.
-  web: { n: '06', vizBox: 'min-h-[17rem]', vizClass: 'w-[56%] scale-[1.7]', fullBleed: true },
+  web: {
+    n: '06',
+    vizBox: 'min-h-[13rem] [@media(min-height:800px)]:min-h-[17rem]',
+    vizClass: 'w-[56%] scale-[1.3] [@media(min-height:800px)]:scale-[1.7]',
+    fullBleed: true,
+  },
 }
+
 
 const panels = tiles.map((tile) => ({ ...tile, ...PANEL_EXTRA[tile.id] }))
 
