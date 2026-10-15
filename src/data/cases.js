@@ -10,6 +10,15 @@ export const cases = [
     // blanco: el modal lo muestra en un tile blanco para no recolorear la marca.
     logo: '/logos/lae.webp',
     sector: 'Audiología · empresa con +60 años',
+    // Portada (formato editorial de Casos): color de marca medido del logo,
+    // dos etiquetas y, sólo en el destacado, el único número real del sitio.
+    brandColor: '#2E6BB0',
+    logoBlend: 'multiply',
+    tags: ['Audiología', 'Email marketing'],
+    highlight: { value: '31%', label: 'open rate en email' },
+    // Pieza real del trabajo (un posteo, un mail, un cuadro de un reel) para
+    // la portada. Mientras sea null, la portada se arma con el logo.
+    cover: null,
     tagline: 'Construcción de marca digital **desde cero**.',
     problem:
       'Laboratorio de Aplicaciones Electrónicas no tenía presencia digital activa ni canales desarrollados en redes. Reconocida en el plano físico, era invisible online.',
@@ -53,6 +62,12 @@ export const cases = [
     // pantallas 2x. Si aparece una versión más grande, reemplazar acá.
     logo: '/logos/dominga.webp',
     sector: 'Gastronomía · pastelería artesanal',
+    brandColor: '#CFE9C2',
+    // Sin fantasma: su "logo" es la foto de perfil de Instagram, de 100px.
+    // Agrandada a tamaño de tapa, aun desenfocada, se leía como una mancha.
+    ghost: false,
+    tags: ['Gastronomía', 'Reels'],
+    cover: null,
     tagline: 'De un feed improvisado a una **identidad consistente**.',
     problem:
       'Tenía presencia en redes, pero sin estrategia ni identidad de contenido clara. Frecuencia baja y sin planificación para crecer.',
@@ -97,6 +112,11 @@ export const cases = [
     logo: '/logos/gtes.webp',
     logoBg: '#001330',
     sector: 'Deportes · representación de futbolistas',
+    brandColor: '#001330',
+    // blanco sobre azul: con mezcla `screen` el azul desaparece y queda el emblema
+    logoBlend: 'screen',
+    tags: ['Deportes', 'Edición de video'],
+    cover: null,
     tagline: 'Highlights y narrativa deportiva, **en tiempo real**.',
     problem:
       'La agencia buscaba mayor visibilidad para sus jugadores, sin una estrategia activa de contenido deportivo dinámico.',
@@ -138,7 +158,16 @@ export const cases = [
     id: 'abelson',
     brand: 'Abelson Express Devoto',
     sector: 'Supermercado · sucursal con foco en consumo diario',
-    tagline: 'Construcción de marca digital **desde cero**.',
+    // Sin logo todavía (el cliente lo consigue): portada tipográfica con el
+    // nombre, sobre un neutro — no se inventa un color de marca.
+    brandColor: null,
+    tags: ['Supermercado', 'Contenido'],
+    cover: null,
+    // Antes repetía textual la bajada de LAE ("Construcción de marca digital
+    // desde cero"): en la lista editorial se leían dos títulos idénticos.
+    // Esta sale de su propio texto ("comunicar ofertas, productos y campañas
+    // promocionales con un tono dinámico y cercano").
+    tagline: 'Ofertas y campañas con un tono **dinámico y cercano**.',
     problem:
       'Una sucursal de supermercado orientada al consumo diario y promociones comerciales que necesitaba fortalecer su presencia digital y comunicar ofertas, productos y campañas promocionales con un tono dinámico y cercano.',
     approach: [

@@ -255,10 +255,15 @@ export function Hero() {
           </h1>
 
           <p
-            className="hero-fade mx-auto mt-6 max-w-xl text-balance text-base leading-relaxed text-muted md:text-[1.06rem]"
+            className="hero-fade mx-auto mt-6 max-w-2xl text-balance text-base leading-relaxed text-muted md:text-[1.06rem]"
             style={fadeAt(0.85)}
           >
-            <RichText text={hero.sub} />
+            {/* El salto va desde md: en celular forzarlo dejaría renglones
+                desparejos, y ahí alcanza con que "de forma integral" no se
+                parta (espacios no separables en content.js). max-w-2xl y no
+                xl: con xl el primer renglón no entraba y "integral" bajaba. */}
+            <RichText text={hero.subLines[0]} />
+            <br className="hidden md:inline" /> <RichText text={hero.subLines[1]} />
           </p>
 
           <div

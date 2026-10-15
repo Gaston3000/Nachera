@@ -11,7 +11,15 @@ export const hero = {
   // Los dos puntos hacen el trabajo que hacían "desde/hasta": la bajada pasa
   // de 177 a 110 caracteres y queda en 2 renglones en escritorio y 3 en
   // celular, los mismos que el h1. Antes pesaba más que el propio titular.
-  sub: 'Me ocupo del marketing digital de tu marca **de forma integral**: estrategia, identidad visual, contenido y redes.',
+  // Dos renglones, en dos partes: "…de forma integral:" cierra el primero y
+  // la lista va entera en el segundo (pedido del cliente: "integral" quedaba
+  // solo arriba del renglón de abajo). Hero.jsx pone el salto entre las dos
+  // desde tablet; en celular el texto fluye solo. Los espacios de "de forma
+  // integral" son no separables ( ): esa frase no se parte nunca.
+  subLines: [
+    'Me ocupo del marketing digital de tu marca **de forma integral**:',
+    'estrategia, identidad visual, contenido y redes.',
+  ],
   chips: ['Storytelling', 'Estrategia', 'Reels', 'Email', 'Branding'],
 
   // ── Fotos del campo del hero ────────────────────────────────────────

@@ -92,7 +92,7 @@ export function BloopAgency() {
           >
             {clients.map((c, i) => {
               // Alterno color + posición del borde para romper la monotonía
-              // violeta. Patrón ya usado en CaseCard (coherencia del sistema).
+              // violeta.
               // Identidad accent2 mantenida via rail del intro + cards pares.
               const isViolet = i % 2 === 0
               const cardAccent = isViolet

@@ -1067,3 +1067,29 @@
     opacity: 1;
   }
 }
+
+/* ── Casos: la portada se acerca al pasar el mouse ────────────────────────
+   Sólo la imagen de la portada (la pieza real o el fantasma del logo), no
+   la tarjeta entera: el gesto es el de una revista que se mira de cerca, no
+   el de un botón que salta. Detrás de `hover: hover` para que en táctiles no
+   quede pegado después de tocar. */
+.case-cover__art {
+  transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (hover: hover) and (pointer: fine) {
+  .case-story:hover .case-cover__art {
+    transform: scale(1.06);
+  }
+}
+.case-story:focus-visible .case-cover__art {
+  transform: scale(1.06);
+}
+@media (prefers-reduced-motion: reduce) {
+  .case-cover__art {
+    transition: none;
+  }
+  .case-story:hover .case-cover__art,
+  .case-story:focus-visible .case-cover__art {
+    transform: none;
+  }
+}

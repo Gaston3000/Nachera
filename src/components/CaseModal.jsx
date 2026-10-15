@@ -2,12 +2,18 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import { Button } from './primitives/Button.jsx'
 import { MessageIcon } from './primitives/icons.jsx'
-import { RichText } from './primitives/RichText.jsx'
 import { BrandLogo } from './primitives/BrandLogo.jsx'
-import { MiniDashboard } from './MiniDashboard.jsx'
+import { CaseResults } from './cases/CaseResults.jsx'
+import { Tags } from './cases/Tags.jsx'
+import { LogoGhost, WordGhost } from './cases/CaseCover.jsx'
+import { brandInk, brandSurface, deepBrand } from './cases/brand.js'
 import { siteConfig } from '../data/siteConfig.js'
 
 export function CaseModal({ caseData, onClose }) {
+  // La tinta del encabezado depende del color de marca: oscura sobre un
+  // color claro (Dominga), clara sobre el resto.
+  const ink = brandInk(caseData.brandColor)
+  const dark = ink === 'dark'
   const reduce = useReducedMotion()
   const closeRef = useRef(null)
   const scrollRef = useRef(null)
@@ -161,7 +167,7 @@ export function CaseModal({ caseData, onClose }) {
         <button
           ref={closeRef}
           onClick={onClose}
-          className="absolute right-4 top-4 z-30 flex h-8 w-8 items-center justify-center rounded-full border border-glassborder bg-glass text-muted backdrop-blur-sm transition hover:text-fg focus-visible:outline-2 focus-visible:outline-accent"
+          className="absolute right-4 top-4 z-30 flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-black/35 text-white/85 backdrop-blur-sm transition hover:bg-black/50 hover:text-white focus-visible:outline-2 focus-visible:outline-accent"
           aria-label="Cerrar modal"
         >
           ✕
@@ -174,101 +180,77 @@ export function CaseModal({ caseData, onClose }) {
           className="modal-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain"
         >
 
-        {/* hero band */}
-        <div className="relative overflow-hidden rounded-t-2xl border-b border-glassborder bg-glass/40 px-8 pt-10 pb-8">
-          <div
-            className="pointer-events-none absolute inset-0 opacity-40"
-            style={{
-              background:
-                'radial-gradient(circle at 80% 0%, color-mix(in srgb, var(--c-accent) 20%, transparent), transparent 60%)',
-            }}
-            aria-hidden="true"
+        {/* Encabezado del color de marca. Es la MISMA superficie que la
+            portada de la tarjeta (brandSurface): el caso es del mismo color
+            en la lista y al abrirlo. Antes era un fondo genérico con un
+            brillo cyan, igual para los cuatro casos, y arrancaba con una
+            pastilla "Caso de muestra" — que además decía lo contrario de lo
+            que son: casos reales. */}
+        <header
+          className={`relative overflow-hidden px-8 pb-9 pt-10 ${dark ? 'text-black' : 'text-white'}`}
+          style={{ background: brandSurface(caseData.brandColor, 'top') }}
+        >
+          <LogoGhost caseData={caseData} className="-right-[6%] -top-[30%] w-[46%]" />
+          <WordGhost
+            caseData={caseData}
+            className="-bottom-[0.2em] -right-[0.04em] text-[10rem] md:text-[13rem]"
           />
-          {/* placeholder chip */}
-          <span className="inline-block rounded-full border border-accent/30 bg-accent/10 px-3 py-1 font-display text-[10px] font-semibold uppercase tracking-[0.15em] text-accent mb-3">
-            Caso de muestra
-          </span>
-          <p className="font-display text-xs font-semibold uppercase tracking-[0.15em] text-muted mb-1">
-            {caseData.sector}
-          </p>
-          <div className="flex items-center gap-4">
-            <BrandLogo src={caseData.logo} bg={caseData.logoBg} size="md" />
-            <h2 className="font-display text-3xl font-bold text-fg">{caseData.brand}</h2>
-          </div>
-          {/* RichText y no el string crudo: el tagline trae **negritas**, y
-              acá se veían los asteriscos literales en los cuatro casos. La
-              tarjeta y la grilla ya lo pasaban por RichText; el modal no. */}
-          <p className="mt-2 text-base text-muted italic">
-            <RichText text={caseData.tagline} />
-          </p>
-        </div>
-
-        {/* body */}
-        <div className="px-8 py-8 space-y-8">
-          {/* El desafío, en caja propia: es el planteo del caso. El riel de
-              la izquierda es el mismo degradé de la sección de Bloop. */}
-          <div className="relative overflow-hidden rounded-2xl border border-glassborder bg-white/[0.025] p-6 pl-7">
-            <span
-              className="absolute inset-y-0 left-0 w-1"
-              style={{ background: 'linear-gradient(180deg, var(--c-accent2), var(--c-accent))' }}
-              aria-hidden="true"
-            />
-            <p className="mb-3 font-display text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-              El Desafío
-            </p>
-            <p className="text-base leading-relaxed text-muted">{caseData.detail.challenge}</p>
-          </div>
-
-          {/* Estrategia | Ejecución en una sola caja partida. Antes eran dos
-              listas cortas apiladas que dejaban media caja vacía a la
-              derecha; juntas se leen como lo que son: el plan y lo que se
-              hizo. La mitad teñida marca la primera columna. Desde md van
-              lado a lado; en celular se apilan con divisor horizontal. */}
-          <div className="grid overflow-hidden rounded-2xl border border-glassborder md:grid-cols-2">
-            <div className="bg-white/[0.035] p-6">
-              <p className="mb-4 font-display text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-                La Estrategia
-              </p>
-              <ul className="space-y-3">
-                {caseData.detail.strategy.map((s, i) => (
-                  <li key={i} className="flex items-start gap-2.5 text-[15px] leading-snug text-fg/85">
-                    <span className="mt-px flex-shrink-0 text-accent" aria-hidden="true">→</span>
-                    <span>{s}</span>
-                  </li>
-                ))}
-              </ul>
+          <div className="relative">
+            <Tags tags={caseData.tags} ink={ink} />
+            <div className="mt-5 flex items-center gap-4">
+              <BrandLogo src={caseData.logo} bg={caseData.logoBg} size="md" />
+              <h2 className="font-display text-3xl font-bold leading-tight md:text-4xl">
+                {caseData.brand}
+              </h2>
             </div>
-            <div className="border-t border-glassborder p-6 md:border-l md:border-t-0">
-              <p className="mb-4 font-display text-xs font-semibold uppercase tracking-[0.2em] text-accent2">
-                La Ejecución
-              </p>
-              <ul className="space-y-3">
-                {caseData.detail.execution.map((e, i) => (
-                  <li key={i} className="flex items-start gap-2.5 text-[15px] leading-snug text-fg/85">
-                    <span className="mt-px flex-shrink-0 text-accent2" aria-hidden="true">◈</span>
-                    <span>{e}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {/* La bajada pareja, sin cursiva ni negrita adentro: misma regla
+                que el título de la tarjeta. */}
+            <p
+              className={`mt-4 max-w-2xl font-display text-xl leading-snug md:text-2xl ${
+                dark ? 'text-black/75' : 'text-white/85'
+              }`}
+            >
+              {plain(caseData.tagline)}
+            </p>
+          </div>
+        </header>
+
+        {/* El cuerpo, en el mismo lenguaje editorial que las tarjetas: texto
+            sobre el fondo, separado por líneas finas. Sin cajas de vidrio,
+            sin rieles en degradé, sin rótulos en mayúsculas espaciadas ni
+            viñetas con símbolos — los tics que se les sacaron a las
+            tarjetas. */}
+        <div className="space-y-10 px-8 py-9">
+          <section>
+            <h3 className={LABEL}>El desafío</h3>
+            <p className="text-lg leading-relaxed text-fg/80">{caseData.detail.challenge}</p>
+          </section>
+
+          <div className="grid gap-8 border-t border-glassborder pt-8 md:grid-cols-2 md:gap-10">
+            <section>
+              <h3 className={LABEL}>La estrategia</h3>
+              <BulletList items={caseData.detail.strategy} />
+            </section>
+            <section>
+              <h3 className={LABEL}>La ejecución</h3>
+              <BulletList items={caseData.detail.execution} />
+            </section>
           </div>
 
-          {/* results — MiniDashboard */}
-          <div>
-            <p className="mb-4 font-display text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-              Resultados
-            </p>
-            <MiniDashboard
-              results={caseData.results}
-              narrative={caseData.detail.resultsNarrative}
-            />
-          </div>
+          <section className="border-t border-glassborder pt-8">
+            <h3 className={LABEL}>Resultados</h3>
+            <CaseResults results={caseData.results} narrative={caseData.detail.resultsNarrative} />
+          </section>
 
-          {/* CTA banner */}
-          <div className="rounded-xl border border-accent/30 bg-accent/5 p-6 text-center">
-            <p className="mb-4 font-display text-lg font-bold text-fg">
-              Quiero algo así para mi marca
-            </p>
+          {/* El cierre vuelve al color de marca: el modal abre y cierra con la
+              identidad del cliente. */}
+          <div
+            className={`flex flex-col items-start gap-4 rounded-2xl p-6 sm:flex-row sm:items-center sm:justify-between ${
+              dark ? 'text-black' : 'text-white'
+            }`}
+            style={{ background: deepBrand(caseData.brandColor) }}
+          >
+            <p className="font-display text-lg font-bold">Quiero algo así para mi marca</p>
             <Button
               href={siteConfig.whatsappUrlWithMsg}
               target="_blank"
@@ -311,5 +293,24 @@ export function CaseModal({ caseData, onClose }) {
         )}
       </MotionDiv>
     </div>
+  )
+}
+
+/* Rótulo de cada bloque del modal: en minúscula normal y sin interletrado. */
+const LABEL = 'mb-3 font-display text-sm font-semibold text-fg/55'
+
+/* Las bajadas traen ** para resaltar en otros lugares; acá van parejas. */
+const plain = (text) => text.replace(/\*\*/g, '')
+
+function BulletList({ items }) {
+  return (
+    <ul className="space-y-2.5">
+      {items.map((item, i) => (
+        <li key={i} className="flex gap-3 text-[15px] leading-snug text-fg/85">
+          <span className="mt-[0.55em] h-1 w-1 flex-none rounded-full bg-fg/40" aria-hidden="true" />
+          <span>{item}</span>
+        </li>
+      ))}
+    </ul>
   )
 }

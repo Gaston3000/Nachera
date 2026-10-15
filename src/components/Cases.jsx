@@ -1,187 +1,102 @@
 import { useState } from 'react'
-import { motion } from 'motion/react'
 import { SectionHeading } from './primitives/SectionHeading.jsx'
 import { Reveal } from './primitives/Reveal.jsx'
 import { Parallax } from './primitives/Parallax.jsx'
-import { Button } from './primitives/Button.jsx'
-import { ArrowUpRight } from './primitives/icons.jsx'
-import { GlassPanel } from './primitives/GlassPanel.jsx'
-import { CountUp } from './primitives/CountUp.jsx'
-import { RichText } from './primitives/RichText.jsx'
-import { BrandLogo } from './primitives/BrandLogo.jsx'
-import { useCardReplay } from './primitives/useCardReplay.js'
-import { containerVariants, itemVariants } from './primitives/motionPresets.js'
-import { CaseCard } from './CaseCard.jsx'
 import { CaseModal } from './CaseModal.jsx'
+import { CaseCover } from './cases/CaseCover.jsx'
+import { brandInk, brandPanel } from './cases/brand.js'
+import { Tags } from './cases/Tags.jsx'
 import { cases } from '../data/cases.js'
 
-/* ─── IG-style phone mockup for featured case ─────────────────────────────── */
+/* ── Casos, en formato editorial ───────────────────────────────────────────
+ *
+ * Una historia grande y el resto en lista, como el índice editorial de
+ * e2.vc. Reemplaza a las tarjetas de vidrio, que no invitaban a leer: cada
+ * una tenía seis capas compitiendo (rubro en mayúsculas, logo, nombre, frase
+ * en cursiva con negrita, número gigante en degradé y botón) y ninguna
+ * ganaba. Además, "Reactivo" o "Multi-formato" iban con el tamaño y el
+ * degradé de un KPI sin ser resultados — y al lado devaluaban el único
+ * número real del sitio, el 31% de LAE.
+ *
+ * Ahora cada caso dice poco: su portada, dos etiquetas y una frase. El
+ * destacado suma ese único número real. Todo lo demás (problema, enfoque,
+ * servicios, resultados) vive en el modal: la tarjeta invita, el modal
+ * cuenta. Y todo el ítem es el link — no hay botones repetidos.
+ */
 
-function PhoneMockup() {
+/* Las bajadas traen ** para el modal; en el formato editorial el título va
+   parejo, sin negrita adentro. */
+const plain = (text) => text.replace(/\*\*/g, '')
+
+/* La historia grande: a un lado el texto sobre el color de marca, al otro
+   la portada. Las etiquetas van sobre la portada, como en e2. */
+function FeaturedStory({ caseData, onOpen }) {
   return (
-    <div
-      className="relative mx-auto w-[180px] rounded-[28px] border-2 border-glassborder bg-bg2 p-3 shadow-[0_24px_60px_-12px_rgba(0,0,0,0.5)]"
-      aria-hidden="true"
+    <button
+      type="button"
+      onClick={() => onOpen(caseData)}
+      aria-label={`Ver caso: ${caseData.brand}`}
+      className="case-story group grid w-full overflow-hidden rounded-2xl text-left ring-1 ring-white/10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent sm:grid-cols-2"
     >
-      {/* notch */}
-      <div className="mx-auto mb-2 h-1.5 w-10 rounded-full bg-glassborder" />
-      {/* "profile" header */}
-      <div className="mb-2 flex items-center gap-2 px-1">
-        <div className="h-7 w-7 flex-shrink-0 rounded-full bg-accent/30 border border-accent/50" />
-        <div className="flex flex-col gap-1">
-          <div className="h-1.5 w-16 rounded bg-fg/30" />
-          <div className="h-1 w-10 rounded bg-muted/30" />
-        </div>
-      </div>
-      {/* "feed" grid */}
-      <div className="grid grid-cols-3 gap-0.5">
-        {[0, 1, 2, 3, 4, 5].map((i) => (
-          <div
-            key={i}
-            className={`aspect-square rounded-sm ${
-              i === 0 ? 'bg-accent/40' : i === 4 ? 'bg-accent2/30' : 'bg-glass border border-glassborder'
-            }`}
-          />
-        ))}
-      </div>
-      {/* (stats row "antes/después" removida — los % eran iguales en todas
-          las tarjetas y no respaldaban data real; pedido del cliente.) */}
-    </div>
-  )
-}
-
-/* ─── featured case — click/tap repite la animación (mismo patrón que las
-       tarjetas de Soluciones) ───────────────────────────────────────────── */
-
-function FeaturedCase({ caseData, active, onActivate, onOpen }) {
-  const { ref, inView, replayKey, replay, reduce } = useCardReplay()
-
-  const activate = () => {
-    onActivate?.()
-    replay()
-  }
-
-  return (
-    <div ref={ref} className="group mb-8">
-      <GlassPanel
-        onClick={activate}
-        title={reduce ? undefined : 'Tocá la tarjeta para repetir la animación'}
-        className={`relative overflow-hidden cursor-pointer select-none transition-all duration-300 ${
-          active ? 'border-accent/60' : ''
-        }`}
+      <div
+        className="relative order-2 flex min-h-[18rem] flex-col justify-between gap-10 p-7 sm:order-1 md:p-9"
+        style={{ background: brandPanel(caseData.brandColor) }}
       >
-        {/* background glow — FUERA del wrapper keyed para que no parpadee en replay */}
-        <div
-          className="pointer-events-none absolute inset-0 opacity-30"
-          style={{
-            background:
-              'radial-gradient(ellipse at 0% 50%, color-mix(in srgb, var(--c-accent) 20%, transparent), transparent 60%)',
-          }}
-          aria-hidden="true"
+        <p className="text-sm font-medium text-white/80">{caseData.brand}</p>
+        <h3 className="font-display text-[clamp(1.75rem,1.1rem+1.9vw,2.7rem)] font-bold leading-[1.05] tracking-tight text-white">
+          {plain(caseData.tagline)}
+        </h3>
+        {caseData.highlight ? (
+          <p className="flex items-baseline gap-2.5">
+            <span className="font-display text-4xl font-bold leading-none text-white md:text-5xl">
+              {caseData.highlight.value}
+            </span>
+            <span className="text-sm text-white/75">{caseData.highlight.label}</span>
+          </p>
+        ) : (
+          <span />
+        )}
+      </div>
+
+      <div className="relative order-1 sm:order-2">
+        <CaseCover caseData={caseData} variant="feature" className="aspect-[16/10] h-full sm:aspect-auto" />
+        <Tags
+          tags={caseData.tags}
+          ink={brandInk(caseData.brandColor)}
+          className="absolute left-4 top-4 md:left-5 md:top-5"
         />
-        {/* anillo accent persistente mientras está activa */}
-        <div
-          className={`pointer-events-none absolute inset-0 rounded-2xl transition-opacity duration-300 ${
-            active ? 'opacity-100' : 'opacity-0'
-          }`}
-          style={{ boxShadow: '0 0 60px -16px var(--c-accent)' }}
-          aria-hidden="true"
-        />
-
-        {/* wrapper keyed — bumpear replayKey lo remonta y re-corre el stagger
-            + los count-ups desde cero. Primer run gateado por viewport. */}
-        <motion.div
-          key={replayKey}
-          className="relative flex flex-col gap-8 p-8 md:flex-row md:items-center md:gap-12 md:p-12"
-          variants={reduce ? undefined : containerVariants}
-          initial={reduce ? false : 'hidden'}
-          animate={reduce ? false : inView ? 'show' : 'hidden'}
-        >
-          {/* LEFT — phone mockup */}
-          <motion.div
-            className="flex-shrink-0 flex justify-center md:justify-start"
-            variants={reduce ? undefined : itemVariants}
-          >
-            <PhoneMockup />
-          </motion.div>
-
-          {/* RIGHT — editorial */}
-          <div className="flex-1">
-            <motion.span
-              className="inline-block mb-3 rounded-full border border-glassborder bg-glass px-3 py-1 font-display text-xs font-semibold uppercase tracking-[0.15em] text-muted"
-              variants={reduce ? undefined : itemVariants}
-            >
-              {caseData.sector}
-            </motion.span>
-            <motion.div
-              className="flex items-center gap-4"
-              variants={reduce ? undefined : itemVariants}
-            >
-              <BrandLogo src={caseData.logo} bg={caseData.logoBg} size="lg" />
-              <h3 className="font-display text-4xl font-black text-fg md:text-5xl">
-                {caseData.brand}
-              </h3>
-            </motion.div>
-            <motion.p
-              className="mt-2 text-base italic text-muted"
-              variants={reduce ? undefined : itemVariants}
-            >
-              <RichText text={caseData.tagline} />
-            </motion.p>
-
-            {/* results as BIG accent numbers */}
-            <motion.div
-              className="mt-6 flex flex-wrap gap-8"
-              variants={reduce ? undefined : itemVariants}
-            >
-              {caseData.results.map((r) => (
-                <div key={r.label}>
-                  <CountUp
-                    value={r.value}
-                    className="font-display text-4xl font-black text-accent"
-                  />
-                  <p className="mt-0.5 text-xs text-muted">{r.label}</p>
-                </div>
-              ))}
-            </motion.div>
-
-            <motion.div
-              className="mt-8"
-              variants={reduce ? undefined : itemVariants}
-            >
-              <Button
-                as="button"
-                variant="ghost"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onOpen(caseData)
-                }}
-                icon={<ArrowUpRight />}
-                iconNudge="diag"
-              >
-                Ver caso completo
-              </Button>
-            </motion.div>
-          </div>
-        </motion.div>
-      </GlassPanel>
-    </div>
+      </div>
+    </button>
   )
 }
 
-/* ─── main section ───────────────────────────────────────────────────────── */
+/* Un caso de la lista: miniatura de portada, dos etiquetas y una frase. El
+   título arranca en gris y se enciende al pasar el mouse, como en e2. */
+function StoryRow({ caseData, onOpen }) {
+  return (
+    <button
+      type="button"
+      onClick={() => onOpen(caseData)}
+      aria-label={`Ver caso: ${caseData.brand}`}
+      className="case-story group flex w-full items-start gap-4 py-6 text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent sm:gap-5"
+    >
+      <CaseCover
+        caseData={caseData}
+        className="aspect-[16/10] w-[42%] max-w-[13.5rem] shrink-0 rounded-xl ring-1 ring-white/10"
+      />
+      <div className="min-w-0 pt-0.5">
+        <Tags tags={caseData.tags} />
+        <h3 className="mt-3 font-display text-lg font-semibold leading-snug text-fg/65 transition-colors duration-300 group-hover:text-fg group-focus-visible:text-fg md:text-xl">
+          {plain(caseData.tagline)}
+        </h3>
+      </div>
+    </button>
+  )
+}
 
 export function Cases() {
-  const [activeCase, setActiveCase] = useState(null) // modal abierto
-  const [activeId, setActiveId] = useState(null) // highlight único (último clic)
-  const featured = cases[0]
-  const secondary = cases.slice(1)
-
-  // La grilla se adapta a la cantidad de casos secundarios para llenar
-  // el ancho completo (alineado con el featured) en vez de dejar una
-  // columna vacía. 2 casos → 2 cols; 3+ → 3 cols.
-  const secondaryCols =
-    secondary.length <= 2 ? 'sm:grid-cols-2' : 'sm:grid-cols-3'
+  const [activeCase, setActiveCase] = useState(null)
+  const [featured, ...rest] = cases
 
   return (
     <section id="casos" className="relative mx-auto w-full max-w-6xl overflow-hidden px-5 py-20 sm:px-8 md:py-28">
@@ -197,37 +112,26 @@ export function Cases() {
         <SectionHeading eyebrow="CASOS" title="Lo que hice por ellos." />
       </Reveal>
       <Reveal delay={0.05}>
-        <p className="mb-12 text-sm text-muted max-w-xl">
+        <p className="mb-12 max-w-xl text-sm text-muted">
           Una selección de marcas que estoy acompañando.
         </p>
       </Reveal>
 
-      {/* ── FEATURED case ── */}
-      <FeaturedCase
-        caseData={featured}
-        active={activeId === featured.id}
-        onActivate={() => setActiveId(featured.id)}
-        onOpen={setActiveCase}
-      />
+      <div className="grid gap-8 lg:grid-cols-12 lg:gap-10">
+        <Reveal className="lg:col-span-7">
+          <FeaturedStory caseData={featured} onOpen={setActiveCase} />
+        </Reveal>
 
-      {/* ── SECONDARY cards (grilla adaptativa al N de casos) ── */}
-      <div className={`grid gap-4 ${secondaryCols}`}>
-        {secondary.map((c, i) => (
-          <CaseCard
-            key={c.id}
-            caseData={c}
-            index={i}
-            onOpen={setActiveCase}
-            active={activeId === c.id}
-            onActivate={() => setActiveId(c.id)}
-          />
-        ))}
+        <ul className="divide-y divide-white/[0.08] border-y border-white/[0.08] lg:col-span-5 lg:self-start">
+          {rest.map((c, i) => (
+            <Reveal key={c.id} as="li" delay={0.08 + i * 0.08}>
+              <StoryRow caseData={c} onOpen={setActiveCase} />
+            </Reveal>
+          ))}
+        </ul>
       </div>
 
-      {/* modal */}
-      {activeCase && (
-        <CaseModal caseData={activeCase} onClose={() => setActiveCase(null)} />
-      )}
+      {activeCase && <CaseModal caseData={activeCase} onClose={() => setActiveCase(null)} />}
     </section>
   )
 }

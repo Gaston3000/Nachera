@@ -107,37 +107,32 @@ describe('App smoke', () => {
     ).toBeInTheDocument()
   })
 
-  it('opens CaseModal with challenge text on "Ver caso completo" click', async () => {
-    const btn = screen.getByRole('button', { name: /ver caso completo/i })
-    fireEvent.click(btn)
+  /* Casos en formato editorial: todo el ítem es el link (ya no hay botones
+     "Ver caso" repetidos ni toque-para-repetir-la-animación). */
+  it('clicking the featured case opens CaseModal with its challenge text', async () => {
+    fireEvent.click(screen.getByRole('button', { name: /ver caso: lae srl/i }))
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument()
     })
-    // challenge text from LAE case (featured)
-    expect(
-      screen.getByText(/no contaba con presencia digital activa/i)
-    ).toBeInTheDocument()
+    expect(screen.getByText(/no contaba con presencia digital activa/i)).toBeInTheDocument()
   })
 
-  it('secondary "Ver caso" buttons open the modal', async () => {
-    // Label no longer carries a literal "→" (now an aria-hidden ArrowUpRight
-    // icon); match the visible text. Use an end anchor so this doesn't also
-    // grab the featured "Ver caso completo" button.
-    const btns = screen.getAllByRole('button', { name: /ver caso$/i })
-    // Tras sacar Only Wines: 1 featured ("Ver caso completo") + 2 secundarios ("Ver caso").
-    expect(btns.length).toBeGreaterThanOrEqual(2)
-    fireEvent.click(btns[0])
+  it('every case in the list opens its own modal', async () => {
+    const items = screen.getAllByRole('button', { name: /^ver caso:/i })
+    expect(items).toHaveLength(4)
+    fireEvent.click(screen.getByRole('button', { name: /ver caso: dominga/i }))
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument()
     })
+    expect(within(screen.getByRole('dialog')).getAllByText(/Dominga/i).length).toBeGreaterThan(0)
   })
 
-  it('clicking a case card surface triggers replay/active, not the modal', () => {
-    // The card surface is click-to-replay; only the "Ver caso" button opens
-    // the case modal (it stops propagation). Clicking the brand text inside
-    // the card must NOT open a dialog.
-    fireEvent.click(screen.getByText('LAE SRL'))
-    expect(screen.queryByRole('dialog')).toBeNull()
+  it('the case cards only show the one real number (31%), no disguised metrics', () => {
+    const casos = document.getElementById('casos')
+    expect(within(casos).getByText('31%')).toBeInTheDocument()
+    ;['Reactivo', 'Multi-formato', '+350', '~1000'].forEach((fake) => {
+      expect(within(casos).queryByText(fake), fake).toBeNull()
+    })
   })
 
   it('renders solutions detail (Resuelve/Entrega/Resultado) in DOM without hover', () => {
