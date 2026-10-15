@@ -19,8 +19,7 @@ const EASE = [0.16, 1, 0.3, 1]
 /* ─── Herramientas — carrusel coverflow por área de trabajo ──────────────── */
 
 /* El agrupado de la stack, las bajadas y los íconos viven en
-   ToolsCarousel.jsx: acá queda sólo el encabezado del bloque y la
-   ambientación de fondo. */
+   ToolsCarousel.jsx: acá queda sólo la ambientación de fondo. */
 function Herramientas({ reduce }) {
   return (
     <div className="relative">
@@ -48,17 +47,12 @@ function Herramientas({ reduce }) {
         }}
       />
 
-      <Reveal>
-        <p className="mb-1 font-display text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-          Herramientas
-        </p>
-        <p className="mb-8 text-sm text-muted">
-          El stack con el que ejecuto, por área de trabajo.
-        </p>
-      </Reveal>
-
-      {/* la entrada la maneja Reveal, no el carrusel: las tarjetas ya llegan
-          colocadas y sólo sube el conjunto */}
+      {/* Sin rótulo propio: el bloque va justo debajo del título de la
+          sección ("Las herramientas y el respaldo…"), y "Herramientas / El
+          stack con el que ejecuto" repetía lo mismo. Formación sí conserva el
+          suyo porque arranca después del divisor y ahí hace de cartel.
+          La entrada la maneja Reveal, no el carrusel: las tarjetas ya llegan
+          colocadas y sólo sube el conjunto. */}
       <Reveal delay={0.06}>
         <ToolsCarousel reduce={reduce} />
       </Reveal>
