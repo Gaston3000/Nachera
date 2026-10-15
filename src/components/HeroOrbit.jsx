@@ -25,7 +25,12 @@ import { motion, useReducedMotion, useMotionValue, useSpring, useTransform } fro
  * meter a React en cada cuadro. `motion` se queda con el parallax, que
  * sí necesita estado.
  */
-export function HeroOrbit({ chips }) {
+/* `duration` y `style` son opcionales y los usa el cierre (FinalCTA), que
+   reusa la cara en chico. `style` permite pisar las variables de tamaño de
+   .orbit-scene (--orbit-r, --head-w, --chip-w, width) sin tocar el CSS del
+   hero. `duration` existe porque el default es 4s POR PALABRA: con menos
+   palabras el anillo daría la vuelta más rápido, y ahí se quiere más lento. */
+export function HeroOrbit({ chips, duration: durationProp, style }) {
   const reduce = useReducedMotion()
   const ref = useRef(null)
 
@@ -50,7 +55,7 @@ export function HeroOrbit({ chips }) {
   }
 
   // 4 s por palabra: con menos, el texto pasa demasiado rápido para leerse.
-  const duration = 4 * chips.length
+  const duration = durationProp ?? 4 * chips.length
 
   return (
     <div
@@ -58,7 +63,7 @@ export function HeroOrbit({ chips }) {
       onMouseMove={onMove}
       onMouseLeave={onLeave}
       className="orbit-scene"
-      style={{ '--orbit-duration': `${duration}s` }}
+      style={{ ...style, '--orbit-duration': `${duration}s` }}
     >
       <div className="orbit-aura" aria-hidden="true" />
 

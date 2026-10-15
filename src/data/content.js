@@ -261,4 +261,7 @@ export const bloopAgency = {
 export const finalCta = {
   title: '¿Querés llevar **tu marca al siguiente nivel**?',
   sub: 'Contactame y coordinamos una **reunión** para analizar tu marca y definir juntos el mejor camino a seguir.',
+  // La cara vuelve al cierre, en chico y con menos palabras que en el hero.
+  // Son un subconjunto de hero.chips: no es copy nuevo.
+  chips: ['Estrategia', 'Branding', 'Storytelling'],
 }
