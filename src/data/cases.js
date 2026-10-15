@@ -48,6 +48,10 @@ export const cases = [
   {
     id: 'dominga',
     brand: 'Dominga Pastelería',
+    // foto de perfil de su Instagram (@dominga.pasteleria). Sin sesión,
+    // Instagram sólo la sirve en 100x100: alcanza para el tile de ~40px en
+    // pantallas 2x. Si aparece una versión más grande, reemplazar acá.
+    logo: '/logos/dominga.webp',
     sector: 'Gastronomía · pastelería artesanal',
     tagline: 'De un feed improvisado a una **identidad consistente**.',
     problem:

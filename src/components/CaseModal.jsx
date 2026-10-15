@@ -199,11 +199,12 @@ export function CaseModal({ caseData, onClose }) {
                 no le suma nada a un lector de pantalla. */}
             {caseData.logo && (
               <span className="grid h-14 w-14 shrink-0 place-items-center rounded-xl bg-white p-2 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.6)]">
+                {/* sin width/height: cada logo tiene su proporción (LAE es
+                    apaisado, Dominga cuadrado) y el tile ya fija el tamaño,
+                    así que no hay salto de layout que prevenir */}
                 <img
                   src={caseData.logo}
                   alt=""
-                  width={240}
-                  height={196}
                   className="h-full w-full object-contain"
                   decoding="async"
                 />
