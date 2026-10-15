@@ -10,6 +10,7 @@ import {
   TargetIcon,
   WindowCursorIcon,
 } from './primitives/icons.jsx'
+import { NAV_BTN } from './primitives/navButton.js'
 
 /* ─────────────────────────────────────────────────────────────────────────
    Herramientas — carrusel coverflow por área de trabajo.
@@ -195,9 +196,6 @@ function ToolCard({ category, n, total, active, onSelect, onFocus }) {
 
 const EDGE_MASK =
   'linear-gradient(to right, transparent 0%, #000 9%, #000 91%, transparent 100%)'
-
-const NAV_BTN =
-  'grid h-11 w-11 place-items-center rounded-full border border-[color-mix(in_srgb,var(--c-accent)_30%,var(--c-glassborder))] bg-[color-mix(in_srgb,var(--c-bg2)_82%,transparent)] text-fg/80 backdrop-blur-sm transition duration-300 hover:-translate-y-px hover:border-[color-mix(in_srgb,var(--c-accent)_70%,transparent)] hover:text-fg hover:shadow-[0_10px_30px_-12px_color-mix(in_srgb,var(--c-accent)_75%,transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--c-accent)_65%,transparent)] disabled:pointer-events-none disabled:opacity-30'
 
 export function ToolsCarousel({ reduce }) {
   const total = CATEGORIES.length

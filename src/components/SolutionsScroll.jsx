@@ -2,6 +2,8 @@ import { useRef, useState } from 'react'
 import { AnimatePresence, motion, useMotionValueEvent, useScroll, useTransform } from 'motion/react'
 import { GlassPanel } from './primitives/GlassPanel.jsx'
 import { RichText } from './primitives/RichText.jsx'
+import { ChevronLeft, ChevronRight } from './primitives/icons.jsx'
+import { NAV_BTN } from './primitives/navButton.js'
 
 /* Recorrido anclado de Soluciones (escritorio, con motion activo).
 
@@ -157,6 +159,14 @@ export function SolutionsScroll({ panels, DetailBlock }) {
   const [dir, setDir] = useState(1)
   const activeRef = useRef(0)
 
+  /* Panel al que se pidió ir y todavía no se llegó. El scroll suave tarda
+     ~700ms, y en ese lapso `active` sigue marcando el de origen: sin esto,
+     dos clics rápidos en → apuntan los dos al mismo panel y el segundo se
+     pierde. Se limpia al llegar, y por las dudas a los 1.2s (si el visitante
+     agarra la rueda a mitad de camino, el destino ya no vale). */
+  const objetivo = useRef(null)
+  const vencimiento = useRef(0)
+
   const { scrollYProgress } = useScroll({
     target: trackRef,
     offset: ['start start', 'end end'],
@@ -172,6 +182,7 @@ export function SolutionsScroll({ panels, DetailBlock }) {
     const next = clamp(Math.floor(raw), 0, panels.length - 1)
     if (next === prev) return
     activeRef.current = next
+    if (objetivo.current === next) objetivo.current = null
     setDir(next > prev ? 1 : -1)
     setActive(next)
   })
@@ -182,12 +193,23 @@ export function SolutionsScroll({ panels, DetailBlock }) {
   )
 
   const goTo = (i) => {
+    objetivo.current = i
+    clearTimeout(vencimiento.current)
+    vencimiento.current = setTimeout(() => {
+      objetivo.current = null
+    }, 1200)
     const track = trackRef.current
     if (!track) return
     const top = track.getBoundingClientRect().top + window.scrollY
     const panelPx = (PANEL_VH / 100) * window.innerHeight
     // +25% para caer bien adentro del segmento, lejos de los bordes
     window.scrollTo({ top: top + (i + 0.25) * panelPx, behavior: 'smooth' })
+  }
+
+  const paso = (delta) => {
+    const base = objetivo.current ?? activeRef.current
+    const destino = clamp(base + delta, 0, panels.length - 1)
+    if (destino !== base) goTo(destino)
   }
 
   const panel = panels[active]
@@ -206,7 +228,7 @@ export function SolutionsScroll({ panels, DetailBlock }) {
           partir de 800px de alto de ventana se agranda. Es al revés de lo
           habitual a propósito: si el default fuera el grande, cualquier
           notebook quedaría afuera. El piso lo pone useCanPin. */}
-      <div className="sticky top-0 flex h-screen flex-col justify-center pb-6 pt-20 [@media(min-height:800px)]:pb-10 [@media(min-height:800px)]:pt-24">
+      <div className="sticky top-0 flex h-screen flex-col justify-center pb-3 pt-20 [@media(min-height:800px)]:pb-10 [@media(min-height:800px)]:pt-24">
         <div className="relative min-h-0 flex-1">
           <AnimatePresence initial={false} custom={dir}>
             <motion.div
@@ -269,7 +291,30 @@ export function SolutionsScroll({ panels, DetailBlock }) {
             renglones y se comía ~80px de alto, que es justo lo que falta en
             pantallas bajas. Cada segmento es el botón de salto y lleva el
             título en aria-label y en el tooltip. */}
-        <div className="mt-4 flex w-full shrink-0 items-center gap-5 [@media(min-height:800px)]:mt-6">
+        <div className="mt-2 flex w-full shrink-0 items-center gap-5 [@media(min-height:800px)]:mt-6">
+          {/* anterior / siguiente: el contador dice dónde estás, pero nada
+              decía "hay más". Mismo botón que el carrusel de Herramientas.
+              Los segmentos siguen siendo clickeables para saltar directo. */}
+          <div className="flex shrink-0 items-center gap-2">
+            <button
+              type="button"
+              onClick={() => paso(-1)}
+              disabled={active === 0}
+              aria-label="Solución anterior"
+              className={NAV_BTN}
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => paso(1)}
+              disabled={active === panels.length - 1}
+              aria-label="Solución siguiente"
+              className={NAV_BTN}
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </div>
           <div className="flex flex-1 items-center gap-1.5">
             {panels.map((p, i) => (
               <button
