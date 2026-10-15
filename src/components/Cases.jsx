@@ -117,7 +117,7 @@ function FeaturedCase({ caseData, active, onActivate, onOpen }) {
               className="flex items-center gap-4"
               variants={reduce ? undefined : itemVariants}
             >
-              <BrandLogo src={caseData.logo} size="lg" />
+              <BrandLogo src={caseData.logo} bg={caseData.logoBg} size="lg" />
               <h3 className="font-display text-4xl font-black text-fg md:text-5xl">
                 {caseData.brand}
               </h3>

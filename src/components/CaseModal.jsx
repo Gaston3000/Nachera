@@ -192,7 +192,7 @@ export function CaseModal({ caseData, onClose }) {
             {caseData.sector}
           </p>
           <div className="flex items-center gap-4">
-            <BrandLogo src={caseData.logo} size="md" />
+            <BrandLogo src={caseData.logo} bg={caseData.logoBg} size="md" />
             <h2 className="font-display text-3xl font-bold text-fg">{caseData.brand}</h2>
           </div>
           {/* RichText y no el string crudo: el tagline trae **negritas**, y

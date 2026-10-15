@@ -91,6 +91,11 @@ export const cases = [
   {
     id: 'gtelite',
     brand: 'GT Elite Soccer',
+    // logo oficial (GT.ES) que pasó el cliente, recortado al cuadrado del
+    // emblema. Es blanco sobre azul marino, sin transparencia: el tile toma
+    // ese mismo azul (medido en el archivo) en vez del blanco por defecto.
+    logo: '/logos/gtes.webp',
+    logoBg: '#001330',
     sector: 'Deportes · representación de futbolistas',
     tagline: 'Highlights y narrativa deportiva, **en tiempo real**.',
     problem:

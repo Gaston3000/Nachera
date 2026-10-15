@@ -77,7 +77,7 @@ export function CaseCard({ caseData, index, onOpen, active = false, onActivate }
             className="mt-2 flex items-center gap-3"
             variants={reduce ? undefined : itemVariants}
           >
-            <BrandLogo src={caseData.logo} size="sm" />
+            <BrandLogo src={caseData.logo} bg={caseData.logoBg} size="sm" />
             <h3 className="font-display text-xl font-bold text-fg">{caseData.brand}</h3>
           </motion.div>
           <motion.p

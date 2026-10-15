@@ -8,6 +8,12 @@
    alt vacío a propósito: siempre va al lado del nombre escrito, y leerlo
    dos veces no le suma nada a un lector de pantalla.
 
+   `bg` es el fondo del tile y por defecto es blanco. Un logo que viene sobre
+   su propio color (GT: blanco sobre azul marino) lo pasa, así el tile es la
+   continuación del logo y no un marco blanco alrededor de un rectángulo
+   azul. El anillo fino separa el tile de una tarjeta oscura cuando el fondo
+   también es oscuro.
+
    Sin width/height: cada logo tiene su proporción (LAE apaisado, Dominga
    cuadrado) y el tile ya fija el tamaño, así que no hay salto de layout.
    Sin loading=lazy: pesan 2-6KB, y adentro del popup el lazy hacía que no
@@ -21,11 +27,12 @@ const SIZES = {
   lg: 'h-16 w-16 rounded-2xl p-2.5 md:h-20 md:w-20',
 }
 
-export function BrandLogo({ src, size = 'md', className = '' }) {
+export function BrandLogo({ src, bg, size = 'md', className = '' }) {
   if (!src) return null
   return (
     <span
-      className={`grid shrink-0 place-items-center bg-white shadow-[0_8px_24px_-12px_rgba(0,0,0,0.6)] ${SIZES[size]} ${className}`}
+      className={`grid shrink-0 place-items-center bg-white shadow-[0_8px_24px_-12px_rgba(0,0,0,0.6)] ring-1 ring-white/10 ${SIZES[size]} ${className}`}
+      style={bg ? { backgroundColor: bg } : undefined}
     >
       <img src={src} alt="" className="h-full w-full object-contain" decoding="async" />
     </span>
