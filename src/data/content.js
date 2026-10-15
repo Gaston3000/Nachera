@@ -156,15 +156,27 @@ export const experience = [
 ]
 
 export const certifications = [
-  { name: 'Licenciatura en Ciencias de la Comunicación', org: 'UADE', year: '2020–2023', primary: true },
-  { name: 'Google Ads: Search, Display, Video & Measurement', org: 'Google Skillshop', year: '2025', primary: true },
-  { name: 'Google Analytics', org: 'Google Skillshop', year: '2025', primary: true },
+  { name: 'Licenciatura en Ciencias de la Comunicación', org: 'UADE', year: '2020–2023', primary: true, stage: 'comunicacion' },
+  { name: 'Google Ads: Search, Display, Video & Measurement', org: 'Google Skillshop', year: '2025', primary: true, stage: 'performance' },
+  { name: 'Google Analytics', org: 'Google Skillshop', year: '2025', primary: true, stage: 'performance' },
   // Coderhouse Google Ads movido acá para que no quede al fondo blurreado
   // en desktop (pedido del cliente). Cluster de los 3 certs de Google juntos.
-  { name: 'Google Ads', org: 'Coderhouse', year: '2025', primary: false },
-  { name: 'Marketing Digital', org: 'Escuela Da Vinci', year: '2024', primary: false },
-  { name: 'Video Editing', org: 'Escuela Da Vinci', year: '2024', primary: false },
-  { name: 'Tecnicatura en Periodismo Deportivo', org: 'Deportea', year: '2015–2017', primary: false },
+  { name: 'Google Ads', org: 'Coderhouse', year: '2025', primary: false, stage: 'performance' },
+  { name: 'Marketing Digital', org: 'Escuela Da Vinci', year: '2024', primary: false, stage: 'marketing' },
+  { name: 'Video Editing', org: 'Escuela Da Vinci', year: '2024', primary: false, stage: 'marketing' },
+  { name: 'Tecnicatura en Periodismo Deportivo', org: 'Deportea', year: '2015–2017', primary: false, stage: 'periodismo' },
+]
+
+/* Etapas del camino de Formación (escritorio): agrupan los certificados por
+   `stage` y van en el orden del recorrido. Agrupar en 4 y no mostrar los 7
+   sueltos es lo que hace que el camino entre en una fila legible.
+   Los `label` son copy nuevo — propuesta pendiente de que la apruebe
+   Nachera. */
+export const formationStages = [
+  { key: 'periodismo', years: '2015–17', label: 'Periodismo' },
+  { key: 'comunicacion', years: '2020–23', label: 'Comunicación' },
+  { key: 'marketing', years: '2024', label: 'Marketing y video' },
+  { key: 'performance', years: '2025', label: 'Performance y datos' },
 ]
 
 export const tools = [

@@ -10,7 +10,8 @@ import { SectionHeading } from './primitives/SectionHeading.jsx'
 import { Reveal } from './primitives/Reveal.jsx'
 import { Parallax } from './primitives/Parallax.jsx'
 import { ToolsCarousel } from './ToolsCarousel.jsx'
-import { certifications } from '../data/content.js'
+import { useMediaQuery } from './primitives/useMediaQuery.js'
+import { certifications, formationStages } from '../data/content.js'
 
 /* ─── shared constants ───────────────────────────────────────────────────── */
 
@@ -77,8 +78,9 @@ function TimelineEntry({ cert, index, total, progress, reduce }) {
   const rawLit = useTransform(progress, [start, threshold], [0, 1])
   const lit = useSpring(rawLit, { stiffness: 90, damping: 22, mass: 0.4 })
 
-  const opacity = useTransform(lit, [0, 1], [0.42, 1])
-  const blurPx = useTransform(lit, [0, 1], [3, 0])
+  // 0.28 y no 0.42: con 0.42 el encendido existía pero no se percibía
+  const opacity = useTransform(lit, [0, 1], [0.28, 1])
+  const blurPx = useTransform(lit, [0, 1], [4, 0])
   const filter = useTransform(blurPx, (b) => `blur(${b}px)`)
   const y = useTransform(lit, [0, 1], [8, 0])
   const dotScale = useTransform(lit, [0, 1], [0.72, 1])
@@ -177,7 +179,7 @@ function TimelineEntry({ cert, index, total, progress, reduce }) {
   )
 }
 
-function Formacion({ reduce, sectionRef }) {
+function Formacion({ reduce, sectionRef, items }) {
   // Scroll progress across the whole section so it feels natural on mobile too.
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -192,19 +194,10 @@ function Formacion({ reduce, sectionRef }) {
   // The cyan "energy" fill height tracks progress (origin at the top).
   const fillScaleY = useTransform(progress, [0, 1], [0, 1])
 
-  const total = certifications.length
+  const total = items.length
 
   return (
     <div>
-      <Reveal>
-        <p className="mb-1 font-display text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-          Formación
-        </p>
-        <p className="mb-7 text-sm text-muted">
-          Títulos y certificaciones que respaldan el criterio.
-        </p>
-      </Reveal>
-
       <ol className="relative">
         {/* base rail — dim/very subtle until the energy fill lights it */}
         <span
@@ -232,7 +225,7 @@ function Formacion({ reduce, sectionRef }) {
         )}
 
         <div className="flex flex-col gap-4">
-          {certifications.map((cert, i) => (
+          {items.map((cert, i) => (
             <TimelineEntry
               key={cert.name}
               cert={cert}
@@ -248,11 +241,187 @@ function Formacion({ reduce, sectionRef }) {
   )
 }
 
+/* ─── Formación en escritorio — el camino ─────────────────────────────────── */
+
+/* La línea de izquierda a derecha, de 2015 a 2025, con un punto por etapa.
+   Ordenada en el tiempo la formación cuenta un recorrido —periodismo,
+   comunicación, marketing y video, performance y datos— que como lista
+   suelta no se veía.
+
+   Cuatro etapas y no los siete títulos sueltos: siete tarjetas en una fila
+   no entran legibles. La línea se dibuja con el scroll y cada punto se
+   enciende cuando la línea lo alcanza, pero SIN anclar la sección: ya hay
+   dos ancladas (Soluciones y Proceso) y una tercera cansa.
+
+   Layout: una grilla de 3 filas compartida por subgrid. Arriba van los
+   textos de los puntos altos, en el medio la franja de la línea, abajo los
+   de los puntos bajos. Los textos van en el flujo y no posicionados a mano,
+   así que nunca se pisan aunque una etapa tenga tres títulos.
+
+   Termina en un punto alto a propósito: el recorrido sube. Y el último es
+   2025, con los certificados de Google: el cliente pidió que no quedaran al
+   fondo apagados, y acá son el remate. */
+
+const CAMINO_ALTO = 140 // alto de la franja de la línea (unidades del viewBox = px)
+const PUNTO_ALTO = 24
+const PUNTO_BAJO = 116
+
+function EtapaCamino({ etapa, index, total, progress, reduce }) {
+  const alto = index % 2 === 1
+  // la línea llega a cada punto en tramos iguales: los cuatro están a la
+  // misma distancia en x y alternan la misma altura
+  const umbral = total > 1 ? index / (total - 1) : 0
+  const rawLit = useTransform(progress, [umbral - 0.08, umbral], [0, 1])
+  const lit = useSpring(rawLit, { stiffness: 90, damping: 22, mass: 0.4 })
+  const opacity = useTransform(lit, [0, 1], [0.3, 1])
+  const y = useTransform(lit, [0, 1], [alto ? -10 : 10, 0])
+  const dotScale = useTransform(lit, [0, 1], [0.55, 1])
+
+  const texto = (
+    <motion.div
+      className={`mx-auto max-w-[15rem] text-center ${alto ? 'self-end pb-6' : 'pt-6'}`}
+      style={reduce ? undefined : { opacity, y }}
+    >
+      <p className="font-mono text-xs tracking-[0.2em] text-accent">{etapa.years}</p>
+      <h3 className="mt-1 font-display text-lg font-bold text-fg">{etapa.label}</h3>
+      <ul className="mt-2 space-y-2">
+        {etapa.certs.map((c) => (
+          <li key={c.name} className="text-sm leading-snug text-fg/80">
+            {c.name}
+            <span className="block text-xs text-muted">{c.org}</span>
+          </li>
+        ))}
+      </ul>
+    </motion.div>
+  )
+
+  return (
+    <div
+      role="listitem"
+      className="grid"
+      style={{ gridColumn: index + 1, gridRow: '1 / span 3', gridTemplateRows: 'subgrid' }}
+    >
+      {alto ? texto : <div />}
+      <div className="relative">
+        <span
+          className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2"
+          style={{ top: `${((alto ? PUNTO_ALTO : PUNTO_BAJO) / CAMINO_ALTO) * 100}%` }}
+          aria-hidden="true"
+        >
+          {/* punto apagado debajo y el encendido encima, que aparece con la
+              línea: motion no interpola color-mix, así que se cruzan
+              opacidades en vez de colores */}
+          <span className="block h-4 w-4 rounded-full border border-glassborder bg-bg2" />
+          <motion.span
+            className="absolute inset-0 rounded-full bg-accent"
+            style={{
+              opacity: reduce ? 1 : lit,
+              scale: reduce ? 1 : dotScale,
+              boxShadow:
+                '0 0 0 4px color-mix(in srgb, var(--c-accent) 18%, transparent), 0 0 18px color-mix(in srgb, var(--c-accent) 60%, transparent)',
+            }}
+          />
+        </span>
+      </div>
+      {alto ? <div /> : texto}
+    </div>
+  )
+}
+
+function FormacionCamino({ reduce }) {
+  const ref = useRef(null)
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 0.8', 'end 0.6'] })
+  const progress = useSpring(scrollYProgress, { stiffness: 80, damping: 26, mass: 0.5 })
+
+  const etapas = formationStages.map((s) => ({
+    ...s,
+    certs: certifications.filter((c) => c.stage === s.key),
+  }))
+  const n = etapas.length
+  const puntos = etapas.map((_, i) => ({
+    x: ((i + 0.5) / n) * 1000,
+    y: i % 2 === 1 ? PUNTO_ALTO : PUNTO_BAJO,
+  }))
+  // tangentes horizontales en cada punto: la onda pasa plana por los nodos
+  const d = puntos
+    .map((p, i) => {
+      if (i === 0) return `M ${p.x} ${p.y}`
+      const q = puntos[i - 1]
+      const mx = (q.x + p.x) / 2
+      return `C ${mx} ${q.y} ${mx} ${p.y} ${p.x} ${p.y}`
+    })
+    .join(' ')
+
+  return (
+    <div
+      ref={ref}
+      role="list"
+      className="relative grid"
+      style={{
+        gridTemplateColumns: `repeat(${n}, minmax(0, 1fr))`,
+        gridTemplateRows: `auto ${CAMINO_ALTO}px auto`,
+      }}
+    >
+      <svg
+        className="pointer-events-none h-full w-full overflow-visible"
+        style={{ gridColumn: '1 / -1', gridRow: 2 }}
+        viewBox={`0 0 1000 ${CAMINO_ALTO}`}
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        <path
+          d={d}
+          fill="none"
+          stroke="var(--c-glass-border)"
+          strokeWidth="2"
+          strokeDasharray="2 7"
+          strokeLinecap="round"
+        />
+        <motion.path
+          d={d}
+          fill="none"
+          stroke="var(--c-accent)"
+          strokeWidth="8"
+          strokeLinecap="round"
+          opacity={0.14}
+          style={{ pathLength: reduce ? 1 : progress }}
+        />
+        <motion.path
+          d={d}
+          fill="none"
+          stroke="var(--c-accent)"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          style={{ pathLength: reduce ? 1 : progress }}
+        />
+      </svg>
+      {etapas.map((etapa, i) => (
+        <EtapaCamino
+          key={etapa.key}
+          etapa={etapa}
+          index={i}
+          total={n}
+          progress={progress}
+          reduce={reduce}
+        />
+      ))}
+    </div>
+  )
+}
+
 /* ─── section ────────────────────────────────────────────────────────────── */
+
+/* En celular y tablet, la lista vertical en orden cronológico DESCENDENTE
+   (2025 primero, como un CV): los certificados de Google quedan arriba,
+   que es lo que pidió el cliente. Orden estable: dentro de 2025 se respeta
+   el agrupado de los tres de Google que ya tenía la data. */
+const anioDe = (c) => parseInt(c.year, 10)
+const certificadosRecientesPrimero = [...certifications].sort((a, b) => anioDe(b) - anioDe(a))
 
 export function StackFormacion() {
   const reduce = useReducedMotion()
   const sectionRef = useRef(null)
+  const ancho = useMediaQuery('(min-width: 1024px)')
 
   return (
     <section
@@ -294,9 +463,21 @@ export function StackFormacion() {
         }}
       />
 
-      <div className="max-w-3xl">
-        <Formacion reduce={reduce} sectionRef={sectionRef} />
-      </div>
+      <Reveal>
+        <p className="mb-1 font-display text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+          Formación
+        </p>
+        <p className={`text-sm text-muted ${ancho ? 'mb-10' : 'mb-7'}`}>
+          Títulos y certificaciones que respaldan el criterio.
+        </p>
+      </Reveal>
+      {ancho ? (
+        <FormacionCamino reduce={reduce} />
+      ) : (
+        <div className="max-w-3xl">
+          <Formacion reduce={reduce} sectionRef={sectionRef} items={certificadosRecientesPrimero} />
+        </div>
+      )}
     </section>
   )
 }
