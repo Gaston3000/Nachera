@@ -1,16 +1,17 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import {
   motion,
   useReducedMotion,
   useScroll,
   useTransform,
   useSpring,
+  useMotionValueEvent,
 } from 'motion/react'
 import { SectionHeading } from './primitives/SectionHeading.jsx'
 import { Reveal } from './primitives/Reveal.jsx'
 import { Parallax } from './primitives/Parallax.jsx'
 import { ToolsCarousel } from './ToolsCarousel.jsx'
-import { useMediaQuery } from './primitives/useMediaQuery.js'
+import { useCanPin } from './solutions/useCanPin.js'
 import { certifications, formationStages } from '../data/content.js'
 
 /* ─── shared constants ───────────────────────────────────────────────────── */
@@ -241,109 +242,114 @@ function Formacion({ reduce, sectionRef, items }) {
   )
 }
 
-/* ─── Formación en escritorio — el camino ─────────────────────────────────── */
+/* ─── Formación en escritorio — el recorrido anclado ──────────────────────── */
 
-/* La línea de izquierda a derecha, de 2015 a 2025, con un punto por etapa.
+/* La sección se queda quieta y el scroll mueve la línea: de 2015 a 2025, un
+   punto por título. La línea es más ancha que la pantalla y se desplaza
+   hacia la izquierda; los puntos que vienen asoman apagados a la derecha y
+   los que ya pasaron se desvanecen por la izquierda.
+
    Ordenada en el tiempo la formación cuenta un recorrido —periodismo,
    comunicación, marketing y video, performance y datos— que como lista
    suelta no se veía.
 
-   Cuatro etapas y no los siete títulos sueltos: siete tarjetas en una fila
-   no entran legibles. La línea se dibuja con el scroll y cada punto se
-   enciende cuando la línea lo alcanza, pero SIN anclar la sección: ya hay
-   dos ancladas (Soluciones y Proceso) y una tercera cansa.
+   Año y etapa sólo en el PRIMER punto de cada etapa: en los siguientes de la
+   misma etapa se repetirían (2025 tres veces). Quedan como capítulos.
 
-   Layout: una grilla de 3 filas compartida por subgrid. Arriba van los
-   textos de los puntos altos, en el medio la franja de la línea, abajo los
-   de los puntos bajos. Los textos van en el flujo y no posicionados a mano,
-   así que nunca se pisan aunque una etapa tenga tres títulos.
+   Termina en un punto alto a propósito: el recorrido sube. Y el último
+   tramo son los certificados de Google: el cliente pidió que no quedaran al
+   fondo apagados, y acá son el remate.
 
-   Termina en un punto alto a propósito: el recorrido sube. Y el último es
-   2025, con los certificados de Google: el cliente pidió que no quedaran al
-   fondo apagados, y acá son el remate. */
+   Todo va en px reales (el tramo es de ancho fijo y se desplaza), así que
+   el SVG no se deforma y los textos se pueden ubicar con precisión. */
 
-const CAMINO_ALTO = 140 // alto de la franja de la línea (unidades del viewBox = px)
-const PUNTO_ALTO = 24
-const PUNTO_BAJO = 116
+const ESPACIO = 300 // distancia entre puntos
+const ENTRADA = 220 // tramo plano antes del primero y después del último
+const ZONA_TEXTO = 120 // alto reservado arriba y abajo para los textos
+const ZONA_LINEA = 120 // alto de la franja por donde pasa la onda
+const Y_ALTO = ZONA_TEXTO + 18
+const Y_BAJO = ZONA_TEXTO + ZONA_LINEA - 18
+/* Dónde queda la punta de la línea, en fracción del ancho: viaja del 30% al
+   60%. Fija al medio, al arrancar sobraba media pantalla a la izquierda y al
+   terminar media a la derecha. Así al principio se ve más de lo que viene
+   y al final, el rastro. */
+const CABEZA_DESDE = 0.3
+const CABEZA_HASTA = 0.6
+const SCROLL_POR_PUNTO = 50 // vh de scroll por tramo
 
-function EtapaCamino({ etapa, index, total, progress, reduce }) {
-  const alto = index % 2 === 1
-  // la línea llega a cada punto en tramos iguales: los cuatro están a la
-  // misma distancia en x y alternan la misma altura
-  const umbral = total > 1 ? index / (total - 1) : 0
-  const rawLit = useTransform(progress, [umbral - 0.08, umbral], [0, 1])
-  const lit = useSpring(rawLit, { stiffness: 90, damping: 22, mass: 0.4 })
-  const opacity = useTransform(lit, [0, 1], [0.3, 1])
-  const y = useTransform(lit, [0, 1], [alto ? -10 : 10, 0])
-  const dotScale = useTransform(lit, [0, 1], [0.55, 1])
+const pad2 = (n) => String(n).padStart(2, '0')
 
-  const texto = (
-    <motion.div
-      className={`mx-auto max-w-[15rem] text-center ${alto ? 'self-end pb-6' : 'pt-6'}`}
-      style={reduce ? undefined : { opacity, y }}
-    >
-      <p className="font-mono text-xs tracking-[0.2em] text-accent">{etapa.years}</p>
-      <h3 className="mt-1 font-display text-lg font-bold text-fg">{etapa.label}</h3>
-      <ul className="mt-2 space-y-2">
-        {etapa.certs.map((c) => (
-          <li key={c.name} className="text-sm leading-snug text-fg/80">
-            {c.name}
-            <span className="block text-xs text-muted">{c.org}</span>
-          </li>
-        ))}
-      </ul>
-    </motion.div>
+function PuntoRecorrido({ cert, index, x, y, alto, posicion, reduce }) {
+  // `posicion` es dónde está la punta medida en puntos (2.5 = entre el 3ro y
+  // el 4to). Los que vienen, apagados; el alcanzado y el anterior, plenos;
+  // los de más atrás se van.
+  const opacity = useTransform(
+    posicion,
+    [index - 0.7, index, index + 1.1, index + 2.1],
+    [0.28, 1, 1, 0]
   )
+  const encendido = useTransform(posicion, [index - 0.06, index], [0, 1])
 
   return (
-    <div
-      role="listitem"
-      className="grid"
-      style={{ gridColumn: index + 1, gridRow: '1 / span 3', gridTemplateRows: 'subgrid' }}
+    <motion.li
+      className="absolute"
+      style={{ left: x, top: y, opacity: reduce ? 1 : opacity }}
     >
-      {alto ? texto : <div />}
-      <div className="relative">
-        <span
-          className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2"
-          style={{ top: `${((alto ? PUNTO_ALTO : PUNTO_BAJO) / CAMINO_ALTO) * 100}%` }}
-          aria-hidden="true"
-        >
-          {/* punto apagado debajo y el encendido encima, que aparece con la
-              línea: motion no interpola color-mix, así que se cruzan
-              opacidades en vez de colores */}
-          <span className="block h-4 w-4 rounded-full border border-glassborder bg-bg2" />
-          <motion.span
-            className="absolute inset-0 rounded-full bg-accent"
-            style={{
-              opacity: reduce ? 1 : lit,
-              scale: reduce ? 1 : dotScale,
-              boxShadow:
-                '0 0 0 4px color-mix(in srgb, var(--c-accent) 18%, transparent), 0 0 18px color-mix(in srgb, var(--c-accent) 60%, transparent)',
-            }}
-          />
-        </span>
+      <span className="absolute left-0 top-0 block -translate-x-1/2 -translate-y-1/2" aria-hidden="true">
+        <span className="block h-4 w-4 rounded-full border border-glassborder bg-bg2" />
+        <motion.span
+          className="absolute inset-0 rounded-full bg-accent"
+          style={{
+            opacity: reduce ? 1 : encendido,
+            boxShadow:
+              '0 0 0 4px color-mix(in srgb, var(--c-accent) 18%, transparent), 0 0 18px color-mix(in srgb, var(--c-accent) 60%, transparent)',
+          }}
+        />
+      </span>
+      <div
+        className={`absolute left-0 w-[15rem] -translate-x-1/2 text-center ${
+          alto ? 'bottom-6' : 'top-6'
+        }`}
+      >
+        {cert.abreEtapa && (
+          <>
+            <p className="font-mono text-xs tracking-[0.2em] text-accent">{cert.years}</p>
+            <p className="mb-1.5 font-display text-lg font-bold text-fg">{cert.etapa}</p>
+          </>
+        )}
+        <h3 className="text-sm font-semibold leading-snug text-fg/90">{cert.name}</h3>
+        <p className="mt-0.5 text-xs text-muted">{cert.org}</p>
       </div>
-      {alto ? <div /> : texto}
-    </div>
+    </motion.li>
   )
 }
 
-function FormacionCamino({ reduce }) {
-  const ref = useRef(null)
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 0.8', 'end 0.6'] })
-  const progress = useSpring(scrollYProgress, { stiffness: 80, damping: 26, mass: 0.5 })
+function FormacionRecorrido({ reduce, items }) {
+  const pistaRef = useRef(null)
+  const [activo, setActivo] = useState(0)
+  const n = items.length
+  const tramo = (n - 1) * ESPACIO
 
-  const etapas = formationStages.map((s) => ({
-    ...s,
-    certs: certifications.filter((c) => c.stage === s.key),
-  }))
-  const n = etapas.length
-  const puntos = etapas.map((_, i) => ({
-    x: ((i + 0.5) / n) * 1000,
-    y: i % 2 === 1 ? PUNTO_ALTO : PUNTO_BAJO,
+  const { scrollYProgress } = useScroll({ target: pistaRef, offset: ['start start', 'end end'] })
+  // un respiro quieto al entrar y al salir, para que el primero y el último
+  // tengan su momento antes de que la línea arranque o la sección se suelte
+  const avance = useTransform(scrollYProgress, [0.06, 0.94], [0, 1], { clamp: true })
+  const suave = useSpring(avance, { stiffness: 80, damping: 26, mass: 0.5 })
+  const posicion = useTransform(suave, (f) => f * (n - 1))
+  const desplazamiento = useTransform(suave, (f) => -(ENTRADA + f * tramo))
+  const cabeza = useTransform(suave, (f) => `${(CABEZA_DESDE + (CABEZA_HASTA - CABEZA_DESDE) * f) * 100}%`)
+
+  useMotionValueEvent(posicion, 'change', (v) => {
+    const i = Math.min(n - 1, Math.max(0, Math.floor(v + 0.05)))
+    setActivo((prev) => (prev === i ? prev : i))
+  })
+
+  const puntos = items.map((c, i) => ({
+    x: ENTRADA + i * ESPACIO,
+    y: i % 2 === 0 ? Y_ALTO : Y_BAJO,
   }))
   // tangentes horizontales en cada punto: la onda pasa plana por los nodos
-  const d = puntos
+  const onda = puntos
     .map((p, i) => {
       if (i === 0) return `M ${p.x} ${p.y}`
       const q = puntos[i - 1]
@@ -351,60 +357,94 @@ function FormacionCamino({ reduce }) {
       return `C ${mx} ${q.y} ${mx} ${p.y} ${p.x} ${p.y}`
     })
     .join(' ')
+  const primero = puntos[0]
+  const ultimo = puntos[n - 1]
+  const ancho = ENTRADA * 2 + tramo
+  const alto = ZONA_TEXTO * 2 + ZONA_LINEA
+  // el fondo punteado sigue de largo a los dos lados: sugiere que el camino
+  // viene de antes y continúa, sin agregar texto
+  const fondo = `M 0 ${primero.y} L ${primero.x} ${primero.y} ${onda.slice(onda.indexOf('C'))} L ${ancho} ${ultimo.y}`
 
   return (
     <div
-      ref={ref}
-      role="list"
-      className="relative grid"
-      style={{
-        gridTemplateColumns: `repeat(${n}, minmax(0, 1fr))`,
-        gridTemplateRows: `auto ${CAMINO_ALTO}px auto`,
-      }}
+      ref={pistaRef}
+      className="relative"
+      style={{ height: `calc(${(n - 1) * SCROLL_POR_PUNTO}vh + 100vh)` }}
     >
-      <svg
-        className="pointer-events-none h-full w-full overflow-visible"
-        style={{ gridColumn: '1 / -1', gridRow: 2 }}
-        viewBox={`0 0 1000 ${CAMINO_ALTO}`}
-        preserveAspectRatio="none"
-        aria-hidden="true"
-      >
-        <path
-          d={d}
-          fill="none"
-          stroke="var(--c-glass-border)"
-          strokeWidth="2"
-          strokeDasharray="2 7"
-          strokeLinecap="round"
-        />
-        <motion.path
-          d={d}
-          fill="none"
-          stroke="var(--c-accent)"
-          strokeWidth="8"
-          strokeLinecap="round"
-          opacity={0.14}
-          style={{ pathLength: reduce ? 1 : progress }}
-        />
-        <motion.path
-          d={d}
-          fill="none"
-          stroke="var(--c-accent)"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          style={{ pathLength: reduce ? 1 : progress }}
-        />
-      </svg>
-      {etapas.map((etapa, i) => (
-        <EtapaCamino
-          key={etapa.key}
-          etapa={etapa}
-          index={i}
-          total={n}
-          progress={progress}
-          reduce={reduce}
-        />
-      ))}
+      <div className="sticky top-0 flex h-screen flex-col justify-center pb-6 pt-20">
+        <p className="font-display text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+          Formación
+        </p>
+        <p className="text-sm text-muted">Títulos y certificaciones que respaldan el criterio.</p>
+
+        {/* ventana: se desvanece en los bordes, así lo que entra y lo que sale
+            no aparece cortado de golpe */}
+        <div
+          className="relative mt-6 w-full overflow-hidden"
+          style={{
+            height: alto,
+            maskImage: 'linear-gradient(to right, transparent, #000 12%, #000 88%, transparent)',
+            WebkitMaskImage: 'linear-gradient(to right, transparent, #000 12%, #000 88%, transparent)',
+          }}
+        >
+          <motion.div
+            className="absolute top-0"
+            style={{ left: cabeza, width: ancho, height: alto, x: desplazamiento }}
+          >
+            <svg
+              className="pointer-events-none absolute inset-0 overflow-visible"
+              width={ancho}
+              height={alto}
+              viewBox={`0 0 ${ancho} ${alto}`}
+              aria-hidden="true"
+            >
+              <path
+                d={fondo}
+                fill="none"
+                stroke="var(--c-glass-border)"
+                strokeWidth="2"
+                strokeDasharray="2 7"
+                strokeLinecap="round"
+              />
+              <motion.path
+                d={onda}
+                fill="none"
+                stroke="var(--c-accent)"
+                strokeWidth="8"
+                strokeLinecap="round"
+                opacity={0.14}
+                style={{ pathLength: reduce ? 1 : suave }}
+              />
+              <motion.path
+                d={onda}
+                fill="none"
+                stroke="var(--c-accent)"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                style={{ pathLength: reduce ? 1 : suave }}
+              />
+            </svg>
+            <ol>
+              {items.map((cert, i) => (
+                <PuntoRecorrido
+                  key={cert.name}
+                  cert={cert}
+                  index={i}
+                  x={puntos[i].x}
+                  y={puntos[i].y}
+                  alto={i % 2 === 0}
+                  posicion={posicion}
+                  reduce={reduce}
+                />
+              ))}
+            </ol>
+          </motion.div>
+        </div>
+
+        <p className="mt-4 self-end font-mono text-xs tabular-nums text-muted" aria-hidden="true">
+          {pad2(activo + 1)} / {pad2(n)}
+        </p>
+      </div>
     </div>
   )
 }
@@ -418,10 +458,27 @@ function FormacionCamino({ reduce }) {
 const anioDe = (c) => parseInt(c.year, 10)
 const certificadosRecientesPrimero = [...certifications].sort((a, b) => anioDe(b) - anioDe(a))
 
+/* Para el recorrido: de lo más viejo a lo más nuevo, y cada título sabe su
+   etapa. Sólo el primero de cada etapa la muestra (abreEtapa). Orden
+   estable: dentro de 2025 queda el agrupado de Google que ya tenía la data. */
+const recorrido = [...certifications]
+  .sort((a, b) => anioDe(a) - anioDe(b))
+  .map((c, i, todos) => {
+    const etapa = formationStages.find((e) => e.key === c.stage)
+    return {
+      ...c,
+      etapa: etapa.label,
+      years: etapa.years,
+      abreEtapa: i === 0 || todos[i - 1].stage !== c.stage,
+    }
+  })
+
 export function StackFormacion() {
   const reduce = useReducedMotion()
   const sectionRef = useRef(null)
-  const ancho = useMediaQuery('(min-width: 1024px)')
+  // anclado sólo donde entra (mismo piso que Soluciones) y con motion activo;
+  // si no, la lista vertical
+  const anclado = useCanPin() && !reduce
 
   return (
     <section
@@ -463,20 +520,24 @@ export function StackFormacion() {
         }}
       />
 
-      <Reveal>
-        <p className="mb-1 font-display text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-          Formación
-        </p>
-        <p className={`text-sm text-muted ${ancho ? 'mb-10' : 'mb-7'}`}>
-          Títulos y certificaciones que respaldan el criterio.
-        </p>
-      </Reveal>
-      {ancho ? (
-        <FormacionCamino reduce={reduce} />
+      {anclado ? (
+        /* el encabezado de Formación va adentro del recorrido: tiene que
+           quedarse a la vista mientras la sección está anclada */
+        <FormacionRecorrido reduce={reduce} items={recorrido} />
       ) : (
-        <div className="max-w-3xl">
-          <Formacion reduce={reduce} sectionRef={sectionRef} items={certificadosRecientesPrimero} />
-        </div>
+        <>
+          <Reveal>
+            <p className="mb-1 font-display text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+              Formación
+            </p>
+            <p className="mb-7 text-sm text-muted">
+              Títulos y certificaciones que respaldan el criterio.
+            </p>
+          </Reveal>
+          <div className="max-w-3xl">
+            <Formacion reduce={reduce} sectionRef={sectionRef} items={certificadosRecientesPrimero} />
+          </div>
+        </>
       )}
     </section>
   )
