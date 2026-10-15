@@ -6,6 +6,9 @@ export const cases = [
   {
     id: 'lae',
     brand: 'LAE SRL',
+    // logo oficial, tomado de laesrl.com.ar (header). Es PNG sin alfa sobre
+    // blanco: el modal lo muestra en un tile blanco para no recolorear la marca.
+    logo: '/logos/lae.webp',
     sector: 'Audiología · empresa con +60 años',
     tagline: 'Construcción de marca digital **desde cero**.',
     problem:

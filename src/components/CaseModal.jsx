@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import { Button } from './primitives/Button.jsx'
 import { MessageIcon } from './primitives/icons.jsx'
+import { RichText } from './primitives/RichText.jsx'
 import { MiniDashboard } from './MiniDashboard.jsx'
 import { siteConfig } from '../data/siteConfig.js'
 
@@ -189,8 +190,33 @@ export function CaseModal({ caseData, onClose }) {
           <p className="font-display text-xs font-semibold uppercase tracking-[0.15em] text-muted mb-1">
             {caseData.sector}
           </p>
-          <h2 className="font-display text-3xl font-bold text-fg">{caseData.brand}</h2>
-          <p className="mt-2 text-base text-muted italic">{caseData.tagline}</p>
+          <div className="flex items-center gap-4">
+            {/* Logo de la marca, si el caso lo trae. Va en un tile blanco y no
+                suelto sobre el fondo oscuro: los logos de clientes vienen con
+                su propio fondo (el de LAE es PNG sin transparencia) y volverlos
+                monocromos sería cambiarle el color a una marca ajena.
+                alt vacío: el nombre está escrito al lado, leerlo dos veces
+                no le suma nada a un lector de pantalla. */}
+            {caseData.logo && (
+              <span className="grid h-14 w-14 shrink-0 place-items-center rounded-xl bg-white p-2 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.6)]">
+                <img
+                  src={caseData.logo}
+                  alt=""
+                  width={240}
+                  height={196}
+                  className="h-full w-full object-contain"
+                  decoding="async"
+                />
+              </span>
+            )}
+            <h2 className="font-display text-3xl font-bold text-fg">{caseData.brand}</h2>
+          </div>
+          {/* RichText y no el string crudo: el tagline trae **negritas**, y
+              acá se veían los asteriscos literales en los cuatro casos. La
+              tarjeta y la grilla ya lo pasaban por RichText; el modal no. */}
+          <p className="mt-2 text-base text-muted italic">
+            <RichText text={caseData.tagline} />
+          </p>
         </div>
 
         {/* body */}
