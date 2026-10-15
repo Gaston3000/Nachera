@@ -15,9 +15,9 @@ export const hero = {
   // la lista va entera en el segundo (pedido del cliente: "integral" quedaba
   // solo arriba del renglón de abajo). Hero.jsx pone el salto entre las dos
   // desde tablet; en celular el texto fluye solo. Los espacios de "de forma
-  // integral" son no separables ( ): esa frase no se parte nunca.
+  // integral" son no separables (U+00A0): esa frase no se parte nunca.
   subLines: [
-    'Me ocupo del marketing digital de tu marca **de forma integral**:',
+    'Me ocupo del marketing digital de tu marca **de\u00A0forma\u00A0integral**:',
     'estrategia, identidad visual, contenido y redes.',
   ],
   chips: ['Storytelling', 'Estrategia', 'Reels', 'Email', 'Branding'],
@@ -99,13 +99,6 @@ export const about = {
   // presenta a la persona, así que la órbita refuerza el diferencial que
   // CLAUDE.md manda usar de ancla — el oficio de periodista y de radio.
   orbit: ['Periodista', 'Radio', 'Narrativa', 'Cámara', 'Criterio'],
-  // El viejo punto 01 ("Vengo del periodismo y la comunicación: un camino
-  // que me enseñó a…") ya no está: ese camino lo cuenta, con fechas, el
-  // bloque de Formación que ahora vive en Sobre mí.
-  beats: [
-    'Aplico todo lo que aprendí en el **mundo del marketing digital** para ayudar a las marcas a **crecer con estrategia y comunicación que conecta de verdad**.',
-    'Hoy trabajo en **Bloop Agency** y, además, llevo adelante **proyectos propios como freelance** — con la misma dedicación y criterio en cada uno.',
-  ],
 }
 
 export const services = [

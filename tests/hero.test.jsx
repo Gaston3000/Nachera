@@ -107,14 +107,6 @@ describe('Sobre mí — con la cara', () => {
     about.orbit.forEach((word) => expect(hero.chips).not.toContain(word))
   })
 
-  it('los puntos que quedan son ítems reales de una lista', () => {
-    render(<About />)
-    const beatsList = screen
-      .getAllByRole('list')
-      .find((ul) => within(ul).queryByText(/Bloop Agency/i))
-    expect(within(beatsList).getAllByRole('listitem')).toHaveLength(about.beats.length)
-  })
-
   it('el apodo es el título de la sección y la lista de instituciones no se repite', () => {
     render(<About />)
     expect(screen.getByRole('heading', { level: 2, name: /me dicen Nachera/i })).toBeInTheDocument()

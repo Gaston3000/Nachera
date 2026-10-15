@@ -16,7 +16,9 @@ import { about } from '../data/content.js'
  *      punto 01 ("Vengo del periodismo y la comunicación: un camino que…"),
  *      que afirmaba lo que este bloque muestra, y a las Credenciales clave,
  *      que repetían cinco de estos mismos títulos.
- *   4. Los puntos que quedan, en fila.
+ *
+ * Los puntos sueltos que venían debajo (marketing digital y Bloop Agency)
+ * se sacaron: Bloop ya tiene su sección y la bio cuenta el resto.
  *
  * La barra de roles cierra el capítulo, ya fuera de la sección (App.jsx).
  */
@@ -65,28 +67,6 @@ export function About() {
         <div className="mt-20 md:mt-28">
           <Formacion />
         </div>
-
-        {/* Los puntos que quedan, en fila desde md y apilados en celular.
-            Cada Reveal ES el <li> (un div envolviendo al li no es HTML válido
-            dentro de un <ul>). */}
-        <ul className="mt-16 grid grid-cols-1 gap-6 md:mt-20 md:grid-cols-2 md:gap-10">
-          {about.beats.map((beat, i) => (
-            <Reveal key={i} as="li" delay={0.1 + i * 0.1} className="flex gap-3 md:flex-col">
-              <span
-                className="mt-0.5 flex-shrink-0 font-display text-xs font-bold md:mt-0 md:text-sm"
-                style={{
-                  color: i % 2 === 0 ? 'var(--c-accent)' : 'var(--c-accent2)',
-                }}
-                aria-hidden="true"
-              >
-                0{i + 1}
-              </span>
-              <p className="text-sm leading-relaxed text-muted md:text-[15px] lg:text-base">
-                <RichText text={beat} />
-              </p>
-            </Reveal>
-          ))}
-        </ul>
       </div>
     </section>
   )

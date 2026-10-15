@@ -23,19 +23,15 @@ describe('siteConfig', () => {
 })
 
 describe('about', () => {
-  it('has lead, kinetic title, orbit and beats', () => {
+  it('has lead, kinetic title and orbit', () => {
     expect(about.lead).toBeTruthy()
     expect(about.kinetic.text).toMatch(/me dicen Nachera/i)
     expect(about.kinetic.text).toContain(about.kinetic.accent)
     expect(about.orbit.length).toBeGreaterThan(0)
-    expect(Array.isArray(about.beats)).toBe(true)
-    // el viejo punto 01 lo reemplaza el bloque de Formación
-    expect(about.beats).toHaveLength(2)
+    // los puntos sueltos se fueron: el camino lo cuenta Formación
+    expect(about.beats).toBeUndefined()
     // las Credenciales clave se fueron: las cubre Formación
     expect(about.credentials).toBeUndefined()
-  })
-  it('beats contain bold markers', () => {
-    about.beats.forEach((b) => expect(b).toMatch(/\*\*.+\*\*/))
   })
 })
 

@@ -157,14 +157,13 @@ describe('App smoke', () => {
     ).toBeInTheDocument()
   })
 
-  it('renders the about beats with bold emphasis', () => {
-    // "Periodismo Deportivo" also appears as a real certification in the
-    // credential timeline, so scope this to the About section to assert the
-    // about beat specifically (its intent), not any DOM-wide occurrence.
+  it('names periodismo deportivo inside the about section', () => {
+    // The brand anchor: "Periodismo Deportivo" lives in the Formación
+    // timeline, which now sits inside the About section.
     const about = document.getElementById('sobre-mi')
     expect(about).not.toBeNull()
     expect(within(about).getByText(/periodismo deportivo/i)).toBeInTheDocument()
-    // Sintonía Digital appears in trust bar AND about beats — both are fine
+    // Sintonía Digital stays visible (trust bar)
     const sintonia = screen.getAllByText(/Sintonía Digital/i)
     expect(sintonia.length).toBeGreaterThanOrEqual(1)
   })

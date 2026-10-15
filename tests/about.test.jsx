@@ -64,16 +64,11 @@ describe('About — Sobre mí', () => {
     expect(screen.queryByText(/credenciales clave/i)).toBeNull()
   })
 
-  it('el viejo punto 01 se fue: el camino lo cuenta Formación', () => {
-    expect(about.beats).toHaveLength(2)
-    about.beats.forEach((b) => expect(b).not.toMatch(/Vengo del/))
-  })
-
-  it('los puntos que quedan se numeran desde 01', () => {
+  it('los puntos sueltos se fueron: la sección cierra con Formación', () => {
     render(<About />)
-    expect(screen.getByText('01')).toBeInTheDocument()
-    expect(screen.getByText('02')).toBeInTheDocument()
-    expect(screen.queryByText('03')).toBeNull()
+    expect(about.beats).toBeUndefined()
+    expect(screen.queryByText('01')).toBeNull()
+    expect(screen.queryByText(/Aplico todo lo que aprendí/)).toBeNull()
   })
 
   it('mantiene el ancla de marca: periodismo deportivo se nombra en Sobre mí', () => {
