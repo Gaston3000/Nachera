@@ -205,42 +205,52 @@ export function CaseModal({ caseData, onClose }) {
 
         {/* body */}
         <div className="px-8 py-8 space-y-8">
-          {/* challenge */}
-          <div>
+          {/* El desafío, en caja propia: es el planteo del caso. El riel de
+              la izquierda es el mismo degradé de la sección de Bloop. */}
+          <div className="relative overflow-hidden rounded-2xl border border-glassborder bg-white/[0.025] p-6 pl-7">
+            <span
+              className="absolute inset-y-0 left-0 w-1"
+              style={{ background: 'linear-gradient(180deg, var(--c-accent2), var(--c-accent))' }}
+              aria-hidden="true"
+            />
             <p className="mb-3 font-display text-xs font-semibold uppercase tracking-[0.2em] text-accent">
               El Desafío
             </p>
             <p className="text-base leading-relaxed text-muted">{caseData.detail.challenge}</p>
           </div>
 
-          {/* strategy */}
-          <div>
-            <p className="mb-3 font-display text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-              La Estrategia
-            </p>
-            <ul className="space-y-2">
-              {caseData.detail.strategy.map((s, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-muted">
-                  <span className="mt-0.5 flex-shrink-0 text-accent">→</span>
-                  <span>{s}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* execution */}
-          <div>
-            <p className="mb-3 font-display text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-              La Ejecución
-            </p>
-            <ul className="space-y-2">
-              {caseData.detail.execution.map((e, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-muted">
-                  <span className="mt-0.5 flex-shrink-0 text-accent2">◈</span>
-                  <span>{e}</span>
-                </li>
-              ))}
-            </ul>
+          {/* Estrategia | Ejecución en una sola caja partida. Antes eran dos
+              listas cortas apiladas que dejaban media caja vacía a la
+              derecha; juntas se leen como lo que son: el plan y lo que se
+              hizo. La mitad teñida marca la primera columna. Desde md van
+              lado a lado; en celular se apilan con divisor horizontal. */}
+          <div className="grid overflow-hidden rounded-2xl border border-glassborder md:grid-cols-2">
+            <div className="bg-white/[0.035] p-6">
+              <p className="mb-4 font-display text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+                La Estrategia
+              </p>
+              <ul className="space-y-3">
+                {caseData.detail.strategy.map((s, i) => (
+                  <li key={i} className="flex items-start gap-2.5 text-[15px] leading-snug text-fg/85">
+                    <span className="mt-px flex-shrink-0 text-accent" aria-hidden="true">→</span>
+                    <span>{s}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="border-t border-glassborder p-6 md:border-l md:border-t-0">
+              <p className="mb-4 font-display text-xs font-semibold uppercase tracking-[0.2em] text-accent2">
+                La Ejecución
+              </p>
+              <ul className="space-y-3">
+                {caseData.detail.execution.map((e, i) => (
+                  <li key={i} className="flex items-start gap-2.5 text-[15px] leading-snug text-fg/85">
+                    <span className="mt-px flex-shrink-0 text-accent2" aria-hidden="true">◈</span>
+                    <span>{e}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
 
           {/* results — MiniDashboard */}
