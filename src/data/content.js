@@ -75,14 +75,17 @@ export const trustBar = [
 ]
 
 export const about = {
-  title: 'Es hora de llevar tu marca al siguiente nivel.',
-  // (pull quote "No vendo humo..." removida a pedido del cliente — ahora
-  // el lead vive en la columna izquierda, junto al título.)
-  // El "Me dicen Nachera" quedó fundido acá. Antes era un párrafo aparte
-  // ("Me dicen Nachera y me formé en UADE, Da Vinci, Deportea y Google
-  // Academy") que repetía exactamente lo que listan las Credenciales clave
-  // de abajo. El apodo se queda; la lista de instituciones, no.
-  lead: 'Soy Ignacio Costa, Licenciado en Ciencias de la Comunicación, periodista y con formación profesional en edición de video y marketing digital. Me dicen Nachera y trabajo junto a marcas y emprendimientos que quieren crecer y comunicar lo que realmente son.',
+  // El título de la sección es el título cinético: la frase cruza la
+  // pantalla y se subraya `accent`. Reemplaza al viejo h2 "Es hora de
+  // llevar tu marca al siguiente nivel." — una frase de venta metida en la
+  // sección donde él se presenta. Si se quiere recuperar, su lugar natural
+  // es el cierre (FinalCTA), donde se pide la acción.
+  kinetic: { text: 'me dicen Nachera', accent: 'Nachera' },
+  // El protagonista de la sección: va en tamaño editorial grande. Los ** son
+  // las frases que quedan en blanco sobre el resto en gris — la jerarquía
+  // que evita que ~50 palabras grandes se lean como una pared.
+  // El "Me dicen Nachera" ya no va acá: lo dice el título cinético.
+  lead: 'Soy Ignacio Costa, **Licenciado en Ciencias de la Comunicación**, **periodista** y con formación profesional en **edición de video y marketing digital**. Trabajo junto a marcas y emprendimientos que quieren **crecer y comunicar lo que realmente son**.',
   // Las palabras que giran alrededor de la cara en esta sección. NO son los
   // chips del hero (esos ya van en los carteles de las fotos): acá la cara
   // presenta a la persona, así que la órbita refuerza el diferencial que

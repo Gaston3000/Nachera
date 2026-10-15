@@ -153,8 +153,12 @@ describe('App smoke', () => {
   it('renders the about lead in the section (moved to LEFT col per cliente)', () => {
     const about = document.getElementById('sobre-mi')
     expect(about).not.toBeNull()
+    // El lead lleva frases en negrita (RichText), así que el texto queda
+    // repartido en varios nodos: se busca el <p> por su texto completo.
     expect(
-      within(about).getByText(/Soy Ignacio Costa, Licenciado/i)
+      within(about).getByText(
+        (_, el) => el?.tagName === 'P' && /Soy Ignacio Costa, Licenciado/i.test(el.textContent)
+      )
     ).toBeInTheDocument()
   })
 

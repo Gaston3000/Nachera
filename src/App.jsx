@@ -18,8 +18,12 @@ export default function App() {
       <Nav />
       <main>
         <Hero />
-        <TrustBar />
         <About />
+        {/* La barra de roles cierra el capítulo de quién es (Fundador,
+            Periodista, Lic. en Cs. de la Comunicación…): vive al final de
+            Sobre mí y no entre el hero y la presentación, donde interrumpía
+            el pasaje. */}
+        <TrustBar />
         <Solutions />
         <ProcessTimeline />
         <Cases />

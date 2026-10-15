@@ -3,6 +3,7 @@ import { motion, useReducedMotion } from 'motion/react'
 import { Reveal } from './primitives/Reveal.jsx'
 import { RichText } from './primitives/RichText.jsx'
 import { HeroOrbit } from './HeroOrbit.jsx'
+import { KineticTitle } from './about/KineticTitle.jsx'
 import {
   DiplomaIcon,
   ChartCheckIcon,
@@ -496,87 +497,81 @@ function CredentialsModule() {
 
 export function About() {
   return (
-    <section id="sobre-mi" className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8 md:py-28">
+    <section id="sobre-mi" className="w-full pb-20 md:pb-28">
       {/*
-       * Arriba, dos columnas: a la izquierda el ANCLA (eyebrow + título +
-       * lead, unidos por el rail de gradiente), a la derecha la cara.
-       * Abajo, a todo el ancho, los tres puntos 01·02·03 en fila, y después
-       * las credenciales.
+       * Abre con el título cinético a todo el ancho ("me dicen Nachera"
+       * cruzando la pantalla). Después, en el contenedor de siempre:
+       *   - la bio, en grande — es la protagonista —, con la cara al lado
+       *   - los tres puntos 01·02·03 en fila
+       *   - las credenciales
        *
-       * La cara vino del hero. Ahí hablaba la marca; acá se presenta la
-       * persona, que es donde una cara tiene sentido. Los puntos 01-03 vivían
-       * en la columna derecha: con la cara ocupándola, apilarlos debajo la
-       * volvía una torre. Como ya vienen numerados, en horizontal se leen
-       * naturales.
+       * El título cinético es el h2 de la sección: reemplaza al eyebrow +
+       * h2 de antes ("Es hora de llevar tu marca al siguiente nivel").
        */}
-      <div className="grid grid-cols-1 items-center gap-10 md:grid-cols-12 md:gap-12 lg:gap-16">
-        {/* LEFT — ANCLA */}
-        <div className="md:col-span-6">
-          <div className="flex gap-5">
-            {/* Rail vertical acento: ancla eyebrow + título + pull en un bloque */}
-            <div
-              className="hidden flex-shrink-0 sm:block w-1 rounded-full self-stretch"
-              style={{
-                background:
-                  'linear-gradient(180deg, var(--c-accent), var(--c-accent2))',
-              }}
-              aria-hidden="true"
-            />
-            <div className="flex min-w-0 flex-col gap-8 md:gap-10">
-              <Reveal>
-                <p className="mb-4 font-display text-sm font-semibold uppercase tracking-[0.2em] text-accent md:text-base">
-                  Sobre mí
-                </p>
-                <h2 className="font-display text-3xl font-bold leading-[1.1] tracking-tight text-fg sm:text-4xl md:text-[2.5rem] lg:text-5xl">
-                  {about.title}
-                </h2>
-              </Reveal>
-              <Reveal delay={0.1}>
-                <p className="text-sm leading-relaxed text-muted md:text-[15px] lg:text-base">
-                  {about.lead}
+      <KineticTitle text={about.kinetic.text} accent={about.kinetic.accent} eyebrow="Sobre mí" />
+
+      <div className="mx-auto w-full max-w-6xl px-5 sm:px-8">
+        <div className="grid grid-cols-1 items-center gap-10 md:grid-cols-12 md:gap-12 lg:gap-16">
+          {/* LEFT — la bio, protagonista. Tamaño editorial grande, con las
+              frases clave en blanco sobre el resto en gris: sin esa jerarquía,
+              ~50 palabras grandes se leen como una pared. El rail de gradiente
+              la ancla, como antes anclaba eyebrow + título + lead. */}
+          <div className="md:col-span-7">
+            <div className="flex gap-5 md:gap-7">
+              <div
+                className="hidden flex-shrink-0 sm:block w-1 rounded-full self-stretch"
+                style={{
+                  background:
+                    'linear-gradient(180deg, var(--c-accent), var(--c-accent2))',
+                }}
+                aria-hidden="true"
+              />
+              <Reveal className="min-w-0">
+                <p className="font-display text-[clamp(1.35rem,0.85rem+1.55vw,2.2rem)] font-normal leading-[1.38] tracking-[-0.01em] text-muted">
+                  <RichText text={about.lead} />
                 </p>
               </Reveal>
             </div>
           </div>
-        </div>
-
-        {/* RIGHT — la cara, al mismo tamaño que tenía en el hero. Las palabras
-            que la orbitan no son los chips del hero (esos van ahora en los
-            carteles de las fotos): acá refuerzan el oficio de periodista.
-            El Reveal envuelve la escena desde AFUERA: anima opacity y
-            transform en un nodo que no es parte del contexto 3D, así que no
-            aplana la órbita (ver la regla de oro de .orbit-head en index.css).
-            Es el mismo criterio con que el hero viejo le animaba la opacidad
-            al envoltorio. */}
-        <Reveal delay={0.15} className="flex justify-center md:col-span-6">
-          <HeroOrbit chips={about.orbit} />
-        </Reveal>
-      </div>
-
-      {/* 01 · 02 · 03 — en fila desde md, apilados en celular. Cada Reveal ES
-          el <li> (antes era un div envolviendo al li, que no es HTML válido
-          dentro de un <ul>). */}
-      <ul className="mt-14 grid grid-cols-1 gap-6 md:mt-16 md:grid-cols-3 md:gap-8">
-        {about.beats.map((beat, i) => (
-          <Reveal key={i} as="li" delay={0.1 + i * 0.1} className="flex gap-3 md:flex-col">
-            <span
-              className="mt-0.5 flex-shrink-0 font-display text-xs font-bold md:mt-0 md:text-sm"
-              style={{
-                color: i % 2 === 0 ? 'var(--c-accent)' : 'var(--c-accent2)',
-              }}
-              aria-hidden="true"
-            >
-              0{i + 1}
-            </span>
-            <p className="text-sm leading-relaxed text-muted md:text-[15px] lg:text-base">
-              <RichText text={beat} />
-            </p>
+  
+          {/* RIGHT — la cara, al mismo tamaño que tenía en el hero. Las palabras
+              que la orbitan no son los chips del hero (esos van ahora en los
+              carteles de las fotos): acá refuerzan el oficio de periodista.
+              El Reveal envuelve la escena desde AFUERA: anima opacity y
+              transform en un nodo que no es parte del contexto 3D, así que no
+              aplana la órbita (ver la regla de oro de .orbit-head en index.css).
+              Es el mismo criterio con que el hero viejo le animaba la opacidad
+              al envoltorio. */}
+          <Reveal delay={0.15} className="flex justify-center md:col-span-5">
+            <HeroOrbit chips={about.orbit} />
           </Reveal>
-        ))}
-      </ul>
-
-      {/* credenciales clave — premium mini-module (full width below) */}
-      <CredentialsModule />
+        </div>
+  
+        {/* 01 · 02 · 03 — en fila desde md, apilados en celular. Cada Reveal ES
+            el <li> (antes era un div envolviendo al li, que no es HTML válido
+            dentro de un <ul>). */}
+        <ul className="mt-14 grid grid-cols-1 gap-6 md:mt-16 md:grid-cols-3 md:gap-8">
+          {about.beats.map((beat, i) => (
+            <Reveal key={i} as="li" delay={0.1 + i * 0.1} className="flex gap-3 md:flex-col">
+              <span
+                className="mt-0.5 flex-shrink-0 font-display text-xs font-bold md:mt-0 md:text-sm"
+                style={{
+                  color: i % 2 === 0 ? 'var(--c-accent)' : 'var(--c-accent2)',
+                }}
+                aria-hidden="true"
+              >
+                0{i + 1}
+              </span>
+              <p className="text-sm leading-relaxed text-muted md:text-[15px] lg:text-base">
+                <RichText text={beat} />
+              </p>
+            </Reveal>
+          ))}
+        </ul>
+  
+        {/* credenciales clave — premium mini-module (full width below) */}
+        <CredentialsModule />
+      </div>
     </section>
   )
 }

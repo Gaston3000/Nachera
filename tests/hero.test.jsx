@@ -115,9 +115,26 @@ describe('Sobre mí — con la cara', () => {
     expect(within(beatsList).getAllByRole('listitem')).toHaveLength(3)
   })
 
-  it('el apodo queda en el lead y la lista de instituciones no se repite', () => {
+  it('el apodo es el título de la sección y la lista de instituciones no se repite', () => {
     render(<About />)
-    expect(screen.getByText(/Me dicen Nachera/i)).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2, name: /me dicen Nachera/i })).toBeInTheDocument()
     expect(screen.queryByText(/me formé como profesional en UADE/i)).toBeNull()
+  })
+
+  it('ya no lleva el viejo h2 de venta', () => {
+    render(<About />)
+    expect(screen.queryByText(/siguiente nivel/i)).toBeNull()
+  })
+
+  it('la bio no repite el apodo: lo dice el título', () => {
+    expect(about.lead).not.toMatch(/Me dicen Nachera/i)
+  })
+
+  it('la bio marca sus frases clave en negrita', () => {
+    const { container } = render(<About />)
+    const lead = [...container.querySelectorAll('p')].find((p) =>
+      /Soy Ignacio Costa/.test(p.textContent)
+    )
+    expect(lead.querySelectorAll('strong').length).toBeGreaterThanOrEqual(3)
   })
 })
