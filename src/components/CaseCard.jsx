@@ -4,6 +4,7 @@ import { Button } from './primitives/Button.jsx'
 import { ArrowUpRight } from './primitives/icons.jsx'
 import { CountUp } from './primitives/CountUp.jsx'
 import { RichText } from './primitives/RichText.jsx'
+import { BrandLogo } from './primitives/BrandLogo.jsx'
 import { useCardReplay } from './primitives/useCardReplay.js'
 import { containerVariants, itemVariants } from './primitives/motionPresets.js'
 
@@ -72,12 +73,13 @@ export function CaseCard({ caseData, index, onOpen, active = false, onActivate }
             </span>
           </motion.div>
 
-          <motion.h3
-            className="mt-2 font-display text-xl font-bold text-fg"
+          <motion.div
+            className="mt-2 flex items-center gap-3"
             variants={reduce ? undefined : itemVariants}
           >
-            {caseData.brand}
-          </motion.h3>
+            <BrandLogo src={caseData.logo} size="sm" />
+            <h3 className="font-display text-xl font-bold text-fg">{caseData.brand}</h3>
+          </motion.div>
           <motion.p
             className="mt-1 text-sm italic text-muted"
             variants={reduce ? undefined : itemVariants}

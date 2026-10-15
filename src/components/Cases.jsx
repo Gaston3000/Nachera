@@ -8,6 +8,7 @@ import { ArrowUpRight } from './primitives/icons.jsx'
 import { GlassPanel } from './primitives/GlassPanel.jsx'
 import { CountUp } from './primitives/CountUp.jsx'
 import { RichText } from './primitives/RichText.jsx'
+import { BrandLogo } from './primitives/BrandLogo.jsx'
 import { useCardReplay } from './primitives/useCardReplay.js'
 import { containerVariants, itemVariants } from './primitives/motionPresets.js'
 import { CaseCard } from './CaseCard.jsx'
@@ -112,12 +113,15 @@ function FeaturedCase({ caseData, active, onActivate, onOpen }) {
             >
               {caseData.sector}
             </motion.span>
-            <motion.h3
-              className="font-display text-4xl font-black text-fg md:text-5xl"
+            <motion.div
+              className="flex items-center gap-4"
               variants={reduce ? undefined : itemVariants}
             >
-              {caseData.brand}
-            </motion.h3>
+              <BrandLogo src={caseData.logo} size="lg" />
+              <h3 className="font-display text-4xl font-black text-fg md:text-5xl">
+                {caseData.brand}
+              </h3>
+            </motion.div>
             <motion.p
               className="mt-2 text-base italic text-muted"
               variants={reduce ? undefined : itemVariants}
