@@ -13,6 +13,54 @@ export const hero = {
   // celular, los mismos que el h1. Antes pesaba más que el propio titular.
   sub: 'Me ocupo del marketing digital de tu marca **de forma integral**: estrategia, identidad visual, contenido y redes.',
   chips: ['Storytelling', 'Estrategia', 'Reels', 'Email', 'Branding'],
+
+  // ── Fotos del campo del hero ────────────────────────────────────────
+  // 8 lugares, en el orden de HERO_CARDS (components/hero/heroGeometry.js):
+  // la posición y el tamaño de cada uno viven ahí, acá solo el contenido.
+  //
+  // Mientras `src` sea null, el lugar se dibuja como placeholder gris con
+  // "Foto a futuro". Cuando Nachera mande las fotos: van a /public/hero/ y
+  // se completa `src` ('/hero/nombre.webp'). Nada más — el componente no se
+  // toca.
+  //
+  // El `alt` describe la foto que va en cada lugar, así esta lista sirve
+  // también de pedido: Nachera trabajando, con la cámara, sacando fotos,
+  // grabando, editando. Se nota en la orientación: los lugares verticales
+  // piden fotos verticales — una apaisada ahí se recorta mucho.
+  //
+  // Los carteles flotan sobre la foto (título corto + una frase). Sus
+  // títulos son los mismos chips de arriba. Las frases salen de lo que ya
+  // dice `services`: no prometen nada nuevo.
+  photos: [
+    {
+      src: null,
+      alt: 'Nachera grabando con la cámara al hombro (vertical)',
+      cartel: { titulo: 'Storytelling', descripcion: 'Historias que tu marca puede contar' },
+    },
+    { src: null, alt: 'Nachera revisando una toma en la pantalla de la cámara (apaisada)', cartel: null },
+    {
+      src: null,
+      alt: 'Nachera filmando un reel en locación (vertical)',
+      cartel: { titulo: 'Reels', descripcion: 'Idea, guion, rodaje y edición' },
+    },
+    {
+      src: null,
+      alt: 'Nachera planificando contenido frente a la computadora (apaisada)',
+      cartel: { titulo: 'Estrategia', descripcion: 'Un plan antes de cada pieza' },
+    },
+    { src: null, alt: 'Detalle de manos ajustando el lente de la cámara (vertical)', cartel: null },
+    {
+      src: null,
+      alt: 'Nachera en una sesión de fotos para una marca (apaisada)',
+      cartel: { titulo: 'Branding', descripcion: 'Que tu marca se vea como lo que es' },
+    },
+    {
+      src: null,
+      alt: 'Nachera editando video en la computadora (apaisada)',
+      cartel: { titulo: 'Email', descripcion: 'Comunicación directa con tu audiencia' },
+    },
+    { src: null, alt: 'Nachera sacando una foto, de perfil (vertical)', cartel: null },
+  ],
 }
 
 // Barra/marquee de roles y proyectos (pieza que el cliente quiere destacada).
@@ -30,9 +78,16 @@ export const about = {
   title: 'Es hora de llevar tu marca al siguiente nivel.',
   // (pull quote "No vendo humo..." removida a pedido del cliente — ahora
   // el lead vive en la columna izquierda, junto al título.)
-  lead: 'Soy Ignacio Costa, Licenciado en Ciencias de la Comunicación, periodista y con formación profesional en edición de video y marketing digital. Trabajo junto a marcas y emprendimientos que quieren crecer y comunicar lo que realmente son.',
-  // Segundo párrafo que cierra la presentación.
-  aside: 'Me dicen Nachera y me formé como profesional en UADE, Da Vinci, Deportea y Google Academy.',
+  // El "Me dicen Nachera" quedó fundido acá. Antes era un párrafo aparte
+  // ("Me dicen Nachera y me formé en UADE, Da Vinci, Deportea y Google
+  // Academy") que repetía exactamente lo que listan las Credenciales clave
+  // de abajo. El apodo se queda; la lista de instituciones, no.
+  lead: 'Soy Ignacio Costa, Licenciado en Ciencias de la Comunicación, periodista y con formación profesional en edición de video y marketing digital. Me dicen Nachera y trabajo junto a marcas y emprendimientos que quieren crecer y comunicar lo que realmente son.',
+  // Las palabras que giran alrededor de la cara en esta sección. NO son los
+  // chips del hero (esos ya van en los carteles de las fotos): acá la cara
+  // presenta a la persona, así que la órbita refuerza el diferencial que
+  // CLAUDE.md manda usar de ancla — el oficio de periodista y de radio.
+  orbit: ['Periodista', 'Radio', 'Narrativa', 'Cámara', 'Criterio'],
   beats: [
     'Vengo del **periodismo y la comunicación**: un camino que me enseñó a **expresarme, perder el miedo y desarrollar mi creatividad** para aplicarla en cada proyecto.',
     'Aplico todo lo que aprendí en el **mundo del marketing digital** para ayudar a las marcas a **crecer con estrategia y comunicación que conecta de verdad**.',

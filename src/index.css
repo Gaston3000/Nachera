@@ -985,3 +985,133 @@
     stroke-width: 2.5;
   }
 }
+
+/* ── Hero: campo de fotos ──────────────────────────────────────────────────
+   La entrada "pila → despliegue" del hero de ED (entrada-hero.ts), en CSS y
+   con sus mismos tempos. Hero.jsx mide cada tarjeta antes del primer paint,
+   escribe las variables de abajo y recién ahí pone data-hero-state="go".
+
+   Dos capas por tarjeta porque ED tiene dos tiempos con escalonados
+   distintos (ver hero/heroDeploy.js):
+     .hero-deploy      (afuera)  queda apilada en el centro y SE DESPLIEGA
+                                 --from-x/--from-y, --scale-pile,
+                                 --move-delay, --move-duration
+     .hero-deploy__in  (adentro) APARECE: fade + crece
+                                 --appear-from, --appear-delay
+   Las escalas se multiplican: 0.62 × 0.806 = 0.5, como el arranque de ED.
+
+   Los defaults existen por un caso borde: si se cruza el breakpoint después
+   de cargar, aparece el set de tarjetas del otro ancho, que nunca se midió.
+   Con los defaults hace un fade suave en su lugar en vez de un transform
+   inválido. */
+.hero-deploy {
+  --from-x: 0px;
+  --from-y: 0px;
+  --scale-pile: 1;
+  --move-delay: 0s;
+  --move-duration: 1.7s;
+}
+.hero-deploy__in {
+  --appear-from: 0.92;
+  --appear-delay: 0s;
+}
+
+/* power3.inOut de GSAP = cuártica de entrada y salida */
+[data-hero-state='go'] .hero-deploy {
+  animation: heroDeployMove var(--move-duration) cubic-bezier(0.76, 0, 0.24, 1) both;
+  animation-delay: var(--move-delay);
+}
+/* power2.out de GSAP = cúbica de salida */
+[data-hero-state='go'] .hero-deploy__in {
+  animation: heroDeployAppear 0.7s cubic-bezier(0.33, 1, 0.68, 1) both;
+  animation-delay: var(--appear-delay);
+}
+
+/* `both` es lo que mantiene la pila armada en el centro mientras espera su
+   turno: el `from` se aplica desde el cuadro 0, no recién cuando arranca. */
+@keyframes heroDeployMove {
+  from {
+    transform: translate(var(--from-x), var(--from-y)) scale(var(--scale-pile));
+  }
+  to {
+    transform: none;
+  }
+}
+@keyframes heroDeployAppear {
+  from {
+    opacity: 0;
+    transform: scale(var(--appear-from));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* El titular, el eyebrow, la bajada y los botones entran en el último
+   segundo del despliegue. Hero.jsx calcula ese momento según cuántas fotos
+   se despliegan (son distintas en escritorio y en celular) y lo escribe en
+   --title-start; cada pieza suma su propio corrimiento. El default es el de
+   escritorio, por si la entrada no llega a armarse. */
+.hero-fade {
+  animation: heroFadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--title-start, 2.45s) + var(--fade-offset, 0s));
+}
+@keyframes heroFadeUp {
+  from {
+    opacity: 0;
+    translate: 0 20px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+/* Los carteles de las fotos del campo y de las bandas entran al final, con
+   las fotos ya asentadas. Solo los que viven dentro de una tarjeta que se
+   despliega: los de los conceptos de celular tienen su propio reveal al
+   scrollear. */
+[data-hero-state='go'] [data-deploy] .hero-cartel {
+  animation: heroCartelIn 0.6s cubic-bezier(0.33, 1, 0.68, 1) both;
+  animation-delay: var(--cartel-delay, 2.5s);
+}
+@keyframes heroCartelIn {
+  from {
+    opacity: 0;
+    translate: 0 8px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+/* Velo de legibilidad detrás del texto: entra último, para no ensuciar la
+   entrada. */
+[data-hero-state='go'] .hero-halo {
+  animation: heroWordIn 0.9s ease-out both;
+  animation-delay: var(--halo-delay, 2.6s);
+}
+
+/* El gris de "Foto a futuro". Gris de verdad, no un tinte de marca: tiene que
+   leerse inequívocamente como un lugar a completar. Un gradiente apenas
+   inclinado y un borde de luz arriba para que no parezca un agujero plano
+   sobre el fondo oscuro. */
+.hero-photo-placeholder {
+  background: linear-gradient(155deg, #2c313d 0%, #20242e 100%);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.06),
+    0 28px 70px -28px rgba(0, 0, 0, 0.8);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-hero-state='go'] .hero-deploy,
+  [data-hero-state='go'] .hero-deploy__in,
+  [data-hero-state='go'] [data-deploy] .hero-cartel,
+  [data-hero-state='go'] .hero-halo,
+  .hero-fade {
+    animation: none;
+    opacity: 1;
+  }
+}

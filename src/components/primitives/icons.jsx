@@ -414,3 +414,20 @@ export const MicIcon = ({ className = '' }) => (
     <path d="M12 17v4M9 21h6" />
   </svg>
 )
+
+/* Cámara de fotos — el placeholder de las fotos del hero ("foto a futuro") */
+export const CameraIcon = ({ className = '' }) => (
+  <svg
+    className={`${base} ${className}`}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.5}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2.2l1.4-2h5.8l1.4 2h2.2A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5Z" />
+    <circle cx="12" cy="13" r="3.5" />
+  </svg>
+)

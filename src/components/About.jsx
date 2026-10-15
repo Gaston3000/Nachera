@@ -2,6 +2,7 @@ import { useId, useLayoutEffect, useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import { Reveal } from './primitives/Reveal.jsx'
 import { RichText } from './primitives/RichText.jsx'
+import { HeroOrbit } from './HeroOrbit.jsx'
 import {
   DiplomaIcon,
   ChartCheckIcon,
@@ -497,17 +498,20 @@ export function About() {
   return (
     <section id="sobre-mi" className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8 md:py-28">
       {/*
-       * Layout editorial asimétrico 5/7 en desktop.
-       * - Columna izquierda = ANCLA: eyebrow + h2 + pull quote unidos por
-       *   un rail vertical de gradiente (la barra acento se extiende sobre
-       *   los tres elementos, no solo sobre el pull).
-       * - Columna derecha = NARRATIVA: lead + aside + beats, alineadas al
-       *   top así arrancan a la misma altura que el eyebrow.
-       * Mobile (grid-cols-1) preserva el flujo apilado actual.
+       * Arriba, dos columnas: a la izquierda el ANCLA (eyebrow + título +
+       * lead, unidos por el rail de gradiente), a la derecha la cara.
+       * Abajo, a todo el ancho, los tres puntos 01·02·03 en fila, y después
+       * las credenciales.
+       *
+       * La cara vino del hero. Ahí hablaba la marca; acá se presenta la
+       * persona, que es donde una cara tiene sentido. Los puntos 01-03 vivían
+       * en la columna derecha: con la cara ocupándola, apilarlos debajo la
+       * volvía una torre. Como ya vienen numerados, en horizontal se leen
+       * naturales.
        */}
-      <div className="grid grid-cols-1 gap-10 md:grid-cols-12 md:gap-12 lg:gap-16">
-        {/* LEFT (5/12) — ANCLA */}
-        <div className="md:col-span-5">
+      <div className="grid grid-cols-1 items-center gap-10 md:grid-cols-12 md:gap-12 lg:gap-16">
+        {/* LEFT — ANCLA */}
+        <div className="md:col-span-6">
           <div className="flex gap-5">
             {/* Rail vertical acento: ancla eyebrow + título + pull en un bloque */}
             <div
@@ -536,41 +540,40 @@ export function About() {
           </div>
         </div>
 
-        {/* RIGHT (7/12) — NARRATIVA. Top-aligned, body con más peso en desktop.
-            (El lead ahora vive en la columna izquierda, así que acá arrancamos
-            directo con el cierre + las 3 bullets.) */}
-        <div className="flex flex-col gap-6 md:col-span-7 md:gap-7 md:pt-2">
-          {about.aside && (
-            <Reveal delay={0.2}>
-              <p className="text-sm leading-relaxed text-muted md:text-[15px] lg:text-base">
-                {about.aside}
-              </p>
-            </Reveal>
-          )}
-
-          <ul className="mt-1 flex flex-col gap-4 md:gap-5">
-            {about.beats.map((beat, i) => (
-              <Reveal key={i} delay={0.28 + i * 0.1}>
-                <li className="flex gap-3">
-                  {/* accent marker */}
-                  <span
-                    className="mt-0.5 flex-shrink-0 font-display text-xs font-bold"
-                    style={{
-                      color: i % 2 === 0 ? 'var(--c-accent)' : 'var(--c-accent2)',
-                    }}
-                    aria-hidden="true"
-                  >
-                    0{i + 1}
-                  </span>
-                  <p className="text-sm leading-relaxed text-muted md:text-[15px] lg:text-base">
-                    <RichText text={beat} />
-                  </p>
-                </li>
-              </Reveal>
-            ))}
-          </ul>
-        </div>
+        {/* RIGHT — la cara, al mismo tamaño que tenía en el hero. Las palabras
+            que la orbitan no son los chips del hero (esos van ahora en los
+            carteles de las fotos): acá refuerzan el oficio de periodista.
+            El Reveal envuelve la escena desde AFUERA: anima opacity y
+            transform en un nodo que no es parte del contexto 3D, así que no
+            aplana la órbita (ver la regla de oro de .orbit-head en index.css).
+            Es el mismo criterio con que el hero viejo le animaba la opacidad
+            al envoltorio. */}
+        <Reveal delay={0.15} className="flex justify-center md:col-span-6">
+          <HeroOrbit chips={about.orbit} />
+        </Reveal>
       </div>
+
+      {/* 01 · 02 · 03 — en fila desde md, apilados en celular. Cada Reveal ES
+          el <li> (antes era un div envolviendo al li, que no es HTML válido
+          dentro de un <ul>). */}
+      <ul className="mt-14 grid grid-cols-1 gap-6 md:mt-16 md:grid-cols-3 md:gap-8">
+        {about.beats.map((beat, i) => (
+          <Reveal key={i} as="li" delay={0.1 + i * 0.1} className="flex gap-3 md:flex-col">
+            <span
+              className="mt-0.5 flex-shrink-0 font-display text-xs font-bold md:mt-0 md:text-sm"
+              style={{
+                color: i % 2 === 0 ? 'var(--c-accent)' : 'var(--c-accent2)',
+              }}
+              aria-hidden="true"
+            >
+              0{i + 1}
+            </span>
+            <p className="text-sm leading-relaxed text-muted md:text-[15px] lg:text-base">
+              <RichText text={beat} />
+            </p>
+          </Reveal>
+        ))}
+      </ul>
 
       {/* credenciales clave — premium mini-module (full width below) */}
       <CredentialsModule />

@@ -1,0 +1,184 @@
+import { describe, it, expect } from 'vitest'
+import {
+  BAND_BOTTOM,
+  BAND_TOP,
+  COPY_ZONE_VW,
+  HERO_CARDS,
+  HERO_HEIGHT_VW,
+  MOBILE_CONCEPTS,
+} from '../src/components/hero/heroGeometry.js'
+import {
+  TEMPOS,
+  centerRanks,
+  deployOffsets,
+  deployTimeline,
+  pileScale,
+} from '../src/components/hero/heroDeploy.js'
+import { hero } from '../src/data/content.js'
+
+/* La caja de cada foto en vw (el hero de escritorio mide 70vw de alto). */
+function boxVw(card) {
+  const cy = (card.cy / 100) * HERO_HEIGHT_VW
+  const h = card.w / card.ar
+  return {
+    left: card.cx - card.w / 2,
+    right: card.cx + card.w / 2,
+    top: cy - h / 2,
+    bottom: cy + h / 2,
+  }
+}
+
+const overlaps = (a, b) =>
+  a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top
+
+describe('hero.photos', () => {
+  it('hay una foto por cada lugar del campo', () => {
+    expect(hero.photos).toHaveLength(HERO_CARDS.length)
+  })
+
+  it('cada lugar es una foto o un placeholder, y siempre describe la foto que va', () => {
+    hero.photos.forEach((photo) => {
+      expect(photo.src === null || typeof photo.src === 'string').toBe(true)
+      // el alt hace de pedido de fotos: no puede quedar vacío
+      expect(photo.alt.length).toBeGreaterThan(10)
+    })
+  })
+
+  it('los títulos de los carteles son los chips del hero', () => {
+    const titulos = hero.photos.filter((p) => p.cartel).map((p) => p.cartel.titulo)
+    expect([...titulos].sort()).toEqual([...hero.chips].sort())
+  })
+})
+
+describe('geometría de escritorio', () => {
+  /* La regla del campo: ninguna foto cae donde está el texto. Si alguien
+     mueve una, esto dice cuál. */
+  it('ninguna foto invade la zona del titular', () => {
+    HERO_CARDS.forEach((card, i) => {
+      expect(overlaps(boxVw(card), COPY_ZONE_VW), `la foto ${i} pisa el texto`).toBe(false)
+    })
+  })
+
+  it('ninguna foto se sale del hero', () => {
+    HERO_CARDS.forEach((card, i) => {
+      const b = boxVw(card)
+      expect(b.left, `foto ${i}`).toBeGreaterThanOrEqual(0)
+      expect(b.right, `foto ${i}`).toBeLessThanOrEqual(100)
+      expect(b.top, `foto ${i}`).toBeGreaterThanOrEqual(0)
+      expect(b.bottom, `foto ${i}`).toBeLessThanOrEqual(HERO_HEIGHT_VW)
+    })
+  })
+
+  it('las fotos no se pisan entre sí', () => {
+    for (let i = 0; i < HERO_CARDS.length; i += 1) {
+      for (let j = i + 1; j < HERO_CARDS.length; j += 1) {
+        expect(overlaps(boxVw(HERO_CARDS[i]), boxVw(HERO_CARDS[j])), `${i} y ${j}`).toBe(false)
+      }
+    }
+  })
+})
+
+describe('geometría de celular', () => {
+  const slots = [...BAND_TOP, ...BAND_BOTTOM, ...MOBILE_CONCEPTS]
+
+  it('todos los lugares apuntan a una foto que existe', () => {
+    slots.forEach((slot) => {
+      expect(hero.photos[slot.photo]).toBeDefined()
+    })
+  })
+
+  it('ninguna foto se repite', () => {
+    const used = slots.map((s) => s.photo)
+    expect(new Set(used).size).toBe(used.length)
+  })
+
+  /* En escritorio los cinco conceptos se leen todos juntos alrededor del
+     título. En celular no puede perderse ninguno: cada foto con cartel tiene
+     que estar en una banda o en el zigzag. */
+  it('ningún cartel se pierde en celular', () => {
+    const used = new Set(slots.map((s) => s.photo))
+    hero.photos.forEach((photo, i) => {
+      if (photo.cartel) expect(used.has(i), `el cartel "${photo.cartel.titulo}"`).toBe(true)
+    })
+  })
+
+  it('los conceptos del zigzag son fotos con cartel', () => {
+    MOBILE_CONCEPTS.forEach((slot) => {
+      expect(hero.photos[slot.photo].cartel).not.toBeNull()
+    })
+  })
+})
+
+/* Los tempos son una copia de entrada-hero.ts de Empoderamiento Docente. Si
+   alguien los toca, que sea a propósito. */
+describe('entrada: los tempos de ED', () => {
+  it('escritorio: aparecen cada 40 ms desde los 0.2 s', () => {
+    const t = deployTimeline(8)
+    expect([0, 1, 7].map(t.appearDelay)).toEqual([0.2, 0.24, 0.48])
+    expect(t.appear).toBe(0.7)
+    expect(t.move).toBe(1.7)
+  })
+
+  it('escritorio: el despliegue arranca al terminar de aparecer la última, más la pausa', () => {
+    const t = deployTimeline(8)
+    // 0.2 + 0.7 + 7×0.04 + 0.15
+    expect(t.moveDelay(0)).toBeCloseTo(1.33, 6)
+    expect(t.moveDelay(7)).toBeCloseTo(1.33 + 7 * 0.06, 6)
+  })
+
+  it('el titular entra en el último segundo del despliegue', () => {
+    const t = deployTimeline(8)
+    expect(t.end).toBeCloseTo(1.33 + 7 * 0.06 + 1.7, 6)
+    expect(t.titleStart).toBeCloseTo(t.end - 1, 6)
+  })
+
+  it('celular usa el timeline propio de las bandas', () => {
+    const t = deployTimeline(4, { mobile: true })
+    expect(t.move).toBe(TEMPOS.mobile.move)
+    expect(t.appearDelay(1)).toBeCloseTo(0.25, 6)
+    // 0.2 + 0.7 + 3×0.05 + 0.15
+    expect(t.moveDelay(0)).toBeCloseTo(1.2, 6)
+  })
+})
+
+describe('entrada: la pila', () => {
+  const viewport = { width: 1440, height: 900 }
+  const rects = [
+    { left: 100, top: 100, width: 200, height: 200 }, // arriba a la izquierda
+    { left: 620, top: 350, width: 200, height: 200 }, // centrada
+    { left: 1200, top: 600, width: 200, height: 200 }, // abajo a la derecha
+  ]
+
+  it('cada tarjeta arranca en el centro de la pantalla', () => {
+    const offsets = deployOffsets(rects, viewport)
+    rects.forEach((r, i) => {
+      expect(r.left + r.width / 2 + offsets[i].x).toBe(720)
+      expect(r.top + r.height / 2 + offsets[i].y).toBe(450)
+    })
+  })
+
+  it('la más cercana al centro de la pantalla sale primero', () => {
+    expect(centerRanks(rects, viewport)).toEqual([1, 0, 2])
+  })
+
+  it('escritorio: la pila arranca al 0.5 y llega al 0.62, como en ED', () => {
+    const { pile, appearFrom } = pileScale(rects[0], viewport)
+    expect(pile).toBe(0.62)
+    expect(pile * appearFrom).toBeCloseTo(0.5, 2)
+  })
+
+  it('celular: la pila mide cerca de media pantalla y nunca más de 1.7×', () => {
+    const phone = { width: 375, height: 812 }
+    const { pile, appearFrom } = pileScale({ width: 120 }, phone, { mobile: true })
+    expect(120 * pile).toBeCloseTo(375 * 0.48, 0)
+    expect(appearFrom).toBe(0.85)
+    expect(pileScale({ width: 10 }, phone, { mobile: true }).pile).toBe(1.7)
+  })
+
+  it('celular: las fotos de la pila quedan apenas corridas, como un mazo', () => {
+    const centered = [{ left: 137.5, top: 356, width: 100, height: 100 }]
+    const [jittered] = deployOffsets(centered, { width: 375, height: 812 }, { jitter: true })
+    expect(Math.abs(jittered.x)).toBeGreaterThan(0)
+    expect(Math.abs(jittered.x)).toBeLessThan(15)
+  })
+})
