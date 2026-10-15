@@ -26,6 +26,19 @@ export function BloopAgency() {
   return (
     <section id="bloop" className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8 md:py-28">
       <Reveal>
+        {/* Logo de Bloop, tomado de bloop.agency (img/logo.svg, el de su
+            header). Es la variante blanca oficial que usan sobre su fondo
+            negro, así que va tal cual sobre el oscuro de este sitio: sin tile
+            y sin recolorear. alt vacío: el eyebrow de abajo ya dice
+            "Bloop Agency". */}
+        <img
+          src="/logos/bloop.svg"
+          alt=""
+          width={130}
+          height={29}
+          className="mb-6 h-7 w-auto"
+          decoding="async"
+        />
         <SectionHeading eyebrow={eyebrow} title={title} />
       </Reveal>
 
