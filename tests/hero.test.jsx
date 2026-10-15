@@ -107,12 +107,12 @@ describe('Sobre mí — con la cara', () => {
     about.orbit.forEach((word) => expect(hero.chips).not.toContain(word))
   })
 
-  it('los tres puntos 01-03 son ítems reales de una lista', () => {
+  it('los puntos que quedan son ítems reales de una lista', () => {
     render(<About />)
     const beatsList = screen
       .getAllByRole('list')
       .find((ul) => within(ul).queryByText(/Bloop Agency/i))
-    expect(within(beatsList).getAllByRole('listitem')).toHaveLength(3)
+    expect(within(beatsList).getAllByRole('listitem')).toHaveLength(about.beats.length)
   })
 
   it('el apodo es el título de la sección y la lista de instituciones no se repite', () => {

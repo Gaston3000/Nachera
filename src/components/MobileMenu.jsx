@@ -5,13 +5,16 @@ import { MessageIcon, ArrowUpRight } from './primitives/icons.jsx'
 import { siteConfig } from '../data/siteConfig.js'
 
 /* ─── Nav links ─────────────────────────────────────────────── */
+/* En el orden en que aparecen en la página. Formación vive ahora dentro de
+   "Sobre mí", justo después del hero; Herramientas tiene su propia sección
+   (#herramientas) — antes las dos apuntaban a #formacion. */
 const NAV_LINKS = [
   { index: '01', label: 'Inicio',       desc: 'Visión general',        href: '#hero' },
-  { index: '02', label: 'Servicios',    desc: 'Lo que puedo resolver', href: '#soluciones' },
-  { index: '03', label: 'Casos',        desc: 'Resultados y ejemplos', href: '#casos' },
+  { index: '02', label: 'Formación',    desc: 'El camino recorrido',   href: '#formacion' },
+  { index: '03', label: 'Servicios',    desc: 'Lo que puedo resolver', href: '#soluciones' },
   { index: '04', label: 'Proceso',      desc: 'Cómo trabajo',          href: '#proceso' },
-  { index: '05', label: 'Herramientas', desc: 'Stack profesional',     href: '#formacion' },
-  { index: '06', label: 'Formación',    desc: 'Respaldo y criterio',   href: '#formacion' },
+  { index: '05', label: 'Casos',        desc: 'Resultados y ejemplos', href: '#casos' },
+  { index: '06', label: 'Herramientas', desc: 'Stack profesional',     href: '#herramientas' },
   { index: '07', label: 'Contacto',     desc: 'Conversemos',           href: '#contacto' },
 ]
 

@@ -40,68 +40,40 @@ vi.mock('motion/react', () => {
     ),
   }
 })
-
 import { About } from '../src/components/About.jsx'
-import { about } from '../src/data/content.js'
+import { about, certifications } from '../src/data/content.js'
 
-describe('About — credenciales clave', () => {
-  it('renderiza el eyebrow del módulo', () => {
+/* "Sobre mí" es un capítulo completo: título cinético, bio con la cara,
+   Formación (el camino con fechas) y los puntos que quedan. */
+describe('About — Sobre mí', () => {
+  it('la Formación vive acá, con sus 7 títulos', () => {
+    const { container } = render(<About />)
+    const section = container.querySelector('#sobre-mi')
+    expect(within(section).getByText('Formación')).toBeInTheDocument()
+    expect(section.querySelector('#formacion')).not.toBeNull()
+    const timeline = section.querySelector('ol')
+    certifications.forEach((c) => {
+      expect(within(timeline).getByText(c.name)).toBeInTheDocument()
+    })
+  })
+
+  /* Las Credenciales clave repetían cinco de los títulos de Formación; ahora
+     que Formación está en la misma sección, duplicarlas sería evidente. */
+  it('ya no lleva las Credenciales clave', () => {
     render(<About />)
-    expect(screen.getByText('Credenciales clave')).toBeInTheDocument()
+    expect(screen.queryByText(/credenciales clave/i)).toBeNull()
   })
 
-  it('renderiza las 6 credenciales con su micro-línea', () => {
-    const { container } = render(<About />)
-    expect(about.credentials).toHaveLength(6)
-    about.credentials.forEach((cred) => {
-      expect(screen.getByRole('heading', { name: cred.label })).toBeInTheDocument()
-      expect(screen.getByText(cred.micro)).toBeInTheDocument()
-    })
-    expect(container.querySelectorAll('.cred-pillar')).toHaveLength(6)
+  it('el viejo punto 01 se fue: el camino lo cuenta Formación', () => {
+    expect(about.beats).toHaveLength(2)
+    about.beats.forEach((b) => expect(b).not.toMatch(/Vengo del/))
   })
 
-  it('con reduced-motion no hay recorrido de luz', () => {
-    const { container } = render(<About />)
-    expect(container.querySelector('[data-cred-beam]')).toBeNull()
-    // pero las tarjetas siguen ahí y completas
-    expect(container.querySelectorAll('.cred-pillar')).toHaveLength(6)
-  })
-
-  it('con reduced-motion las tarjetas quedan en su estado encendido', () => {
-    const { container } = render(<About />)
-    container.querySelectorAll('.cred-pillar').forEach((card) => {
-      // sin recorrido que las encienda, arrancan ya en el estado final
-      expect(card.style.borderColor).toContain('46%')
-    })
-  })
-
-  /* La regla de la pieza, tras dos intentos descartados: la animación no
-     puede restarle legibilidad a la sección.
-
-     OJO con el alcance de este caso: el mock de motion fuerza
-     `useReducedMotion() === true` y además descarta `style` y `variants`,
-     así que esto verifica la rama de reduced-motion — que es justamente
-     donde el intento anterior dejaba las tarjetas en opacity .42 + blur 3px
-     de forma permanente. La rama animada no se puede cubrir desde jsdom. */
-  it('con reduced-motion las 6 tarjetas se renderizan completas y sin atenuar', () => {
-    const { container } = render(<About />)
-    const cards = container.querySelectorAll('.cred-pillar')
-    expect(cards).toHaveLength(6)
-    cards.forEach((card) => {
-      const wrapper = card.parentElement
-      expect(card.style.filter || '').not.toContain('blur')
-      expect(wrapper.style.filter || '').not.toContain('blur')
-      const opacity = wrapper.style.opacity
-      expect(opacity === '' || Number(opacity) === 1).toBe(true)
-      // el contenido completo, no un esqueleto
-      expect(card.querySelector('h3')).not.toBeNull()
-      expect(card.querySelector('p')).not.toBeNull()
-    })
-  })
-
-  it('muestra el badge C1 en la credencial de inglés', () => {
+  it('los puntos que quedan se numeran desde 01', () => {
     render(<About />)
-    expect(screen.getByText('C1')).toBeInTheDocument()
+    expect(screen.getByText('01')).toBeInTheDocument()
+    expect(screen.getByText('02')).toBeInTheDocument()
+    expect(screen.queryByText('03')).toBeNull()
   })
 
   it('mantiene el ancla de marca: periodismo deportivo se nombra en Sobre mí', () => {

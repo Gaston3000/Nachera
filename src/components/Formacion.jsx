@@ -7,60 +7,24 @@ import {
   useSpring,
   useMotionValueEvent,
 } from 'motion/react'
-import { SectionHeading } from './primitives/SectionHeading.jsx'
 import { Reveal } from './primitives/Reveal.jsx'
-import { Parallax } from './primitives/Parallax.jsx'
-import { ToolsCarousel } from './ToolsCarousel.jsx'
 import { useCanPin } from './solutions/useCanPin.js'
 import { certifications, formationStages } from '../data/content.js'
 
-/* ─── shared constants ───────────────────────────────────────────────────── */
+/* Formación: el recorrido de títulos y certificaciones.
+ *
+ * Vivía en StackFormacion, al fondo del sitio, junto a Herramientas. Se mudó
+ * a "Sobre mí": ahí reemplaza al viejo punto 01 ("Vengo del periodismo y la
+ * comunicación: un camino que…"), que AFIRMABA el camino que este bloque
+ * MUESTRA con fechas. Y reemplaza a las Credenciales clave, que repetían
+ * cinco de estos mismos títulos.
+ *
+ * La lógica es la misma de antes, sin cambios: en escritorio el recorrido
+ * anclado de 2015 a 2025; en celular y tablet (o con reduced-motion) la lista
+ * vertical, de lo más nuevo a lo más viejo.
+ */
 
 const EASE = [0.16, 1, 0.3, 1]
-
-/* ─── Herramientas — carrusel coverflow por área de trabajo ──────────────── */
-
-/* El agrupado de la stack, las bajadas y los íconos viven en
-   ToolsCarousel.jsx: acá queda sólo la ambientación de fondo. */
-function Herramientas({ reduce }) {
-  return (
-    <div className="relative">
-      {/* profundidad: grilla de puntos + glow cyan suave */}
-      <div
-        className="pointer-events-none absolute -inset-x-4 -top-6 -bottom-2 -z-10 rounded-3xl opacity-[0.5]"
-        aria-hidden="true"
-        style={{
-          backgroundImage:
-            'radial-gradient(circle, color-mix(in srgb, var(--c-fg) 13%, transparent) 1px, transparent 1px)',
-          backgroundSize: '22px 22px',
-          maskImage:
-            'radial-gradient(ellipse 78% 70% at 16% 20%, #000 0%, transparent 75%)',
-          WebkitMaskImage:
-            'radial-gradient(ellipse 78% 70% at 16% 20%, #000 0%, transparent 75%)',
-        }}
-      />
-      <div
-        className="pointer-events-none absolute -left-16 -top-10 -z-10 h-64 w-64 rounded-full blur-3xl"
-        aria-hidden="true"
-        style={{
-          background:
-            'radial-gradient(circle, color-mix(in srgb, var(--c-accent) 24%, transparent), transparent 70%)',
-          opacity: 0.22,
-        }}
-      />
-
-      {/* Sin rótulo propio: el bloque va justo debajo del título de la
-          sección ("Las herramientas y el respaldo…"), y "Herramientas / El
-          stack con el que ejecuto" repetía lo mismo. Formación sí conserva el
-          suyo porque arranca después del divisor y ahí hace de cartel.
-          La entrada la maneja Reveal, no el carrusel: las tarjetas ya llegan
-          colocadas y sólo sube el conjunto. */}
-      <Reveal delay={0.06}>
-        <ToolsCarousel reduce={reduce} />
-      </Reveal>
-    </div>
-  )
-}
 
 /* ─── Formación — scroll-illuminated credential timeline (all 7) ──────────── */
 
@@ -180,7 +144,7 @@ function TimelineEntry({ cert, index, total, progress, reduce }) {
   )
 }
 
-function Formacion({ reduce, sectionRef, items }) {
+function FormacionLista({ reduce, sectionRef, items }) {
   // Scroll progress across the whole section so it feels natural on mobile too.
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -324,7 +288,7 @@ function PuntoRecorrido({ cert, index, x, y, alto, posicion, reduce }) {
   )
 }
 
-function FormacionRecorrido({ reduce, items }) {
+function FormacionRecorrido({ reduce, items, bajada }) {
   const pistaRef = useRef(null)
   const [activo, setActivo] = useState(0)
   const n = items.length
@@ -375,7 +339,7 @@ function FormacionRecorrido({ reduce, items }) {
         <p className="font-display text-xs font-semibold uppercase tracking-[0.2em] text-accent">
           Formación
         </p>
-        <p className="text-sm text-muted">Títulos y certificaciones que respaldan el criterio.</p>
+        <p className="text-sm text-muted">{bajada}</p>
 
         {/* ventana: se desvanece en los bordes, así lo que entra y lo que sale
             no aparece cortado de golpe */}
@@ -449,8 +413,6 @@ function FormacionRecorrido({ reduce, items }) {
   )
 }
 
-/* ─── section ────────────────────────────────────────────────────────────── */
-
 /* En celular y tablet, la lista vertical en orden cronológico DESCENDENTE
    (2025 primero, como un CV): los certificados de Google quedan arriba,
    que es lo que pidió el cliente. Orden estable: dentro de 2025 se respeta
@@ -473,72 +435,37 @@ const recorrido = [...certifications]
     }
   })
 
-export function StackFormacion() {
+/* Inglés avanzado (C1) no es una etapa del recorrido ni tiene fecha: va en
+   la bajada del bloque, para que no se pierda ahora que se fueron las
+   Credenciales clave (era el único dato que vivía solo ahí). */
+const BAJADA = 'Títulos y certificaciones que respaldan el criterio. Además, inglés avanzado (C1).'
+
+export function Formacion() {
   const reduce = useReducedMotion()
-  const sectionRef = useRef(null)
+  const blockRef = useRef(null)
   // anclado sólo donde entra (mismo piso que Soluciones) y con motion activo;
   // si no, la lista vertical
   const anclado = useCanPin() && !reduce
 
   return (
-    <section
-      ref={sectionRef}
-      id="formacion"
-      className="relative mx-auto w-full max-w-6xl px-5 py-20 sm:px-8 md:py-28"
-    >
-      {/* decorative parallax glow — drifts independently of content */}
-      <Parallax
-        speed={-40}
-        className="pointer-events-none absolute -right-32 top-1/3 h-80 w-80 rounded-full blur-3xl opacity-[0.12]"
-      >
-        <div
-          className="h-full w-full rounded-full"
-          style={{ background: 'radial-gradient(circle, var(--c-accent2), transparent 70%)' }}
-          aria-hidden="true"
-        />
-      </Parallax>
-
-      <Reveal>
-        <SectionHeading
-          eyebrow="STACK & FORMACIÓN"
-          title="Las herramientas y el respaldo detrás del trabajo."
-        />
-      </Reveal>
-
-      {/* El carrusel necesita ancho completo para que las tarjetas laterales
-          se vayan de perspectiva y sangren en los bordes: por eso los dos
-          bloques quedan apilados y ya no en dos columnas. */}
-      <Herramientas reduce={reduce} />
-
-      {/* misma hairline que separaba las columnas, ahora horizontal */}
-      <div
-        className="my-14 h-px w-full md:my-16"
-        aria-hidden="true"
-        style={{
-          background:
-            'linear-gradient(to right, transparent, var(--c-glass-border) 18%, var(--c-glass-border) 82%, transparent)',
-        }}
-      />
-
+    <div ref={blockRef} id="formacion" className="relative scroll-mt-24">
       {anclado ? (
         /* el encabezado de Formación va adentro del recorrido: tiene que
-           quedarse a la vista mientras la sección está anclada */
-        <FormacionRecorrido reduce={reduce} items={recorrido} />
+           quedarse a la vista mientras el bloque está anclado */
+        <FormacionRecorrido reduce={reduce} items={recorrido} bajada={BAJADA} />
       ) : (
         <>
           <Reveal>
             <p className="mb-1 font-display text-xs font-semibold uppercase tracking-[0.2em] text-accent">
               Formación
             </p>
-            <p className="mb-7 text-sm text-muted">
-              Títulos y certificaciones que respaldan el criterio.
-            </p>
+            <p className="mb-7 text-sm text-muted">{BAJADA}</p>
           </Reveal>
           <div className="max-w-3xl">
-            <Formacion reduce={reduce} sectionRef={sectionRef} items={certificadosRecientesPrimero} />
+            <FormacionLista reduce={reduce} sectionRef={blockRef} items={certificadosRecientesPrimero} />
           </div>
         </>
       )}
-    </section>
+    </div>
   )
 }

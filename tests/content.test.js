@@ -23,26 +23,16 @@ describe('siteConfig', () => {
 })
 
 describe('about', () => {
-  it('has lead, beats and credentials', () => {
+  it('has lead, kinetic title, orbit and beats', () => {
     expect(about.lead).toBeTruthy()
+    expect(about.kinetic.text).toMatch(/me dicen Nachera/i)
+    expect(about.kinetic.text).toContain(about.kinetic.accent)
+    expect(about.orbit.length).toBeGreaterThan(0)
     expect(Array.isArray(about.beats)).toBe(true)
-    expect(about.beats).toHaveLength(3)
-    expect(Array.isArray(about.credentials)).toBe(true)
-    expect(about.credentials).toHaveLength(6)
-    about.credentials.forEach((c) => {
-      expect(c.label).toBeTruthy()
-      expect(c.micro).toBeTruthy()
-      expect(c.icon).toBeTruthy()
-    })
-    // icon keys must map to the known in-house credential icon registry
-    expect(about.credentials.map((c) => c.icon)).toEqual([
-      'diploma',
-      'megaphone',
-      'video',
-      'mic',
-      'chartcheck',
-      'flagen',
-    ])
+    // el viejo punto 01 lo reemplaza el bloque de Formación
+    expect(about.beats).toHaveLength(2)
+    // las Credenciales clave se fueron: las cubre Formación
+    expect(about.credentials).toBeUndefined()
   })
   it('beats contain bold markers', () => {
     about.beats.forEach((b) => expect(b).toMatch(/\*\*.+\*\*/))

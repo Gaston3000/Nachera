@@ -91,61 +91,12 @@ export const about = {
   // presenta a la persona, así que la órbita refuerza el diferencial que
   // CLAUDE.md manda usar de ancla — el oficio de periodista y de radio.
   orbit: ['Periodista', 'Radio', 'Narrativa', 'Cámara', 'Criterio'],
+  // El viejo punto 01 ("Vengo del periodismo y la comunicación: un camino
+  // que me enseñó a…") ya no está: ese camino lo cuenta, con fechas, el
+  // bloque de Formación que ahora vive en Sobre mí.
   beats: [
-    'Vengo del **periodismo y la comunicación**: un camino que me enseñó a **expresarme, perder el miedo y desarrollar mi creatividad** para aplicarla en cada proyecto.',
     'Aplico todo lo que aprendí en el **mundo del marketing digital** para ayudar a las marcas a **crecer con estrategia y comunicación que conecta de verdad**.',
     'Hoy trabajo en **Bloop Agency** y, además, llevo adelante **proyectos propios como freelance** — con la misma dedicación y criterio en cada uno.',
-  ],
-  // ── Credenciales clave ───────────────────────────────────────────────
-  // Las 6 van acá por decisión del cliente. Ojo: 5 de las 6 vuelven a
-  // aparecer, con otro texto, en `certifications` (abajo), que es lo que
-  // renderiza el timeline de StackFormacion cinco secciones más abajo.
-  // Esa repetición es deliberada — este bloque es el resumen que se ve
-  // temprano; el timeline es el detalle con fechas. Si algún día se decide
-  // desduplicar, la salida limpia es agrupar estas 6 en pilares
-  // (categorías de criterio) y dejar los diplomas sueltos sólo abajo.
-  //
-  // El orden importa: es el recorrido del circuito que las cose en
-  // About.jsx (serpentina por filas, en orden de lectura).
-  credentials: [
-    {
-      label: 'Formación universitaria',
-      micro: 'Lic. en Cs. de la Comunicación · UADE',
-      icon: 'diploma',
-      accent: 'accent',
-      verified: true,
-    },
-    {
-      label: 'Marketing Digital',
-      micro: 'Escuela Da Vinci · Buenos Aires',
-      icon: 'megaphone',
-      accent: 'accent2',
-    },
-    {
-      label: 'Edición de video',
-      micro: 'Escuela Da Vinci · formación profesional',
-      icon: 'video',
-      accent: 'accent',
-    },
-    {
-      label: 'Periodismo deportivo',
-      micro: 'Tecnicatura · Deportea',
-      icon: 'mic',
-      accent: 'accent2',
-    },
-    {
-      label: 'Formación en performance',
-      micro: 'Google Ads & Analytics · Skillshop',
-      icon: 'chartcheck',
-      accent: 'accent2',
-    },
-    {
-      label: 'Inglés avanzado',
-      micro: 'Nivel C1',
-      icon: 'flagen',
-      accent: 'accent',
-      badge: 'C1',
-    },
   ],
 }
 
@@ -252,8 +203,7 @@ export const tools = [
    Las bajadas describen el terreno de cada área, NO ofrecen un servicio:
    Ads y SEO figuran como stack y formación, nunca como propuesta comercial.
 
-   `icon` es una clave; el componente la mapea al ícono propio (mismo patrón
-   que `about.credentials`). */
+   `icon` es una clave; el componente la mapea al ícono propio. */
 export const toolCategories = [
   {
     label: 'Ads & Performance',

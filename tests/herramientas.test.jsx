@@ -38,26 +38,28 @@ vi.mock('motion/react', () => {
   }
 })
 
-import { StackFormacion } from '../src/components/StackFormacion.jsx'
-import { certifications, tools } from '../src/data/content.js'
+import { Herramientas } from '../src/components/Herramientas.jsx'
+import { tools } from '../src/data/content.js'
 
-describe('StackFormacion', () => {
-  it('renders the formacion section anchor', () => {
-    const { container } = render(<StackFormacion />)
-    expect(container.querySelector('#formacion')).not.toBeNull()
+/* La sección de abajo quedó sólo con Herramientas: la Formación se mudó a
+   "Sobre mí" (ver formacion.test.jsx). */
+describe('Herramientas', () => {
+  it('tiene su propio ancla, separada de la de Formación', () => {
+    const { container } = render(<Herramientas />)
+    expect(container.querySelector('#herramientas')).not.toBeNull()
+    expect(container.querySelector('#formacion')).toBeNull()
   })
 
-  it('renders the section heading', () => {
-    render(<StackFormacion />)
+  it('el título ya no promete un "respaldo" que se fue de la sección', () => {
+    render(<Herramientas />)
     expect(
-      screen.getByRole('heading', {
-        name: /Las herramientas y el respaldo detrás del trabajo\./i,
-      })
+      screen.getByRole('heading', { name: /Las herramientas detrás del trabajo\./i })
     ).toBeInTheDocument()
+    expect(screen.queryByText(/respaldo/i)).toBeNull()
   })
 
   it('renders all 5 tool category labels', () => {
-    render(<StackFormacion />)
+    render(<Herramientas />)
     ;[
       'Ads & Performance',
       'Analítica & SEO',
@@ -70,26 +72,12 @@ describe('StackFormacion', () => {
   })
 
   it('keeps every tool from content.js visible in the stack block', () => {
-    const { container } = render(<StackFormacion />)
-    // Se busca dentro de las tarjetas del stack: algunos nombres (p. ej.
-    // "Google Analytics") también son certificaciones reales del timeline.
+    const { container } = render(<Herramientas />)
     const cards = Array.from(container.querySelectorAll('.tool-card'))
     expect(cards.length).toBeGreaterThan(0)
     const stackText = cards.map((el) => el.textContent).join(' | ')
     tools.forEach((t) => {
       expect(stackText, `falta "${t}"`).toContain(t)
-    })
-  })
-
-  it('renders all 7 certification names in the timeline (full, not just 3)', () => {
-    const { container } = render(<StackFormacion />)
-    expect(certifications).toHaveLength(7)
-    // Cert names are looked up inside the credential timeline (<ol>) because
-    // some labels (e.g. "Google Ads") also legitimately appear as tool pills.
-    const timeline = container.querySelector('ol')
-    expect(timeline).not.toBeNull()
-    certifications.forEach((c) => {
-      expect(within(timeline).getByText(c.name)).toBeInTheDocument()
     })
   })
 })

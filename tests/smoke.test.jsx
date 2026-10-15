@@ -55,7 +55,7 @@ describe('App smoke', () => {
   })
 
   it('renders all required section anchors', () => {
-    ;['hero', 'sobre-mi', 'soluciones', 'proceso', 'casos', 'formacion', 'contacto'].forEach(
+    ;['hero', 'sobre-mi', 'formacion', 'soluciones', 'proceso', 'casos', 'herramientas', 'contacto'].forEach(
       (id) => {
         expect(document.getElementById(id), `#${id} missing`).not.toBeNull()
       }
