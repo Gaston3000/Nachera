@@ -1358,7 +1358,7 @@ export function Solutions() {
         </Parallax>
       </div>
       <Reveal>
-        <SectionHeading eyebrow="SOLUCIONES" title="Lo que puedo resolver por tu marca." />
+        <SectionHeading eyebrow="SOLUCIONES" title="Lo que puedo resolver por tu marca." wide eyebrowLarge />
       </Reveal>
       {pinned ? (
         <SolutionsScroll panels={panels} DetailBlock={DetailBlock} />
