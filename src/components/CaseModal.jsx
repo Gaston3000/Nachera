@@ -154,7 +154,7 @@ export function CaseModal({ caseData, onClose }) {
     >
       <MotionDiv
         {...animProps}
-        className="relative flex max-h-[88vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-glassborder bg-bg2 shadow-[0_32px_80px_-16px_rgba(0,0,0,0.6)]"
+        className="relative flex max-h-[88vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-glassborder bg-bg2 shadow-[0_32px_80px_-16px_rgba(0,0,0,0.6)]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* close button — stays fixed over the scrolling content */}
