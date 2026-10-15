@@ -1,6 +1,5 @@
 import { motion, useReducedMotion } from 'motion/react'
 import { Reveal } from './primitives/Reveal.jsx'
-import { SectionHeading } from './primitives/SectionHeading.jsx'
 import { GlassPanel } from './primitives/GlassPanel.jsx'
 import { RichText } from './primitives/RichText.jsx'
 import { bloopAgency } from '../data/content.js'
@@ -39,7 +38,16 @@ export function BloopAgency() {
           className="mb-6 h-7 w-auto"
           decoding="async"
         />
-        <SectionHeading eyebrow={eyebrow} title={title} />
+        {/* Sin título visible: con el logo arriba y el eyebrow "Bloop Agency",
+            "Lo que hago en Bloop Agency" repetía la marca por tercera vez.
+            El h2 queda para lectores de pantalla — si no, la sección no
+            tiene encabezado en el esquema del documento. */}
+        <div className="mb-12">
+          <p className="font-display text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+            {eyebrow}
+          </p>
+          <h2 className="sr-only">{title}</h2>
+        </div>
       </Reveal>
 
       {/* Intro — texto hasta el margen (sin max-w interno) */}
