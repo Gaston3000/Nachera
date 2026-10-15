@@ -520,7 +520,7 @@ export function About() {
             />
             <div className="flex min-w-0 flex-col gap-8 md:gap-10">
               <Reveal>
-                <p className="mb-3 font-display text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+                <p className="mb-4 font-display text-sm font-semibold uppercase tracking-[0.2em] text-accent md:text-base">
                   Sobre mí
                 </p>
                 <h2 className="font-display text-3xl font-bold leading-[1.1] tracking-tight text-fg sm:text-4xl md:text-[2.5rem] lg:text-5xl">

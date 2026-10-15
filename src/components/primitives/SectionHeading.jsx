@@ -4,22 +4,19 @@
    títulos largos corten en dos renglones parejos). Soluciones lo usa porque
    su título entra en un solo renglón en escritorio y así se lee de un saque.
 
-   `eyebrowLarge` agranda el eyebrow. Por defecto queda chico, como en el
-   resto del sitio.
+   El eyebrow de sección va en 14/16px. A 12px y con ese espaciado ancho casi
+   no se leía. Los rótulos INTERNOS de una sección (Formación, Cuentas, El
+   desafío…) quedan chicos a propósito: si fueran iguales se perdería la
+   jerarquía entre la sección y sus partes. "Sobre mí" y Bloop arman su
+   eyebrow a mano y usan esta misma talla.
 
    Clases literales y completas: Tailwind extrae leyendo el código como
    texto, y una clase armada por partes no se genera. */
-export function SectionHeading({ eyebrow, title, className = '', wide = false, eyebrowLarge = false }) {
+export function SectionHeading({ eyebrow, title, className = '', wide = false }) {
   return (
     <div className={`mb-12 ${className}`}>
       {eyebrow && (
-        <p
-          className={
-            eyebrowLarge
-              ? 'mb-4 font-display text-sm font-semibold uppercase tracking-[0.2em] text-accent md:text-base'
-              : 'mb-3 font-display text-xs font-semibold uppercase tracking-[0.2em] text-accent'
-          }
-        >
+        <p className="mb-4 font-display text-sm font-semibold uppercase tracking-[0.2em] text-accent md:text-base">
           {eyebrow}
         </p>
       )}

@@ -43,7 +43,7 @@ export function BloopAgency() {
             El h2 queda para lectores de pantalla — si no, la sección no
             tiene encabezado en el esquema del documento. */}
         <div className="mb-12">
-          <p className="font-display text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+          <p className="font-display text-sm font-semibold uppercase tracking-[0.2em] text-accent md:text-base">
             {eyebrow}
           </p>
           <h2 className="sr-only">{title}</h2>
