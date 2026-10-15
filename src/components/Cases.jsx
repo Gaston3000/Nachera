@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { SectionHeading } from './primitives/SectionHeading.jsx'
 import { Reveal } from './primitives/Reveal.jsx'
-import { Parallax } from './primitives/Parallax.jsx'
 import { CaseModal } from './CaseModal.jsx'
 import { CaseCover } from './cases/CaseCover.jsx'
 import { brandInk, brandPanel } from './cases/brand.js'
@@ -100,14 +99,6 @@ export function Cases() {
 
   return (
     <section id="casos" className="relative mx-auto w-full max-w-6xl overflow-hidden px-5 py-20 sm:px-8 md:py-28">
-      {/* depth glow drifts at a different rate than content */}
-      <Parallax speed={30} className="pointer-events-none absolute -left-40 top-1/4 h-80 w-80 rounded-full blur-3xl opacity-15">
-        <div
-          className="h-full w-full rounded-full"
-          style={{ background: 'radial-gradient(circle, var(--c-accent), transparent 70%)' }}
-          aria-hidden="true"
-        />
-      </Parallax>
       <Reveal>
         <SectionHeading eyebrow="CASOS" title="Lo que hice por ellos." />
       </Reveal>
