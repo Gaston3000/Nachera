@@ -74,7 +74,7 @@ export function Herramientas() {
       </Parallax>
 
       <Reveal>
-        <SectionHeading eyebrow="HERRAMIENTAS" title="Las herramientas detrás del trabajo." />
+        <SectionHeading eyebrow="HERRAMIENTAS" title="Las herramientas detrás del trabajo." wide />
       </Reveal>
 
       <HerramientasCarrusel reduce={reduce} />

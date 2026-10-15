@@ -1,8 +1,9 @@
 /* Encabezado de sección: eyebrow + título.
 
    `wide` le saca el ancho máximo al título (por defecto 768px, para que los
-   títulos largos corten en dos renglones parejos). Soluciones lo usa porque
-   su título entra en un solo renglón en escritorio y así se lee de un saque.
+   títulos largos corten en dos renglones parejos). Soluciones y Herramientas
+   lo usan porque su título entra en un solo renglón en escritorio y así se
+   lee de un saque.
 
    El eyebrow de sección va en 14/16px. A 12px y con ese espaciado ancho casi
    no se leía. Los rótulos INTERNOS de una sección (Formación, Cuentas, El
