@@ -296,7 +296,10 @@ export const toolCategories = [
 // las cuentas, en el panel que abre el botón.
 export const bloopAgency = {
   // El titular va en renglones: cada uno sube desde su máscara al entrar.
-  titleLines: ['Hoy, parte del equipo', 'de Bloop Agency.'],
+  // El último cierra con el logo de Bloop (BloopAgency.jsx), que el lector
+  // de pantalla lee como `titleLogoAlt`: "…de Bloop Agency."
+  titleLines: ['Hoy, parte del equipo', 'de'],
+  titleLogoAlt: 'Bloop Agency',
   // Párrafos 1 y 2 del Word: estrategia de contenido, planificación y copy
   // para distintas marcas, en conjunto con diseño, contenido y paid media.
   lead: 'Estrategia de contenido, planificación y copy para las marcas del estudio, codo a codo con diseño y paid media.',

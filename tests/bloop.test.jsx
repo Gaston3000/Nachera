@@ -74,10 +74,15 @@ describe('Bloop — la franja', () => {
     expect(mark).toHaveAttribute('alt', '')
   })
 
-  it('con reduced-motion el wordmark no se desliza: queda quieto y centrado', () => {
+  it('con reduced-motion el wordmark no se desliza', () => {
     const { container } = render(<BloopAgency />)
-    expect(container.querySelector('section#bloop')).toHaveClass('bloop-band--static')
     expect(container.querySelector('.bloop-band__mark').getAttribute('style')).toBeNull()
+  })
+
+  it('el titular cierra con el logo de Bloop, que se lee como "Bloop Agency"', () => {
+    render(<BloopAgency />)
+    const heading = screen.getByRole('heading', { level: 2 })
+    expect(within(heading).getByRole('img', { name: 'Bloop Agency' })).toBeInTheDocument()
   })
 
   it('el ancla #bloop sigue existiendo', () => {

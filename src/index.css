@@ -1122,30 +1122,34 @@
 }
 
 /* ── Bloop: la franja de color ─────────────────────────────────────────────
-   El wordmark gigante asoma por el borde de abajo, cortado, y es MÁS ANCHO
-   que la pantalla: con el scroll se desliza de costado y recorre lo que le
-   sobra (BloopAgency.jsx), como el OKAYDEV de la franja social de okaydev.co.
-   Su ancho manda: el alto del logo es el 22,36 % del ancho (130 × 29), y de
-   ese alto se ve el 55 %. El padding de abajo de la franja sale del mismo
-   número, así el botón nunca queda encima del wordmark, mida lo que mida la
-   pantalla. */
+   El wordmark grande asoma por el borde de abajo y se desliza de costado con
+   el scroll (BloopAgency.jsx), como el OKAYDEV de la franja social de
+   okaydev.co. Va casi a lo ancho y cortado solo en su último 20 %: más
+   grande, o más cortado, dejaba de leerse y era una textura. Su ancho manda:
+   el alto del logo es el 22,36 % del ancho (130 × 29). El padding de abajo
+   de la franja sale del mismo número, así el botón nunca queda encima del
+   wordmark, mida lo que mida la pantalla. */
 .bloop-band {
-  --mark-w: 135vw;
-  padding-bottom: calc(var(--mark-w) * 0.2236 * 0.55 + clamp(3rem, 6vw, 5rem));
+  --mark-w: 92vw;
+  padding-bottom: calc(var(--mark-w) * 0.2236 * 0.8 + clamp(3rem, 6vw, 5rem));
 }
 .bloop-band__mark {
   width: var(--mark-w);
   max-width: none;
   /* translate (la propiedad) y no transform: transform lo escribe el
      deslizamiento. */
-  translate: 0 45%;
-  opacity: 0.3;
+  translate: -50% 20%;
+  opacity: 0.34;
 }
-/* Reduced-motion: no se desliza. Entra entero a lo ancho, centrado. */
-.bloop-band--static {
-  --mark-w: min(94vw, 80rem);
-}
-.bloop-band--static .bloop-band__mark {
-  left: 50%;
-  translate: -50% 45%;
+
+/* El logo de Bloop dentro del titular: el SVG oficial como máscara, pintado
+   con el color del texto. Alto de mayúscula, así se apoya en el renglón
+   como una palabra más. */
+.bloop-title-logo {
+  display: inline-block;
+  height: 0.74em;
+  width: calc(0.74em * 130 / 29);
+  background-color: currentColor;
+  -webkit-mask: url('/logos/bloop.svg') no-repeat center / contain;
+  mask: url('/logos/bloop.svg') no-repeat center / contain;
 }

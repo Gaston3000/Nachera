@@ -1,4 +1,4 @@
-import { Fragment, useLayoutEffect, useRef, useState } from 'react'
+import { Fragment, useRef, useState } from 'react'
 import { motion, useReducedMotion, useScroll, useSpring, useTransform } from 'motion/react'
 import { Button } from './primitives/Button.jsx'
 import { ArrowRight } from './primitives/icons.jsx'
@@ -27,38 +27,23 @@ const EASE = [0.16, 1, 0.3, 1]
  * hago EN Bloop".
  */
 export function BloopAgency() {
-  const { titleLines, lead, tagline, cta } = bloopAgency
+  const { titleLines, titleLogoAlt, lead, tagline, cta } = bloopAgency
   const reduce = useReducedMotion()
   const [open, setOpen] = useState(false)
   const sectionRef = useRef(null)
-  const markRef = useRef(null)
-  // Cuánto le sobra al wordmark respecto de la franja (px). Se mide, y se
-  // vuelve a medir con cada resize: el recorrido es exactamente lo que
-  // sobra, así llega a la otra punta y no se pasa.
-  const overflowRef = useRef(0)
-
-  useLayoutEffect(() => {
-    if (reduce) return undefined
-    const measure = () => {
-      const section = sectionRef.current
-      const mark = markRef.current
-      if (section && mark) overflowRef.current = Math.max(0, mark.offsetWidth - section.offsetWidth)
-    }
-    measure()
-    window.addEventListener('resize', measure)
-    return () => window.removeEventListener('resize', measure)
-  }, [reduce])
 
   // El wordmark se desliza de costado mientras la franja cruza la pantalla,
   // como el OKAYDEV de la referencia: desde que asoma por abajo hasta que se
-  // va por arriba, recorre todo lo que le sobra. El resorte es el `scrub`
-  // de okaydev: lo sigue con un arrastre corto, no pegado al dedo.
+  // va por arriba. En okaydev desborda la pantalla y recorre lo que le
+  // sobra; acá va casi a lo ancho para que se LEA, y el recorrido es de
+  // +9vw a −9vw: a mitad de camino queda centrado y entero. El resorte es el
+  // `scrub` de okaydev: lo sigue con un arrastre corto, no pegado al dedo.
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ['start end', 'end start'],
   })
   const smooth = useSpring(scrollYProgress, { stiffness: 140, damping: 30, mass: 0.6 })
-  const markX = useTransform(smooth, (p) => -p * overflowRef.current)
+  const markX = useTransform(smooth, [0, 1], ['9vw', '-9vw'])
 
   // Lo que entra después del titular: sube apenas y aparece, en orden.
   const rise = (delay) =>
@@ -76,7 +61,7 @@ export function BloopAgency() {
       <section
         id="bloop"
         ref={sectionRef}
-        className={`bloop-band relative isolate overflow-hidden ${reduce ? 'bloop-band--static' : ''}`}
+        className="bloop-band relative isolate overflow-hidden"
         style={{ background: BLOOP.color, color: BLOOP.ink }}
       >
         <div className="relative z-10 mx-auto flex max-w-4xl flex-col items-center px-5 pt-24 text-center sm:px-8 md:pt-32">
@@ -115,6 +100,19 @@ export function BloopAgency() {
                     }}
                   >
                     {line}
+                    {/* El último renglón cierra con el logo de Bloop, en la tinta
+                        de la franja: la marca se lee donde se lee todo. Es una
+                        máscara del SVG oficial pintada con currentColor, así
+                        toma el color exacto del texto y escala con la letra. */}
+                    {i === titleLines.length - 1 && (
+                      <>
+                        {' '}
+                        <span className="whitespace-nowrap">
+                          <span role="img" aria-label={titleLogoAlt} className="bloop-title-logo" />
+                          .
+                        </span>
+                      </>
+                    )}
                   </motion.span>
                 </span>
               </Fragment>
@@ -152,14 +150,13 @@ export function BloopAgency() {
           titular. Decorativo: la marca ya la dice el titular. Con
           reduced-motion no se desliza: queda quieto y entero a lo ancho. */}
         <motion.img
-          ref={markRef}
           src="/logos/bloop.svg"
           alt=""
           aria-hidden="true"
           width={130}
           height={29}
           decoding="async"
-          className="bloop-band__mark pointer-events-none absolute bottom-0 left-0 select-none"
+          className="bloop-band__mark pointer-events-none absolute bottom-0 left-1/2 select-none"
           style={reduce ? undefined : { x: markX }}
         />
       </section>
