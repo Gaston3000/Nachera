@@ -140,35 +140,104 @@ function PlusIcon({ className = '' }) {
   )
 }
 
-/* Portada (el dibujo), título, una frase y "Qué resuelve". El dibujo corre
-   su animación la primera vez que la tarjeta entra en pantalla (`seen`), no
-   antes: los seis a la vez se pisarían.
-
-   "Qué resuelve" abre un panel que sube como cortina sobre la tarjeta
-   (clip-path, en 2D: un giro 3D de tarjeta falla en Safari de iOS). El foco
-   va al "Volver" del panel y, al cerrar, vuelve al botón. */
-function ServiceCard({ s, seen, open, onToggle, vizVariants, reduce, cursor, className = '' }) {
+/* El foco entre el botón que abre "Qué resuelve" y el "Volver" del panel:
+   al abrir va a "Volver"; al cerrar, vuelve al botón. */
+function useFocusSwap(open) {
   const toggleRef = useRef(null)
   const closeRef = useRef(null)
   const wasOpen = useRef(open)
-  const panelId = `resuelve-${s.id}`
-  const { Viz } = s
-
   useEffect(() => {
     if (open) closeRef.current?.focus({ preventScroll: true })
     else if (wasOpen.current) toggleRef.current?.focus({ preventScroll: true })
     wasOpen.current = open
   }, [open])
+  return { toggleRef, closeRef }
+}
+
+/* El dibujo de un servicio. Corre su animación la primera vez que la
+   tarjeta entra en pantalla (`seen`), no antes: los seis a la vez se
+   pisarían. */
+function CardViz({ s, seen, reduce, vizVariants, className = '' }) {
+  const { Viz } = s
+  return (
+    <motion.div
+      className={`relative ${s.cover} [&>*]:w-full ${className}`}
+      initial={reduce ? false : 'hidden'}
+      animate={seen || reduce ? 'show' : 'hidden'}
+      variants={vizVariants}
+    >
+      <Viz inView={seen || reduce} />
+    </motion.div>
+  )
+}
+
+/* "Qué resuelve": un panel que sube como cortina sobre la tarjeta
+   (clip-path, en 2D: un giro 3D de tarjeta falla en Safari de iOS). Tres
+   renglones — el problema, lo que hago, en qué queda — y el WhatsApp con el
+   servicio ya nombrado. Lo comparten las dos tarjetas. */
+function ResolvePanel({ s, id, onClose, closeRef, reduce }) {
+  return (
+    <motion.div
+      id={id}
+      role="region"
+      aria-label={`Qué resuelve: ${s.title}`}
+      className="service-panel absolute inset-0 z-10 flex flex-col p-6"
+      style={{
+        background: `radial-gradient(90% 70% at 100% 0%, color-mix(in srgb, ${s.glow} 18%, transparent), transparent 70%), var(--c-bg2)`,
+      }}
+      onKeyDown={(e) => {
+        if (e.key === 'Escape') onClose()
+      }}
+      {...(reduce
+        ? {}
+        : {
+            initial: { clipPath: 'inset(100% 0% 0% 0%)' },
+            animate: { clipPath: 'inset(0% 0% 0% 0%)', transition: { duration: 0.55, ease: EASE } },
+            exit: { clipPath: 'inset(100% 0% 0% 0%)', transition: { duration: 0.35, ease: EASE } },
+          })}
+    >
+      <div className="flex items-start justify-between gap-4">
+        <p className="font-display text-sm font-semibold text-fg/55">{s.title}</p>
+        <button
+          ref={closeRef}
+          type="button"
+          onClick={onClose}
+          aria-label="Volver"
+          className="-mr-2 -mt-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-fg/70 transition-colors hover:text-fg focus-visible:outline-2 focus-visible:outline-accent"
+        >
+          <PlusIcon className="h-4 w-4 rotate-45" />
+        </button>
+      </div>
+
+      <div className="mt-4 space-y-3">
+        <p className="text-lg leading-snug text-muted">{s.resuelve[0]}</p>
+        <p className="font-display text-xl font-semibold leading-snug text-fg">{s.resuelve[1]}</p>
+        <p className="text-lg leading-snug text-fg/85">{s.resuelve[2]}</p>
+      </div>
+
+      <div className="mt-auto pt-6">
+        <Button href={whatsappWith(waMessage(s.waTopic))} target="_blank" rel="noopener" icon={<MessageIcon />}>
+          Quiero esto para mi marca
+        </Button>
+      </div>
+    </motion.div>
+  )
+}
+
+/* Escritorio: portada (el dibujo), título, una frase y el botón "Qué
+   resuelve". El clic sobre el dibujo también abre (con mouse, el cursor lo
+   anuncia); el control accesible es el botón. */
+function ServiceCard({ s, seen, open, onToggle, vizVariants, reduce, cursor, className = '' }) {
+  const { toggleRef, closeRef } = useFocusSwap(open)
+  const panelId = `resuelve-${s.id}`
 
   return (
     <article
       data-service={s.id}
       className={`service-card relative flex shrink-0 flex-col overflow-hidden rounded-[1.75rem] ${className}`}
     >
-      {/* La portada. El clic sobre el dibujo también abre (con mouse, el
-          cursor lo anuncia); el control accesible es el botón de abajo. */}
       <div
-        className="relative flex min-h-[11rem] flex-1 cursor-pointer items-center justify-center overflow-hidden lg:min-h-[13rem]"
+        className="relative flex min-h-[13rem] flex-1 cursor-pointer items-center justify-center overflow-hidden"
         onClick={() => onToggle(true)}
         onPointerEnter={cursor?.show}
         onPointerMove={cursor?.move}
@@ -181,14 +250,7 @@ function ServiceCard({ s, seen, open, onToggle, vizVariants, reduce, cursor, cla
             background: `radial-gradient(70% 60% at 50% 55%, color-mix(in srgb, ${s.glow} 16%, transparent), transparent 75%)`,
           }}
         />
-        <motion.div
-          className={`relative ${s.cover} [&>*]:w-full`}
-          initial={reduce ? false : 'hidden'}
-          animate={seen || reduce ? 'show' : 'hidden'}
-          variants={vizVariants}
-        >
-          <Viz inView={seen || reduce} />
-        </motion.div>
+        <CardViz s={s} seen={seen} reduce={reduce} vizVariants={vizVariants} />
       </div>
 
       <div className="relative px-6 pb-6 pt-1">
@@ -220,56 +282,85 @@ function ServiceCard({ s, seen, open, onToggle, vizVariants, reduce, cursor, cla
 
       <AnimatePresence>
         {open && (
-          <motion.div
-            id={panelId}
-            role="region"
-            aria-label={`Qué resuelve: ${s.title}`}
-            className="service-panel absolute inset-0 z-10 flex flex-col p-6"
-            style={{
-              background: `radial-gradient(90% 70% at 100% 0%, color-mix(in srgb, ${s.glow} 18%, transparent), transparent 70%), var(--c-bg2)`,
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Escape') onToggle(false)
-            }}
-            {...(reduce
-              ? {}
-              : {
-                  initial: { clipPath: 'inset(100% 0% 0% 0%)' },
-                  animate: { clipPath: 'inset(0% 0% 0% 0%)', transition: { duration: 0.55, ease: EASE } },
-                  exit: { clipPath: 'inset(100% 0% 0% 0%)', transition: { duration: 0.35, ease: EASE } },
-                })}
-          >
-            <div className="flex items-start justify-between gap-4">
-              <p className="font-display text-sm font-semibold text-fg/55">{s.title}</p>
-              <button
-                ref={closeRef}
-                type="button"
-                onClick={() => onToggle(false)}
-                aria-label="Volver"
-                className="-mr-2 -mt-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-fg/70 transition-colors hover:text-fg focus-visible:outline-2 focus-visible:outline-accent"
-              >
-                <PlusIcon className="h-4 w-4 rotate-45" />
-              </button>
-            </div>
+          <ResolvePanel s={s} id={panelId} onClose={() => onToggle(false)} closeRef={closeRef} reduce={reduce} />
+        )}
+      </AnimatePresence>
+    </article>
+  )
+}
 
-            {/* Tres renglones: el problema, lo que hago, en qué queda. */}
-            <div className="mt-4 space-y-3">
-              <p className="text-lg leading-snug text-muted">{s.resuelve[0]}</p>
-              <p className="font-display text-xl font-semibold leading-snug text-fg">{s.resuelve[1]}</p>
-              <p className="text-lg leading-snug text-fg/85">{s.resuelve[2]}</p>
-            </div>
+/* Celular: la tarjeta como afiche, tomada de las de mkvision. El dibujo es
+   la "foto" y ocupa la tarjeta entera, sobre un fondo teñido con el color
+   del servicio; abajo, un degradé oscuro y encima el título y lo que
+   incluye, en pastillas de borde fino. Toda la tarjeta se toca para abrir
+   "Qué resuelve" (el botón se estira sobre ella); el "+" de la esquina es
+   la seña de que se abre. */
+function PosterCard({ s, seen, open, onToggle, vizVariants, reduce, className = '' }) {
+  const { toggleRef, closeRef } = useFocusSwap(open)
+  const panelId = `resuelve-${s.id}`
 
-            <div className="mt-auto pt-6">
-              <Button
-                href={whatsappWith(waMessage(s.waTopic))}
-                target="_blank"
-                rel="noopener"
-                icon={<MessageIcon />}
-              >
-                Quiero esto para mi marca
-              </Button>
-            </div>
-          </motion.div>
+  return (
+    <article
+      data-service={s.id}
+      className={`service-poster relative shrink-0 overflow-hidden rounded-[1.25rem] ${className}`}
+      style={{
+        background: `radial-gradient(85% 55% at 50% 30%, color-mix(in srgb, ${s.glow} 26%, transparent), transparent 72%), linear-gradient(180deg, color-mix(in srgb, ${s.glow} 9%, var(--c-bg2)), var(--c-bg2) 70%)`,
+      }}
+    >
+      {/* La foto: el dibujo, grande, en los dos tercios de arriba — desde
+          abajo del "+", para que no se le encime. */}
+      <div aria-hidden="true" className="absolute inset-x-0 top-0 flex h-[68%] items-center justify-center pt-14">
+        <CardViz s={s} seen={seen} reduce={reduce} vizVariants={vizVariants} className="scale-[1.1]" />
+      </div>
+
+      {/* El degradé de mkvision: transparente arriba, oscuro abajo, para que
+          el título se lea siempre. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            'linear-gradient(180deg, transparent 42%, color-mix(in srgb, var(--c-bg) 78%, transparent) 70%, var(--c-bg) 100%)',
+        }}
+      />
+
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 p-5">
+        <h3 className="font-display text-[1.6rem] font-semibold leading-[1.1] tracking-tight text-fg">
+          {s.title}
+        </h3>
+        <p className="mt-3 flex flex-wrap gap-1.5">
+          {s.tags.map((t) => (
+            <span
+              key={t}
+              className="inline-flex h-8 items-center rounded-full border border-white/25 px-3 text-[0.8rem] font-medium text-fg/90"
+            >
+              {t}
+            </span>
+          ))}
+        </p>
+      </div>
+
+      {/* El botón se estira sobre la tarjeta entera; su nombre dice qué hace. */}
+      <button
+        ref={toggleRef}
+        type="button"
+        aria-expanded={open}
+        aria-controls={panelId}
+        aria-label={`Qué resuelve: ${s.title}`}
+        onClick={() => onToggle(!open)}
+        className="absolute inset-0 z-[1] rounded-[1.25rem] transition-colors active:bg-white/[0.03] focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-accent"
+      >
+        <span
+          aria-hidden="true"
+          className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full border border-white/25 text-fg"
+        >
+          <PlusIcon className="h-4 w-4" />
+        </span>
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <ResolvePanel s={s} id={panelId} onClose={() => onToggle(false)} closeRef={closeRef} reduce={reduce} />
         )}
       </AnimatePresence>
     </article>
@@ -505,16 +596,20 @@ function SwipeTrack({ services, vizVariants, reduce, openId, setOpenId }) {
     el.scrollTo?.({ left: card.offsetLeft - pad, behavior: reduce ? 'auto' : 'smooth' })
   }
 
-  const size = 'min-h-[27rem] w-[85vw] max-w-[23rem] snap-start'
+  const size = 'h-[27rem] w-[85vw] max-w-[23rem] snap-start'
 
   return (
     <div className="py-16 md:py-28">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
+        {/* Dos renglones fijos: "Lo que puedo hacer" / "por tu marca.". El
+            tamaño sale del ancho para que el primero entre entero hasta en
+            un teléfono de 320px. */}
         <h2
           id="soluciones-title"
-          className="text-balance font-display text-[clamp(2.4rem,1.6rem+3.6vw,3.5rem)] font-bold leading-[1.02] tracking-tight text-fg"
+          className="font-display text-[clamp(1.75rem,8.4vw,3.5rem)] font-bold leading-[1.04] tracking-tight text-fg"
         >
-          Lo que puedo hacer por tu marca.
+          <span className="block whitespace-nowrap">Lo que puedo hacer</span>{' '}
+          <span className="block whitespace-nowrap">por tu marca.</span>
         </h2>
       </div>
       <div
@@ -524,7 +619,7 @@ function SwipeTrack({ services, vizVariants, reduce, openId, setOpenId }) {
       >
         <IndexCard services={services} onJump={jump} className={size} />
         {services.map((s, i) => (
-          <ServiceCard
+          <PosterCard
             key={s.id}
             s={s}
             seen={seen[i]}
@@ -532,7 +627,7 @@ function SwipeTrack({ services, vizVariants, reduce, openId, setOpenId }) {
             onToggle={(v) => setOpenId(v ? s.id : null)}
             vizVariants={vizVariants}
             reduce={reduce}
-            className={s.wide ? 'min-h-[27rem] w-[85vw] max-w-[30rem] snap-start' : size}
+            className={size}
           />
         ))}
         <ClosingCard className={size} />
@@ -562,7 +657,7 @@ function IndexCard({ services, onJump, className = '' }) {
   return (
     <nav
       aria-label="Servicios"
-      className={`flex shrink-0 flex-col rounded-[1.75rem] p-6 ${className}`}
+      className={`flex shrink-0 flex-col rounded-[1.25rem] p-6 ${className}`}
       style={{ background: 'var(--c-fg)', color: 'var(--c-bg)' }}
     >
       <p className="font-display text-lg font-semibold leading-tight">Elegí por dónde empezar</p>
@@ -592,7 +687,7 @@ function IndexCard({ services, onJump, className = '' }) {
 function ClosingCard({ className = '' }) {
   return (
     <div
-      className={`service-card flex shrink-0 flex-col justify-between rounded-[1.75rem] p-6 ${className}`}
+      className={`service-card flex shrink-0 flex-col justify-between rounded-[1.25rem] p-6 ${className}`}
       style={{
         background:
           'radial-gradient(90% 70% at 100% 0%, color-mix(in srgb, var(--c-accent) 22%, transparent), transparent 70%), var(--c-bg2)',

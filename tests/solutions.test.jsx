@@ -95,6 +95,21 @@ describe('Soluciones — la tira de servicios', () => {
     expect(within(last).getByRole('link', { name: /Escribirme por WhatsApp/ }).getAttribute('href')).toContain('wa.me')
   })
 
+  /* La tarjeta afiche (celular): el dibujo de foto, el título y lo que
+     incluye en pastillas; toda la tarjeta abre "Qué resuelve". */
+  it('cada tarjeta muestra lo que incluye y se abre entera', () => {
+    render(<Solutions />)
+    const prod = card('Producción y edición')
+    ;['Reels', 'Video', 'Placas', 'Carruseles'].forEach((t) => expect(within(prod).getByText(t)).toBeInTheDocument())
+    expect(toggleOf('Producción y edición')).toHaveAccessibleName('Qué resuelve: Producción y edición')
+  })
+
+  it('el título va en dos renglones fijos', () => {
+    render(<Solutions />)
+    const lines = [...screen.getByRole('heading', { level: 2 }).children].map((el) => el.textContent)
+    expect(lines).toEqual(['Lo que puedo hacer', 'por tu marca.'])
+  })
+
   it('ya no usa los rótulos en mayúsculas Resuelve / Entrega / Resultado', () => {
     render(<Solutions />)
     ;[/^Resuelve$/i, /^Entrega$/i, /^Resultado$/i].forEach((r) => expect(screen.queryByText(r)).toBeNull())

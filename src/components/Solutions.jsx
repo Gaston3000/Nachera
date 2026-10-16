@@ -919,6 +919,9 @@ function WebViz() {
                  hago, y en qué queda la marca.
    - `waTopic`   cómo se nombra el servicio en el mensaje de WhatsApp que
                  arma "Quiero esto para mi marca".
+   - `tags`      qué incluye, en pastillas: en celular reemplazan a `line`
+                 sobre la portada (como las etiquetas de mkvision). Salen de
+                 lo que ya decía cada servicio que entrega.
    - `cover`     ancho del dibujo en la portada. FeedViz mide ~su ancho de
                  alto (celdas cuadradas), así que va más angosto.
 
@@ -935,6 +938,7 @@ const tiles = [
       'Tu marca deja de improvisar y comunica con intención.',
     ],
     waTopic: 'la estrategia de contenido',
+    tags: ['Pilares', 'Tono', 'Calendario'],
     Viz: BarChartViz,
     cover: 'w-[72%]',
     glow: 'var(--c-accent)',
@@ -949,6 +953,7 @@ const tiles = [
       'Una marca deseable, coherente y reconocible.',
     ],
     waTopic: 'trabajar la marca, la voz y el contenido',
+    tags: ['Branding', 'Voz', 'Sistema visual'],
     Viz: FeedViz,
     cover: 'w-[50%]',
     glow: 'var(--c-accent2)',
@@ -963,6 +968,7 @@ const tiles = [
       'Contenido que se nota que es tuyo.',
     ],
     waTopic: 'la producción y edición de contenido',
+    tags: ['Reels', 'Video', 'Placas', 'Carruseles'],
     Viz: MediaViz,
     cover: 'w-[72%]',
     glow: 'var(--c-accent)',
@@ -977,6 +983,7 @@ const tiles = [
       'Conversaciones reales con una audiencia que abre lo que mandás.',
     ],
     waTopic: 'el email marketing',
+    tags: ['Flujos', 'Segmentación', 'Copy'],
     Viz: FlowViz,
     cover: 'w-[72%]',
     glow: 'var(--c-accent2)',
@@ -991,6 +998,7 @@ const tiles = [
       'Decisiones basadas en números reales, no en intuición.',
     ],
     waTopic: 'el análisis de métricas',
+    tags: ['Métricas', 'Lectura', 'Ajustes'],
     Viz: DashboardViz,
     cover: 'w-[72%]',
     glow: 'var(--c-accent)',
@@ -1009,6 +1017,7 @@ const tiles = [
       'Una presencia online profesional, a la altura de tu negocio.',
     ],
     waTopic: 'un sitio, landing o portfolio',
+    tags: ['Sitio', 'Landing', 'Portfolio'],
     Viz: WebViz,
     cover: 'w-[62%]',
     glow: 'var(--c-accent2)',
