@@ -8,14 +8,10 @@ import {
   HERO_HEIGHT_VW,
 } from '../src/components/hero/heroGeometry.js'
 import {
-  EXIT,
   TEMPOS,
   centerRanks,
   deployOffsets,
   deployTimeline,
-  cardExitProgress,
-  exitCluster,
-  exitProgress,
   pileScale,
 } from '../src/components/hero/heroDeploy.js'
 import { hero } from '../src/data/content.js'
@@ -218,61 +214,5 @@ describe('entrada: la pila', () => {
     const [jittered] = deployOffsets(centered, { width: 375, height: 812 }, { jitter: true })
     expect(Math.abs(jittered.x)).toBeGreaterThan(0)
     expect(Math.abs(jittered.x)).toBeLessThan(15)
-  })
-})
-
-/* La vuelta de okaydev (las fotos vuelven al montón del centro), atada al
-   scroll: que tarden en irse y no quede el hero vacío. */
-describe('vuelta: al bajar, las fotos se vuelven al centro', () => {
-  const hero = { left: 0, top: 0, width: 1440, height: 1008 }
-  const rects = [
-    { left: 40, top: 100, width: 240, height: 300 },
-    { left: 1150, top: 120, width: 200, height: 160 },
-    { left: 300, top: 700, width: 320, height: 240 },
-    { left: 900, top: 720, width: 280, height: 220 },
-  ]
-
-  it('cada foto termina cerca del centro del hero (45 % del alto), corrida y apenas girada', () => {
-    exitCluster(rects, hero).forEach((c, i) => {
-      const r = rects[i]
-      const dx = r.left + r.width / 2 + c.x - 720
-      const dy = r.top + r.height / 2 + c.y - 1008 * 0.45
-      expect(Math.abs(dx)).toBeLessThanOrEqual(50)
-      expect(Math.abs(dy)).toBeLessThanOrEqual(36)
-      expect(Math.abs(c.rot)).toBeLessThanOrEqual(EXIT.rot)
-    })
-  })
-
-  it('más suave que okaydev: gira menos de 14° y no baja del 55 %', () => {
-    expect(EXIT.rot).toBeLessThan(14)
-    expect(EXIT.scale).toBeGreaterThan(0.55)
-  })
-
-  it('el azar es sembrado: las mismas posiciones en cada carga', () => {
-    expect(exitCluster(rects, hero)).toEqual(exitCluster(rects, hero))
-  })
-
-  it('arrancan escalonadas, en orden mezclado, la primera en 0 y la última en EXIT.spread', () => {
-    const at = exitCluster(rects, hero).map((c) => c.at)
-    expect(Math.min(...at)).toBe(0)
-    expect(Math.max(...at)).toBeCloseTo(EXIT.spread, 3)
-    expect(new Set(at).size).toBe(rects.length)
-  })
-
-  /* El pedido: que tarden en irse. Con el hero de 1008px, a 40px de scroll
-     (donde antes ya no quedaba ninguna) siguen todas casi enteras, y la
-     última se termina de ir recién al 90 % del hero. */
-  it('tardan en irse: el avance acompaña todo el hero', () => {
-    expect(exitProgress(0, 1008)).toBe(0)
-    expect(exitProgress(40, 1008)).toBeLessThan(0.05)
-    expect(exitProgress(1008 * 0.45, 1008)).toBeCloseTo(0.5, 2)
-    expect(exitProgress(1008 * EXIT.end, 1008)).toBe(1)
-    expect(exitProgress(5000, 1008)).toBe(1)
-  })
-
-  it('cada foto arranca en su turno y termina antes del final', () => {
-    expect(cardExitProgress(0.1, 0.2)).toBe(0)
-    expect(cardExitProgress(1, EXIT.spread)).toBe(1)
-    expect(cardExitProgress(0.55, 0.2)).toBeCloseTo(0.5, 6)
   })
 })

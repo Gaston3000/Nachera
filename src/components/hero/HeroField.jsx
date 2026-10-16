@@ -2,7 +2,7 @@ import { motion, useTransform } from 'motion/react'
 import { DEPTH, HERO_CARDS } from './heroGeometry.js'
 import { HeroCartel, HeroPhoto } from './HeroPhoto.jsx'
 
-/* Campo de fotos dispersas (escritorio, ≥ lg). Cinco capas por tarjeta, de
+/* Campo de fotos dispersas (escritorio, ≥ lg). Cuatro capas por tarjeta, de
  * afuera hacia adentro, y cada una hace UNA cosa:
  *
  *   posición   left/top/width + el centrado (translate -50%) + el orden de
@@ -11,10 +11,6 @@ import { HeroCartel, HeroPhoto } from './HeroPhoto.jsx'
  *              (`par`), así el campo tiene profundidad al bajar. Es motion.
  *   mouse      se corre EN CONTRA del puntero, más cuanto más cerca está su
  *              plano. Lee las variables --pnx/--pny que escribe el hero.
- *   vuelta     al bajar, la foto vuelve al montón del centro; al subir,
- *              sale de nuevo (como en okaydev), de a poco con el scroll.
- *              CSS: el hero escribe el avance en --exit-p, y las variables
- *              de cada foto al medir.
  *   entrada    la pila → despliegue, en CSS. A su vez son dos capas
  *              (`.hero-deploy` se despliega, `.hero-deploy__in` aparece):
  *              ED tiene dos tiempos con escalonados distintos. Las variables
@@ -61,19 +57,15 @@ function FieldCard({ card, photo, scrollY, heroHeightRef, reduce }) {
             transform: `translate(calc(var(--pnx, 0) * ${depth}px), calc(var(--pny, 0) * ${depth}px))`,
           }}
         >
-          <div className="hero-exit">
-            {/* La entrada son DOS capas: afuera se despliega, adentro aparece
+          {/* La entrada son DOS capas: afuera se despliega, adentro aparece
               (ver hero/heroDeploy.js). La de adentro es además la zona de
               hover que muestra la firma. */}
-            <div data-deploy className="hero-deploy">
-              <div className="hero-deploy__in hero-field-card relative">
-                <div style={filter ? { filter } : undefined}>
-                  <HeroPhoto photo={photo} ratio={card.ar} />
-                </div>
-                {photo.cartel && (
-                  <HeroCartel cartel={photo.cartel} side={card.cx > 60 ? 'right' : 'left'} />
-                )}
+          <div data-deploy className="hero-deploy">
+            <div className="hero-deploy__in hero-field-card relative">
+              <div style={filter ? { filter } : undefined}>
+                <HeroPhoto photo={photo} ratio={card.ar} />
               </div>
+              {photo.cartel && <HeroCartel cartel={photo.cartel} side={card.cx > 60 ? 'right' : 'left'} />}
             </div>
           </div>
         </div>

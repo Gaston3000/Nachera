@@ -1019,42 +1019,6 @@
   }
 }
 
-/* La vuelta: al bajar, cada foto del campo vuelve al montón del centro —
-   corrida, girada, más chica y desvaneciéndose — y al subir sale otra vez.
-   Tomada del hero de okaydev.co, pero ATADA al scroll (heroDeploy.js →
-   EXIT): Hero.jsx escribe en el hero una sola variable, --exit-p, el avance
-   de 0 a 1, y cada foto saca de ahí el suyo con su propio arranque
-   (--exit-at). Las cuentas van en CSS: así el scroll toca una variable, no
-   diez estilos.
-
-     --p  avance de la foto: arranca en su --exit-at y tarda el 70 % del
-          recorrido (1 − EXIT.spread; si se cambia uno, cambiar el otro).
-     --e  el mismo avance con smoothstep: arranca y llega suave.
-
-   El montón sigue el centro de la pantalla: a la distancia hasta el centro
-   del hero (--exit-y) se le suma lo scrolleado (--exit-scroll). Así se
-   juntan donde se está mirando, en vez de subir con la página y dejar
-   abajo un hueco.
-
-   La transición corta es el `scrub` de okaydev: sigue al scroll con un
-   arrastre breve en vez de pegada a la rueda.
-
-   Es 2D a propósito (sin translateZ), así la opacidad se puede animar sin
-   romper nada en Safari de iOS. */
-.hero-exit {
-  --p: clamp(0, (var(--exit-p, 0) - var(--exit-at, 0)) / 0.7, 1);
-  --e: calc(var(--p) * var(--p) * (3 - 2 * var(--p)));
-  transform: translate(
-      calc(var(--exit-x, 0px) * var(--e)),
-      calc((var(--exit-y, 0px) + var(--exit-scroll, 0px)) * var(--e))
-    )
-    rotate(calc(var(--exit-rot, 0deg) * var(--e))) scale(calc(1 - 0.3 * var(--e)));
-  opacity: calc(1 - var(--e));
-  transition:
-    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
 /* La sombra central detrás del texto entra con el titular: durante la pila
    no tapa nada, y cuando el texto aparece ya tiene su pozo de noche. */
 [data-hero-state='go'] .hero-halo {
@@ -1081,8 +1045,7 @@
     animation: none;
     opacity: 1;
   }
-  .hero-cartel,
-  .hero-exit {
+  .hero-cartel {
     transition: none;
   }
 }

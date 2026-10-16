@@ -7,14 +7,7 @@ import { HeroField } from './hero/HeroField.jsx'
 import { HeroBand } from './hero/HeroMobile.jsx'
 import { useMouseParallax } from './hero/useMouseParallax.js'
 import { BAND_BOTTOM, BAND_TOP } from './hero/heroGeometry.js'
-import {
-  centerRanks,
-  deployOffsets,
-  deployTimeline,
-  exitCluster,
-  exitProgress,
-  pileScale,
-} from './hero/heroDeploy.js'
+import { centerRanks, deployOffsets, deployTimeline, pileScale } from './hero/heroDeploy.js'
 import { hero } from '../data/content.js'
 import { siteConfig } from '../data/siteConfig.js'
 
@@ -27,9 +20,8 @@ import { siteConfig } from '../data/siteConfig.js'
  * Lo que es de ED: el campo, la coreografía de la pila y las bandas de
  * celular. Lo que se tomó de okaydev.co, que tiene la misma idea: la escala
  * mezclada en planos (heroGeometry.js), la firma de cada imagen solo al
- * hover, la sombra que aparta las fotos del texto, la barra apoyada sobre
- * una palabra del titular y la vuelta: al bajar, las fotos vuelven al centro
- * — acá atada al scroll, para que tarden en irse (heroDeploy.js → EXIT). Lo que es de Nachera: la cascada palabra por
+ * hover, la sombra que aparta las fotos del texto y la barra apoyada sobre
+ * una palabra del titular. Lo que es de Nachera: la cascada palabra por
  * palabra, la barra en el cyan del sitio, la firma de periodista, los dos
  * botones.
  *
@@ -137,32 +129,6 @@ function armDeploy(root) {
 
   // El titular y lo que entra con él cuelgan de este reloj.
   root.style.setProperty('--title-start', `${timeline.titleStart}s`)
-  return timeline
-}
-
-/* Mide adónde vuelve cada foto del campo cuando se baja (ver exitCluster).
- * Se mide el lugar de la foto (.hero-field-slot), no la foto: el slot no
- * tiene la vuelta ni el parallax encima, así que da lo mismo medirlo con las
- * fotos afuera o adentro, scrolleado o no. Devuelve false si el campo no se
- * ve (celular): ahí no hay vuelta. */
-function armExit(root) {
-  const slots = [...root.querySelectorAll('.hero-field-slot')].filter(
-    (el) => el.getClientRects().length > 0
-  )
-  if (!slots.length) return false
-  const cluster = exitCluster(
-    slots.map((el) => el.getBoundingClientRect()),
-    root.getBoundingClientRect()
-  )
-  slots.forEach((el, i) => {
-    const layer = el.querySelector('.hero-exit')
-    if (!layer) return
-    const c = cluster[i]
-    layer.style.setProperty('--exit-x', `${c.x}px`)
-    layer.style.setProperty('--exit-y', `${c.y}px`)
-    layer.style.setProperty('--exit-rot', `${c.rot}deg`)
-    layer.style.setProperty('--exit-at', String(c.at))
-  })
   return true
 }
 
@@ -207,53 +173,9 @@ export function Hero() {
   useLayoutEffect(() => {
     const root = heroRef.current
     if (!root || reduce) return undefined
-    const timeline = armDeploy(root)
-    if (timeline) root.dataset.heroState = 'go'
-
-    // La vuelta (solo donde se ve el campo), atada al scroll: cada scroll
-    // escribe el avance en --exit-p y el CSS hace el resto (.hero-exit). Un
-    // solo requestAnimationFrame por cuadro, por más eventos que lleguen.
-    // Recién se habilita cuando la entrada terminó, como en okaydev: antes,
-    // un scroll cortaría el despliegue a la mitad. Al habilitarse toma el
-    // scroll que haya, por si se bajó durante la entrada (y la transición
-    // de .hero-exit lo lleva ahí sin salto).
-    let ready = false
-    let frame = 0
-    // También el scroll en sí (--exit-scroll): el montón sigue el centro de
-    // la PANTALLA, no el del hero, que sube con la página. Si no, las fotos
-    // se juntaban arriba, fuera de vista, y abajo quedaba el hueco.
-    const write = () => {
-      frame = 0
-      const y = Math.max(0, window.scrollY)
-      root.style.setProperty('--exit-p', String(exitProgress(y, root.offsetHeight)))
-      root.style.setProperty('--exit-scroll', `${Math.round(y)}px`)
-    }
-    const onScroll = () => {
-      if (ready && !frame) frame = requestAnimationFrame(write)
-    }
-    const onResize = () => {
-      armExit(root)
-      onScroll()
-    }
-
-    let readyTimer = 0
-    if (timeline && armExit(root)) {
-      readyTimer = setTimeout(() => {
-        ready = true
-        onScroll()
-      }, timeline.end * 1000 + 100)
-      window.addEventListener('scroll', onScroll, { passive: true })
-      window.addEventListener('resize', onResize)
-    }
-
+    if (armDeploy(root)) root.dataset.heroState = 'go'
     return () => {
-      clearTimeout(readyTimer)
-      if (frame) cancelAnimationFrame(frame)
-      window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', onResize)
       delete root.dataset.heroState
-      root.style.removeProperty('--exit-p')
-      root.style.removeProperty('--exit-scroll')
     }
   }, [reduce])
 
