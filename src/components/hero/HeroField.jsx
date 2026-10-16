@@ -1,42 +1,53 @@
 import { motion, useTransform } from 'motion/react'
-import { HERO_CARDS } from './heroGeometry.js'
+import { DEPTH, HERO_CARDS } from './heroGeometry.js'
 import { HeroCartel, HeroPhoto } from './HeroPhoto.jsx'
 
 /* Campo de fotos dispersas (escritorio, ≥ lg). Cuatro capas por tarjeta, de
  * afuera hacia adentro, y cada una hace UNA cosa:
  *
- *   posición   left/top/width + el centrado (translate -50%). Estático.
- *   scroll     parallax con el scroll: cada foto sube a su propio ritmo
+ *   posición   left/top/width + el centrado (translate -50%) + el orden de
+ *              apilado de su plano. Estático.
+ *   scroll     parallax con el scroll: cada plano sube a su propio ritmo
  *              (`par`), así el campo tiene profundidad al bajar. Es motion.
- *   mouse      se corre EN CONTRA del puntero, más cuanto más grande (=
- *              más cerca). Lee las variables --pnx/--pny que escribe el hero.
+ *   mouse      se corre EN CONTRA del puntero, más cuanto más cerca está su
+ *              plano. Lee las variables --pnx/--pny que escribe el hero.
  *   entrada    la pila → despliegue, en CSS. A su vez son dos capas
  *              (`.hero-deploy` se despliega, `.hero-deploy__in` aparece):
  *              ED tiene dos tiempos con escalonados distintos. Las variables
  *              las escribe el hero antes del primer paint.
  *
  * Van separadas porque cada una escribe su propio `transform`: si dos
- * compartieran nodo, la segunda pisaría a la primera. */
+ * compartieran nodo, la segunda pisaría a la primera.
+ *
+ * El desenfoque y la atenuación de los planos lejanos van en la imagen, por
+ * DENTRO de la entrada, y son estáticos: la entrada anima opacidad y
+ * transform en las capas de afuera, y un filtro animado encima se pagaría en
+ * cada cuadro. */
 function FieldCard({ card, photo, scrollY, heroHeightRef, reduce }) {
+  const plane = DEPTH[card.depth]
+
   // ED mide el recorrido del parallax con el alto del hero: a lo largo de un
   // hero entero de scroll, cada foto se adelanta (par - 1) × alto. El alto se
   // lee del ref en el momento del cálculo, así un resize no deja el número
   // viejo congelado.
   const y = useTransform(scrollY, (v) => {
     const h = heroHeightRef.current || 0
-    return -(card.par - 1) * Math.min(Math.max(v, 0), h)
+    return -(plane.par - 1) * Math.min(Math.max(v, 0), h)
   })
 
-  // Profundidad del parallax de mouse: más grande = más cerca = se mueve más.
-  const depth = -Math.round(card.w * 2)
+  const depth = -plane.mouse
+  const filter =
+    plane.blur || plane.dim < 1 ? `blur(${plane.blur}px) brightness(${plane.dim})` : undefined
 
   return (
     <div
-      className="absolute"
+      className="hero-field-slot absolute"
+      data-depth={card.depth}
       style={{
         left: `${card.cx}%`,
         top: `${card.cy}%`,
         width: `${card.w}vw`,
+        zIndex: plane.z,
         transform: 'translate(-50%, -50%)',
       }}
     >
@@ -47,13 +58,14 @@ function FieldCard({ card, photo, scrollY, heroHeightRef, reduce }) {
           }}
         >
           {/* La entrada son DOS capas: afuera se despliega, adentro aparece
-              (ver hero/heroDeploy.js). */}
+              (ver hero/heroDeploy.js). La de adentro es además la zona de
+              hover que muestra la firma. */}
           <div data-deploy className="hero-deploy">
-            <div className="hero-deploy__in relative">
-              <HeroPhoto photo={photo} ratio={card.ar} />
-              {photo.cartel && (
-                <HeroCartel cartel={photo.cartel} side={card.cartelSide} className="-bottom-5 max-w-[20rem]" />
-              )}
+            <div className="hero-deploy__in hero-field-card relative">
+              <div style={filter ? { filter } : undefined}>
+                <HeroPhoto photo={photo} ratio={card.ar} />
+              </div>
+              {photo.cartel && <HeroCartel cartel={photo.cartel} side={card.cx > 60 ? 'right' : 'left'} />}
             </div>
           </div>
         </div>

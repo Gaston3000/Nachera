@@ -4,7 +4,7 @@ import { Button } from './primitives/Button.jsx'
 import { ArrowDown, MessageIcon } from './primitives/icons.jsx'
 import { RichText } from './primitives/RichText.jsx'
 import { HeroField } from './hero/HeroField.jsx'
-import { HeroBand, HeroConcepts } from './hero/HeroMobile.jsx'
+import { HeroBand } from './hero/HeroMobile.jsx'
 import { useMouseParallax } from './hero/useMouseParallax.js'
 import { BAND_BOTTOM, BAND_TOP } from './hero/heroGeometry.js'
 import { centerRanks, deployOffsets, deployTimeline, pileScale } from './hero/heroDeploy.js'
@@ -17,59 +17,62 @@ import { siteConfig } from '../data/siteConfig.js'
  * el centro, se despliegan a su lugar, y después tienen parallax con el
  * scroll y con el mouse. El titular entra cuando las fotos ya casi llegaron.
  *
- * Lo que es de ED: el campo, la coreografía de la pila, las bandas y los
- * conceptos de celular. Lo que es de Nachera: el titular con la cascada
- * palabra por palabra y la inundación de gradiente en "evolucione", la
- * cápsula del eyebrow, los dos botones. Se adapta la estructura; el
- * vocabulario visual sigue siendo el del sitio.
- *
- * La cara, que antes vivía acá, se mudó a "Sobre mí": en el hero habla la
- * marca y el trabajo; la persona va donde se presenta.
+ * Lo que es de ED: el campo, la coreografía de la pila y las bandas de
+ * celular. Lo que se tomó de okaydev.co, que tiene la misma idea: la escala
+ * mezclada en planos (heroGeometry.js), la firma de cada imagen solo al
+ * hover, la sombra que aparta las fotos del texto y la barra apoyada sobre
+ * una palabra del titular. Lo que es de Nachera: la cascada palabra por
+ * palabra, la barra en el cyan del sitio, la firma de periodista, los dos
+ * botones.
  *
  * Piezas: geometría en hero/heroGeometry.js, matemática de la entrada en
- * hero/heroDeploy.js, campo de escritorio en HeroField, bandas y conceptos de
- * celular en HeroMobile, foto/placeholder en HeroPhoto. Las fotos en sí,
- * en `hero.photos` (data/content.js).
+ * hero/heroDeploy.js, campo de escritorio en HeroField, bandas de celular en
+ * HeroMobile, foto/placeholder y firma en HeroPhoto. Las fotos en sí, en
+ * `hero.photos` (data/content.js).
  */
 
 /* El titular entra en el último segundo del despliegue de las fotos, como en
  * ED: cuando ya casi llegaron. Ese momento depende de cuántas fotos se
- * despliegan (8 en escritorio, 4 en celular), así que no es una constante:
+ * despliegan (10 en escritorio, 4 en celular), así que no es una constante:
  * armDeploy lo calcula y lo escribe en --title-start, y cada palabra suma su
- * corrimiento con calc(). Todo lo que entra con el titular (eyebrow, bajada,
- * botones) cuelga de la misma variable — un solo reloj. */
+ * corrimiento con calc(). Todo lo que entra con el titular (firma, bajada,
+ * botones, sombra) cuelga de la misma variable — un solo reloj. */
 // La cascada de palabras: cada una se enciende 90 ms después de la anterior.
 const WORD_STEP = 0.09
-// Tiene que coincidir con la duración de `heroAccentFlood` en index.css.
-const FLOOD_DURATION = 1.6
+// La barra cae cuando la palabra ya se encendió: el remate llega después
+// de que se lee la palabra, no a la vez.
+const BAR_AFTER = 0.32
 
-const afterTitle = (offset) => `calc(var(--title-start, 2.45s) + ${offset.toFixed(2)}s)`
+const afterTitle = (offset) => `calc(var(--title-start, 2.65s) + ${offset.toFixed(2)}s)`
+
+/* La palabra de la barra. Tres capas, como el "Builders" de okaydev:
+ *   1. la palabra en blanco, que entra en su turno de la cascada
+ *   2. la barra cyan, que cae de arriba hacia abajo
+ *   3. la MISMA palabra en oscuro, recortada con la barra: la inversión sigue
+ *      el borde de la barra cuadro a cuadro, en vez de un cambio de color
+ *      que salta de golpe.
+ * La copia oscura es aria-hidden: el nombre del h1 dice la palabra una vez. */
+function BarWord({ text, appear }) {
+  const bar = { '--bar-delay': afterTitle(appear + BAR_AFTER) }
+  return (
+    <span className="hero-bar" style={bar}>
+      <span className="hero-title__w" style={{ animationDelay: afterTitle(appear) }}>
+        {text}
+      </span>
+      <span className="hero-bar__fill" aria-hidden="true" />
+      <span className="hero-bar__ink" aria-hidden="true">
+        {text}
+      </span>
+    </span>
+  )
+}
 
 function renderTitle(parts) {
   let n = 0
   const nextOffset = () => n++ * WORD_STEP
 
   return parts.map((part, i) => {
-    if (part.accent) {
-      // Tres delays, uno por animación de .hero-accent-word:
-      //   1. aparece blanca, en su turno dentro de la cascada
-      //   2. el gradiente la inunda (el remate), apenas después de estar
-      //   3. el shimmer de reposo, una vez que el remate terminó de asentarse
-      const appear = nextOffset()
-      const flood = appear + 0.12
-      const shimmer = flood + FLOOD_DURATION + 0.15
-      return (
-        <span
-          key={i}
-          className="hero-accent-word"
-          style={{
-            animationDelay: `${afterTitle(appear)}, ${afterTitle(flood)}, ${afterTitle(shimmer)}`,
-          }}
-        >
-          {part.t}
-        </span>
-      )
-    }
+    if (part.accent) return <BarWord key={i} text={part.t} appear={nextOffset()} />
 
     // Se preserva el separador para no perder los espacios entre palabras.
     return part.t.split(/(\s+)/).map((token, j) =>
@@ -126,14 +129,6 @@ function armDeploy(root) {
 
   // El titular y lo que entra con él cuelgan de este reloj.
   root.style.setProperty('--title-start', `${timeline.titleStart}s`)
-  // Los carteles entran al final, ya con las fotos en su lugar: el remate
-  // del armado (en ED, después de los botones).
-  const cartelStart = timeline.titleStart + 1.5
-  root.querySelectorAll('[data-deploy] .hero-cartel').forEach((el, k) => {
-    el.style.setProperty('--cartel-delay', `${(cartelStart + k * 0.08).toFixed(2)}s`)
-  })
-  // El velo de legibilidad, lo último: no ensucia la entrada.
-  root.style.setProperty('--halo-delay', `${(cartelStart + 0.45).toFixed(2)}s`)
   return true
 }
 
@@ -147,8 +142,8 @@ export function Hero() {
 
   // Medidas que necesita el scroll: el alto del hero (parallax de las fotos)
   // y cuánto scroll tarda el texto en irse. En escritorio, el 55% del hero;
-  // en celular, el 60% de la pantalla — ahí el hero es más largo (lleva los
-  // conceptos) y atarlo a su alto haría que el texto se quede demasiado.
+  // en celular, el 60% de la pantalla — ahí el hero mide una pantalla y
+  // atarlo a su alto haría que el texto se vaya demasiado rápido.
   useLayoutEffect(() => {
     const root = heroRef.current
     if (!root) return undefined
@@ -210,42 +205,45 @@ export function Hero() {
       />
 
       {/* El primer pantallazo. En escritorio es una capa absoluta, centrada,
-          sobre el campo de fotos. Por debajo de lg es una columna EN EL FLUJO
-          del alto de la pantalla: banda de fotos arriba, texto, banda abajo.
-          El piso de alto es para los celulares bajos: ahí la banda de abajo
-          asoma cortada por el borde —invita a bajar— en vez de aplastarse. */}
-      <div className="relative z-20 flex h-svh min-h-[44rem] flex-col items-center px-5 pb-8 pt-[5.5rem] text-center min-[360px]:min-h-[38rem] sm:px-8 lg:absolute lg:inset-x-0 lg:top-0 lg:h-screen lg:min-h-0 lg:justify-center lg:pb-0 lg:pt-0">
-        <HeroBand slots={BAND_TOP} photos={hero.photos} cartelSide="left" className="pb-4" />
+          sobre el campo de fotos — y transparente al mouse, para que el
+          hover llegue a las fotos de abajo; solo el bloque de texto lo
+          recibe. Por debajo de lg es una columna EN EL FLUJO del alto de la
+          pantalla: banda de fotos arriba, texto, banda abajo. El piso de alto
+          es para los celulares bajos: ahí la banda de abajo asoma cortada por
+          el borde —invita a bajar— en vez de aplastarse. */}
+      <div className="relative z-20 flex h-svh min-h-[44rem] flex-col items-center px-5 pb-8 pt-[5.5rem] text-center min-[360px]:min-h-[38rem] sm:px-8 lg:pointer-events-none lg:absolute lg:inset-x-0 lg:top-0 lg:h-screen lg:min-h-0 lg:justify-center lg:pb-0 lg:pt-0">
+        <HeroBand slots={BAND_TOP} photos={hero.photos} className="pb-4" />
 
         {/* El bloque de texto se va con el scroll (sube y se desvanece). En
             celular las bandas se quedan: se va solo el texto. Va con margen
             y no con translate porque motion ya escribe el transform. */}
         <motion.div
-          className="relative mx-auto max-w-2xl shrink-0 lg:mt-[6vh]"
+          className="relative mx-auto max-w-2xl shrink-0 lg:pointer-events-auto lg:mt-[6vh]"
           style={reduce ? undefined : { y: copyY, opacity: copyOpacity }}
         >
-          {/* Velo de legibilidad (solo escritorio): oscurece SOLO las fotos
-              que quedan detrás de las palabras; las de los costados se ven
-              igual. Es el halo blanco de ED, en la noche de Nachera. */}
+          {/* Sombra central (solo escritorio): un pozo de noche detrás del
+              texto, macizo en el medio y que se abre recién lejos de las
+              palabras, como el fade de okaydev. Las fotos pueden pasar por
+              debajo en la entrada o con el parallax, pero nunca le compiten
+              al titular. Entra con el titular, no antes: durante la pila no
+              tapa nada. */}
           <span
             aria-hidden="true"
-            className="hero-halo pointer-events-none absolute left-1/2 top-1/2 -z-10 hidden h-[clamp(26rem,80vh,36rem)] w-[clamp(30rem,62vw,52rem)] -translate-x-1/2 -translate-y-1/2 lg:block"
+            className="hero-halo pointer-events-none absolute left-1/2 top-1/2 -z-10 hidden h-[clamp(30rem,92vh,44rem)] w-[clamp(36rem,74vw,64rem)] -translate-x-1/2 -translate-y-1/2 lg:block"
             style={{
               background:
-                'radial-gradient(50% 50% at 50% 50%, color-mix(in srgb, var(--c-bg) 94%, transparent) 0%, color-mix(in srgb, var(--c-bg) 78%, transparent) 46%, transparent 78%)',
+                'radial-gradient(closest-side, var(--c-bg) 0%, color-mix(in srgb, var(--c-bg) 96%, transparent) 42%, color-mix(in srgb, var(--c-bg) 70%, transparent) 66%, transparent 100%)',
             }}
           />
 
-          {/* El eyebrow apenas antes que el titular: el corrimiento negativo
-              es relativo a --title-start, no absoluto. El envoltorio es
-              inline-block porque `translate` no aplica a un inline. */}
-          <p className="mb-5">
-            <span className="hero-fade inline-block" style={fadeAt(-0.15)}>
-              <span className="hero-eyebrow">
-                <span className="hero-eyebrow__dot" aria-hidden="true" />
-                {hero.eyebrow}
-              </span>
-            </span>
+          {/* La firma, apenas antes que el titular: el corrimiento negativo
+              es relativo a --title-start, no absoluto. Como la de una nota:
+              en minúscula, sin cápsula. */}
+          <p
+            className="hero-fade mb-5 text-[0.95rem] text-muted md:text-base"
+            style={fadeAt(-0.15)}
+          >
+            <RichText text={hero.byline} strongClassName="font-medium text-fg" />
           </p>
 
           {/* Sin `fade`: el reveal de este bloque es el encendido palabra por
@@ -285,10 +283,8 @@ export function Hero() {
           </div>
         </motion.div>
 
-        <HeroBand slots={BAND_BOTTOM} photos={hero.photos} cartelSide="right" className="pt-5" />
+        <HeroBand slots={BAND_BOTTOM} photos={hero.photos} className="pt-5" />
       </div>
-
-      <HeroConcepts photos={hero.photos} reduce={reduce} />
     </section>
   )
 }

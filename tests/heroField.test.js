@@ -3,9 +3,9 @@ import {
   BAND_BOTTOM,
   BAND_TOP,
   COPY_ZONE_VW,
+  DEPTH,
   HERO_CARDS,
   HERO_HEIGHT_VW,
-  MOBILE_CONCEPTS,
 } from '../src/components/hero/heroGeometry.js'
 import {
   TEMPOS,
@@ -15,6 +15,7 @@ import {
   pileScale,
 } from '../src/components/hero/heroDeploy.js'
 import { hero } from '../src/data/content.js'
+import { cases } from '../src/data/cases.js'
 
 /* La caja de cada foto en vw (el hero de escritorio mide 70vw de alto). */
 function boxVw(card) {
@@ -44,9 +45,53 @@ describe('hero.photos', () => {
     })
   })
 
-  it('los títulos de los carteles son los chips del hero', () => {
+  it('cada lugar es una foto de Nachera o una pieza real', () => {
+    hero.photos.forEach((photo) => expect(['foto', 'pieza']).toContain(photo.kind))
+  })
+
+  it('los chips del hero están todos en las firmas de las imágenes', () => {
     const titulos = hero.photos.filter((p) => p.cartel).map((p) => p.cartel.titulo)
-    expect([...titulos].sort()).toEqual([...hero.chips].sort())
+    hero.chips.forEach((chip) => expect(titulos).toContain(chip))
+  })
+
+  /* Nada de piezas de muestra: cada pieza sale de un caso real. */
+  it('cada pieza es de una marca de los casos', () => {
+    // "LAE SRL" → "LAE": alcanza con el nombre corto de la marca.
+    const brands = cases.map((c) => c.brand.split(' ')[0])
+    const piezas = hero.photos.filter((p) => p.kind === 'pieza')
+    expect(piezas.length).toBeGreaterThan(0)
+    piezas.forEach((p) => {
+      expect(brands.some((b) => p.alt.includes(b)), p.alt).toBe(true)
+    })
+  })
+})
+
+describe('profundidad', () => {
+  const sizes = (pred) => HERO_CARDS.filter(pred).map((c) => c.w)
+
+  it('cada lugar está en un plano conocido', () => {
+    HERO_CARDS.forEach((card) => expect(DEPTH[card.depth]).toBeDefined())
+  })
+
+  /* La escala mezclada de okaydev: lo grande adelante, lo chico atrás. */
+  it('las piezas y los planos lejanos son más chicos que cualquier foto cercana', () => {
+    const nearMin = Math.min(...sizes((c) => c.depth === 'near'))
+    const piezas = HERO_CARDS.filter((_, i) => hero.photos[i].kind === 'pieza')
+    piezas.forEach((c) => expect(c.w).toBeLessThan(nearMin))
+    sizes((c) => c.depth === 'far').forEach((w) => expect(w).toBeLessThan(nearMin))
+  })
+
+  it('las piezas reales nunca van desenfocadas', () => {
+    HERO_CARDS.forEach((card, i) => {
+      if (hero.photos[i].kind === 'pieza') expect(DEPTH[card.depth].blur).toBe(0)
+    })
+  })
+
+  it('lo cercano se mueve más que lo lejano', () => {
+    expect(DEPTH.near.par).toBeGreaterThan(DEPTH.mid.par)
+    expect(DEPTH.mid.par).toBeGreaterThan(DEPTH.far.par)
+    expect(DEPTH.near.mouse).toBeGreaterThan(DEPTH.far.mouse)
+    expect(DEPTH.near.z).toBeGreaterThan(DEPTH.far.z)
   })
 })
 
@@ -79,7 +124,7 @@ describe('geometría de escritorio', () => {
 })
 
 describe('geometría de celular', () => {
-  const slots = [...BAND_TOP, ...BAND_BOTTOM, ...MOBILE_CONCEPTS]
+  const slots = [...BAND_TOP, ...BAND_BOTTOM]
 
   it('todos los lugares apuntan a una foto que existe', () => {
     slots.forEach((slot) => {
@@ -92,20 +137,9 @@ describe('geometría de celular', () => {
     expect(new Set(used).size).toBe(used.length)
   })
 
-  /* En escritorio los cinco conceptos se leen todos juntos alrededor del
-     título. En celular no puede perderse ninguno: cada foto con cartel tiene
-     que estar en una banda o en el zigzag. */
-  it('ningún cartel se pierde en celular', () => {
-    const used = new Set(slots.map((s) => s.photo))
-    hero.photos.forEach((photo, i) => {
-      if (photo.cartel) expect(used.has(i), `el cartel "${photo.cartel.titulo}"`).toBe(true)
-    })
-  })
-
-  it('los conceptos del zigzag son fotos con cartel', () => {
-    MOBILE_CONCEPTS.forEach((slot) => {
-      expect(hero.photos[slot.photo].cartel).not.toBeNull()
-    })
+  /* Las bandas no van con fotos de fondo: en celular cada foto es grande. */
+  it('las bandas no usan imágenes del plano lejano', () => {
+    slots.forEach((slot) => expect(HERO_CARDS[slot.photo].depth).not.toBe('far'))
   })
 })
 

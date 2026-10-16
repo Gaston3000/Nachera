@@ -1,7 +1,12 @@
 export const hero = {
-  eyebrow: 'Comunicación y Marketing Digital',
+  // La firma del titular, como la de una nota: quién lo dice y desde dónde.
+  // Reemplaza al eyebrow en mayúsculas ("Comunicación y Marketing Digital"),
+  // que era una etiqueta genérica y no decía nada que el titular no dijera.
+  // Ancla el diferencial de marca: viene del periodismo. El nombre va en
+  // blanco (**), el resto en gris.
+  byline: 'Por **Ignacio Costa**, periodista y comunicador.',
   // h1 (string plano) = nombre accesible / SEO / fallback.
-  // h1Parts = render con la palabra clave destacada ("evolucione").
+  // h1Parts = render con la palabra que lleva la barra ("evolucione").
   h1: 'Estrategia y contenido para que tu marca evolucione.',
   h1Parts: [
     { t: 'Estrategia y contenido para que tu marca ' },
@@ -17,57 +22,98 @@ export const hero = {
   // desde tablet; en celular el texto fluye solo. Los espacios de "de forma
   // integral" son no separables (U+00A0): esa frase no se parte nunca.
   subLines: [
-    'Me ocupo del marketing digital de tu marca **de\u00A0forma\u00A0integral**:',
+    'Me ocupo del marketing digital de tu marca **de forma integral**:',
     'estrategia, identidad visual, contenido y redes.',
   ],
   chips: ['Storytelling', 'Estrategia', 'Reels', 'Email', 'Branding'],
 
   // ── Fotos del campo del hero ────────────────────────────────────────
-  // 8 lugares, en el orden de HERO_CARDS (components/hero/heroGeometry.js):
-  // la posición y el tamaño de cada uno viven ahí, acá solo el contenido.
+  // 10 lugares, en el orden de HERO_CARDS (components/hero/heroGeometry.js):
+  // la posición, el tamaño y el plano de cada uno viven ahí, acá solo el
+  // contenido.
   //
-  // Mientras `src` sea null, el lugar se dibuja como placeholder gris con
-  // "Foto a futuro". Cuando Nachera mande las fotos: van a /public/hero/ y
-  // se completa `src` ('/hero/nombre.webp'). Nada más — el componente no se
-  // toca.
+  // Mientras `src` sea null, el lugar se dibuja como placeholder gris. Cuando
+  // lleguen las imágenes: van a /public/hero/ y se completa `src`
+  // ('/hero/nombre.webp'). Nada más — el componente no se toca.
   //
-  // El `alt` describe la foto que va en cada lugar, así esta lista sirve
-  // también de pedido: Nachera trabajando, con la cámara, sacando fotos,
-  // grabando, editando. Se nota en la orientación: los lugares verticales
-  // piden fotos verticales — una apaisada ahí se recorta mucho.
+  // Dos clases de lugar (`kind`):
+  //   'foto'   Nachera trabajando: con la cámara, grabando, editando. Son
+  //            los lugares grandes, adelante.
+  //   'pieza'  un trabajo real suyo, chico: un posteo, un mail, un cuadro de
+  //            video. Salen de los casos (data/cases.js) — nada de piezas
+  //            de muestra.
   //
-  // Los carteles flotan sobre la foto (título corto + una frase). Sus
-  // títulos son los mismos chips de arriba. Las frases salen de lo que ya
-  // dice `services`: no prometen nada nuevo.
+  // El `alt` describe la imagen que va en cada lugar, así esta lista sirve
+  // también de pedido. Se nota en la orientación: los lugares verticales
+  // piden imágenes verticales — una apaisada ahí se recorta mucho.
+  //
+  // El cartel (título corto + una frase) aparece SOLO al pasar el mouse por
+  // la imagen, en escritorio — como la firma de cada pieza en okaydev.co.
+  // Siempre visibles, cinco carteles cargaban el hero. En celular no van: no
+  // hay hover, y nada de la página depende de leerlos. Los títulos de las
+  // fotos son los chips de arriba; las frases salen de lo que ya dice
+  // `services`, y las de las piezas, de los casos. No prometen nada nuevo.
   photos: [
     {
+      kind: 'foto',
       src: null,
       alt: 'Nachera grabando con la cámara al hombro (vertical)',
       cartel: { titulo: 'Storytelling', descripcion: 'Historias que tu marca puede contar' },
     },
-    { src: null, alt: 'Nachera revisando una toma en la pantalla de la cámara (apaisada)', cartel: null },
     {
+      kind: 'foto',
+      src: null,
+      alt: 'Nachera revisando una toma en la pantalla de la cámara (apaisada)',
+      cartel: null,
+    },
+    {
+      kind: 'foto',
       src: null,
       alt: 'Nachera filmando un reel en locación (vertical)',
       cartel: { titulo: 'Reels', descripcion: 'Idea, guion, rodaje y edición' },
     },
     {
+      kind: 'foto',
+      src: null,
+      alt: 'Detalle de manos ajustando el lente de la cámara (apaisada)',
+      cartel: null,
+    },
+    {
+      kind: 'foto',
       src: null,
       alt: 'Nachera planificando contenido frente a la computadora (apaisada)',
       cartel: { titulo: 'Estrategia', descripcion: 'Un plan antes de cada pieza' },
     },
-    { src: null, alt: 'Detalle de manos ajustando el lente de la cámara (vertical)', cartel: null },
     {
+      kind: 'foto',
       src: null,
       alt: 'Nachera en una sesión de fotos para una marca (apaisada)',
       cartel: { titulo: 'Branding', descripcion: 'Que tu marca se vea como lo que es' },
     },
     {
+      kind: 'pieza',
       src: null,
-      alt: 'Nachera editando video en la computadora (apaisada)',
-      cartel: { titulo: 'Email', descripcion: 'Comunicación directa con tu audiencia' },
+      alt: 'Captura de un mail de la campaña de LAE (vertical)',
+      cartel: { titulo: 'Email', descripcion: 'Campañas de email para LAE' },
     },
-    { src: null, alt: 'Nachera sacando una foto, de perfil (vertical)', cartel: null },
+    {
+      kind: 'pieza',
+      src: null,
+      alt: 'Un posteo de Instagram de Dominga Pastelería (cuadrado)',
+      cartel: { titulo: 'Dominga', descripcion: 'Una identidad consistente en redes' },
+    },
+    {
+      kind: 'pieza',
+      src: null,
+      alt: 'Un cuadro de un highlight de GT Elite Soccer (16:9)',
+      cartel: { titulo: 'GT Elite', descripcion: 'Highlights y narrativa deportiva' },
+    },
+    {
+      kind: 'foto',
+      src: null,
+      alt: 'Nachera sacando una foto, de perfil (vertical)',
+      cartel: null,
+    },
   ],
 }
 

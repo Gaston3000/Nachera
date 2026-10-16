@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, within } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 
 /* Mismo mock que el resto de la suite: fuerza la rama de reduced-motion,
    así que estos casos describen lo que ve alguien con las animaciones
@@ -67,7 +67,7 @@ describe('Hero — campo de fotos', () => {
   it('dibuja un placeholder "Foto a futuro" por cada foto que todavía no llegó', () => {
     const { container } = render(<Hero />)
     const missing = hero.photos.filter((p) => !p.src).length
-    // campo de escritorio (8) + bandas de celular (4) + conceptos de celular (3)
+    // campo de escritorio (10) + bandas de celular (4)
     expect(container.querySelectorAll('.hero-photo-placeholder').length).toBeGreaterThanOrEqual(missing)
     expect(screen.getAllByText('Foto a futuro').length).toBeGreaterThan(0)
   })
@@ -77,11 +77,38 @@ describe('Hero — campo de fotos', () => {
     expect(container.querySelector('[data-hero-field]')).toHaveAttribute('aria-hidden', 'true')
   })
 
-  it('los conceptos de celular son una lista real, con sus carteles', () => {
+  it('la firma de periodista reemplaza al eyebrow en mayúsculas', () => {
     render(<Hero />)
-    const list = screen.getAllByRole('list').find((ul) => within(ul).queryByText('Estrategia'))
-    expect(list).toBeDefined()
-    expect(within(list).getAllByRole('listitem').length).toBe(3)
+    expect(screen.getByText('Ignacio Costa').tagName).toBe('STRONG')
+    expect(screen.getByText(/periodista y comunicador/i)).toBeInTheDocument()
+    expect(screen.queryByText(/Comunicación y Marketing Digital/i)).toBeNull()
+  })
+
+  it('la barra no duplica la palabra para el lector de pantalla', () => {
+    const { container } = render(<Hero />)
+    const ink = container.querySelector('.hero-bar__ink')
+    expect(ink).toHaveTextContent('evolucione')
+    expect(ink).toHaveAttribute('aria-hidden', 'true')
+    expect(container.querySelector('.hero-accent-word')).toBeNull()
+  })
+
+  /* Las firmas de las fotos solo existen en el campo de escritorio, donde
+     aparecen al pasar el mouse. En celular no hay hover: ni carteles en las
+     bandas ni el tramo en zigzag que los contaba debajo del hero. */
+  it('los carteles viven solo en el campo de escritorio', () => {
+    const { container } = render(<Hero />)
+    const field = container.querySelector('[data-hero-field]')
+    const carteles = [...container.querySelectorAll('.hero-cartel')]
+    expect(carteles.length).toBe(hero.photos.filter((p) => p.cartel).length)
+    carteles.forEach((c) => expect(field.contains(c)).toBe(true))
+    expect(container.querySelector('#hero ul')).toBeNull()
+  })
+
+  it('los planos lejanos van desenfocados; los cercanos, nítidos', () => {
+    const { container } = render(<Hero />)
+    const filterOf = (el) => el.querySelector('.hero-deploy__in > div').style.filter
+    container.querySelectorAll('[data-depth="far"]').forEach((el) => expect(filterOf(el)).toMatch(/blur/))
+    container.querySelectorAll('[data-depth="near"]').forEach((el) => expect(filterOf(el)).toBe(''))
   })
 
   it('con reduced-motion no arma la entrada: todo queda en su estado final', () => {
