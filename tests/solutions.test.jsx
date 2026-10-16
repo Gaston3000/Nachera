@@ -74,13 +74,25 @@ describe('Soluciones — la tira de servicios', () => {
   })
 
   /* El que viene a contratar algo puntual lo encuentra de una. */
-  it('el índice lista los seis y marca el que se elige', () => {
+  it('el índice lista los seis servicios', () => {
     render(<Solutions />)
     const index = screen.getByRole('navigation', { name: 'Servicios' })
     const items = within(index).getAllByRole('button')
     expect(items.map((b) => b.textContent)).toEqual(TITLES)
+    // tocar uno no rompe nada aunque el navegador no sepa scrollear (jsdom)
     fireEvent.click(within(index).getByRole('button', { name: 'Email marketing' }))
-    expect(within(index).getByRole('button', { name: 'Email marketing' })).toHaveAttribute('aria-current', 'true')
+  })
+
+  /* Celular (y reduced-motion): arriba, solo el título; el índice es la
+     primera tarjeta de la tira y no un bloque de pastillas encima. */
+  it('en la tira, el índice es la primera tarjeta y el cierre la última', () => {
+    const { container } = render(<Solutions />)
+    const strip = container.querySelector('.service-swipe')
+    const items = [...strip.children].filter((el) => !el.getAttribute('aria-hidden'))
+    expect(items[0]).toBe(screen.getByRole('navigation', { name: 'Servicios' }))
+    const last = items[items.length - 1]
+    expect(last).toHaveTextContent('¿No sabés por dónde empezar?')
+    expect(within(last).getByRole('link', { name: /Escribirme por WhatsApp/ }).getAttribute('href')).toContain('wa.me')
   })
 
   it('ya no usa los rótulos en mayúsculas Resuelve / Entrega / Resultado', () => {

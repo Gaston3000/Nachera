@@ -8,8 +8,8 @@ import {
   useTransform,
 } from 'motion/react'
 import { Button } from '../primitives/Button.jsx'
-import { MessageIcon } from '../primitives/icons.jsx'
-import { whatsappWith } from '../../data/siteConfig.js'
+import { ChevronRight, MessageIcon } from '../primitives/icons.jsx'
+import { siteConfig, whatsappWith } from '../../data/siteConfig.js'
 
 /* ── Soluciones: los servicios en una tira ─────────────────────────────────
  *
@@ -83,10 +83,10 @@ export function SolutionsTrack({ services, vizVariants }) {
 /* ─── la presentación: título + índice ─────────────────────────────────── */
 
 /* El índice es la respuesta a "el que viene a contratar algo puntual lo
-   encuentra de una". En escritorio es una lista vertical con el indicador
-   deslizante del nav (layoutId); en celular, pastillas que se acomodan en
-   renglones — nada de una segunda tira horizontal arriba de la tira. */
-function Intro({ services, active, onJump, chips = false }) {
+   encuentra de una": una lista vertical con el indicador deslizante del nav
+   (layoutId). Es la presentación de la tira de escritorio; en celular el
+   índice vive adentro de la tira, como su primera tarjeta (IndexCard). */
+function Intro({ services, active, onJump }) {
   return (
     <div>
       <h2
@@ -97,8 +97,8 @@ function Intro({ services, active, onJump, chips = false }) {
       </h2>
       <p className="mt-4 text-base text-muted">Elegí lo que necesitás, o recorré todo.</p>
 
-      <nav aria-label="Servicios" className={chips ? 'mt-5' : 'mt-7'}>
-        <ul className={chips ? 'flex flex-wrap gap-1.5' : 'flex flex-col'}>
+      <nav aria-label="Servicios" className="mt-7">
+        <ul className="flex flex-col">
           {services.map((s, i) => {
             const on = active === i
             return (
@@ -107,19 +107,11 @@ function Intro({ services, active, onJump, chips = false }) {
                   type="button"
                   onClick={() => onJump(i)}
                   aria-current={on ? 'true' : undefined}
-                  className={
-                    chips
-                      ? `min-h-[2.75rem] rounded-full border px-3.5 text-[0.82rem] font-medium transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
-                          on
-                            ? 'border-accent bg-accent text-bg'
-                            : 'border-glassborder text-fg/80 hover:text-fg'
-                        }`
-                      : `relative block py-[0.4rem] pl-4 text-left font-display text-[1.05rem] transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
-                          on ? 'text-fg' : 'text-fg/45 hover:text-fg/80'
-                        }`
-                  }
+                  className={`relative block py-[0.4rem] pl-4 text-left font-display text-[1.05rem] transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
+                    on ? 'text-fg' : 'text-fg/45 hover:text-fg/80'
+                  }`}
                 >
-                  {!chips && on && (
+                  {on && (
                     <motion.span
                       layoutId="solutions-index"
                       aria-hidden="true"
@@ -440,13 +432,17 @@ function PinnedTrack({ services, vizVariants, reduce, openId, setOpenId }) {
 
 /* ─── celular y reduced-motion: la tira que se desliza ─────────────────── */
 
-/* Scroll horizontal nativo con encastre por tarjeta (scroll-snap): cada una
-   ocupa ~85% del ancho, así asoma la siguiente y se entiende que sigue. El
-   índice va arriba, como pastillas. Nada anclado. */
+/* Como mkvision en celular: arriba, solo el título; todo lo demás vive
+   adentro de la tira, que se desliza con el dedo y encastra por tarjeta
+   (scroll-snap). Cada tarjeta ocupa ~85% del ancho, así asoma la siguiente.
+
+   La tira arranca con el índice (IndexCard) y termina con una tarjeta de
+   cierre (ClosingCard): la sección entera entra en una pantalla, y las
+   categorías dejan de ser un bloque de pastillas encima de la tira. */
 function SwipeTrack({ services, vizVariants, reduce, openId, setOpenId }) {
   const scrollerRef = useRef(null)
+  const thumbRef = useRef(null)
   const frame = useRef(0)
-  const [active, setActive] = useState(0)
   // Sin IntersectionObserver (o con reduced-motion) los dibujos quedan
   // directamente en su estado final.
   const [seen, setSeen] = useState(() =>
@@ -471,23 +467,33 @@ function SwipeTrack({ services, vizVariants, reduce, openId, setOpenId }) {
     return () => io.disconnect()
   }, [reduce])
 
+  // La barra de progreso es un "pulgar": mide lo que se ve de la tira y se
+  // corre con el scroll. Así dice desde el arranque que hay más, y cuánto.
+  // Se escribe por el DOM: nada de estado de React por cuadro.
+  const paintThumb = () => {
+    const el = scrollerRef.current
+    const thumb = thumbRef.current
+    if (!el || !thumb || !el.scrollWidth) return
+    const frac = Math.min(1, el.clientWidth / el.scrollWidth)
+    const max = el.scrollWidth - el.clientWidth
+    const p = max > 0 ? el.scrollLeft / max : 0
+    thumb.style.width = `${frac * 100}%`
+    thumb.style.transform = `translateX(${p * (1 / frac - 1) * 100}%)`
+  }
+
+  useEffect(() => {
+    paintThumb()
+    const el = scrollerRef.current
+    const ro = typeof ResizeObserver !== 'undefined' && el ? new ResizeObserver(paintThumb) : null
+    ro?.observe(el)
+    return () => ro?.disconnect()
+  }, [])
+
   const onScroll = () => {
     if (frame.current) return
     frame.current = requestAnimationFrame(() => {
       frame.current = 0
-      const el = scrollerRef.current
-      if (!el) return
-      const pad = parseFloat(getComputedStyle(el).scrollPaddingLeft) || 0
-      let best = 0
-      let bestD = Infinity
-      cards().forEach((c, i) => {
-        const d = Math.abs(c.offsetLeft - pad - el.scrollLeft)
-        if (d < bestD) {
-          bestD = d
-          best = i
-        }
-      })
-      setActive(best)
+      paintThumb()
     })
   }
 
@@ -497,19 +503,26 @@ function SwipeTrack({ services, vizVariants, reduce, openId, setOpenId }) {
     if (!el || !card) return
     const pad = parseFloat(getComputedStyle(el).scrollPaddingLeft) || 0
     el.scrollTo?.({ left: card.offsetLeft - pad, behavior: reduce ? 'auto' : 'smooth' })
-    setActive(i)
   }
+
+  const size = 'min-h-[27rem] w-[85vw] max-w-[23rem] snap-start'
 
   return (
     <div className="py-16 md:py-28">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
-        <Intro services={services} active={active} onJump={jump} chips />
+        <h2
+          id="soluciones-title"
+          className="text-balance font-display text-[clamp(2.4rem,1.6rem+3.6vw,3.5rem)] font-bold leading-[1.02] tracking-tight text-fg"
+        >
+          Lo que puedo hacer por tu marca.
+        </h2>
       </div>
       <div
         ref={scrollerRef}
         onScroll={onScroll}
         className="service-swipe mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-5 px-5 sm:scroll-px-8 sm:px-8 lg:scroll-px-[max(2rem,calc((100vw-72rem)/2))] lg:px-[max(2rem,calc((100vw-72rem)/2))]"
       >
+        <IndexCard services={services} onJump={jump} className={size} />
         {services.map((s, i) => (
           <ServiceCard
             key={s.id}
@@ -519,14 +532,84 @@ function SwipeTrack({ services, vizVariants, reduce, openId, setOpenId }) {
             onToggle={(v) => setOpenId(v ? s.id : null)}
             vizVariants={vizVariants}
             reduce={reduce}
-            className={`min-h-[27rem] snap-start ${
-              s.wide ? 'w-[85vw] max-w-[30rem]' : 'w-[85vw] max-w-[23rem]'
-            }`}
+            className={s.wide ? 'min-h-[27rem] w-[85vw] max-w-[30rem] snap-start' : size}
           />
         ))}
+        <ClosingCard className={size} />
         {/* El aire del final: el padding derecho de un contenedor que
             scrollea no siempre cuenta. */}
         <div aria-hidden="true" className="w-px shrink-0" />
+      </div>
+
+      <div className="mx-auto mt-6 max-w-6xl px-5 sm:px-8" aria-hidden="true">
+        <div className="h-0.5 overflow-hidden rounded-full bg-white/10">
+          <div
+            ref={thumbRef}
+            className="h-full rounded-full bg-accent shadow-[0_0_8px_var(--c-accent)]"
+            style={{ width: '25%' }}
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* La portada de la tira: el índice. Superficie clara con tinta oscura, la
+   única de la tira — se lee como el sumario de una revista, y es lo que la
+   distingue de las tarjetas de servicio. Cada renglón lleva directo a su
+   tarjeta. */
+function IndexCard({ services, onJump, className = '' }) {
+  return (
+    <nav
+      aria-label="Servicios"
+      className={`flex shrink-0 flex-col rounded-[1.75rem] p-6 ${className}`}
+      style={{ background: 'var(--c-fg)', color: 'var(--c-bg)' }}
+    >
+      <p className="font-display text-lg font-semibold leading-tight">Elegí por dónde empezar</p>
+      <ul className="mt-4 divide-y divide-black/10 border-y border-black/10">
+        {services.map((s, i) => (
+          <li key={s.id}>
+            <button
+              type="button"
+              onClick={() => onJump(i)}
+              className="flex min-h-[3rem] w-full items-center justify-between gap-3 text-left font-display text-[1.02rem] font-semibold leading-snug transition-opacity active:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--c-bg)]"
+            >
+              {s.title}
+              <ChevronRight className="h-4 w-4 shrink-0 opacity-50" />
+            </button>
+          </li>
+        ))}
+      </ul>
+      <p className="mt-auto pt-5 text-sm" style={{ color: 'color-mix(in srgb, var(--c-bg) 60%, transparent)' }}>
+        O deslizá y recorrelo todo.
+      </p>
+    </nav>
+  )
+}
+
+/* El cierre de la tira, como el "Meer zien" de mkvision: para el que
+   recorrió todo y todavía no sabe qué pedir. Termina en una charla. */
+function ClosingCard({ className = '' }) {
+  return (
+    <div
+      className={`service-card flex shrink-0 flex-col justify-between rounded-[1.75rem] p-6 ${className}`}
+      style={{
+        background:
+          'radial-gradient(90% 70% at 100% 0%, color-mix(in srgb, var(--c-accent) 22%, transparent), transparent 70%), var(--c-bg2)',
+      }}
+    >
+      <div>
+        <p className="font-display text-[1.7rem] font-bold leading-[1.1] tracking-tight text-fg">
+          ¿No sabés por dónde empezar?
+        </p>
+        <p className="mt-3 text-base leading-snug text-muted">
+          Contame qué necesita tu marca y lo vemos juntos.
+        </p>
+      </div>
+      <div className="pt-6">
+        <Button href={siteConfig.whatsappUrlWithMsg} target="_blank" rel="noopener" icon={<MessageIcon />}>
+          Escribirme por WhatsApp
+        </Button>
       </div>
     </div>
   )
