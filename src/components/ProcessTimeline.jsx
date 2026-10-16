@@ -1,669 +1,240 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { useReducedMotion } from 'motion/react'
-import { SectionHeading } from './primitives/SectionHeading.jsx'
-import { Reveal } from './primitives/Reveal.jsx'
-import { RAIL_PAD, StackRail } from './primitives/StackRail.jsx'
+import { Button } from './primitives/Button.jsx'
+import { MessageIcon } from './primitives/icons.jsx'
+import { Camara, Consola, Libreta, Microfono, Pauta, Prueba } from './process/OficioDrawings.jsx'
 import { process } from '../data/content.js'
+import { siteConfig } from '../data/siteConfig.js'
 
-/* ───────────────────────────────────────────────────────────────
-   Proceso — acordeón manejado por el scroll
+/* ── Proceso: cómo trabajo, paso a paso ────────────────────────────────────
+ *
+ * Inspirado en la fila de servicios de metic.studio: un acordeón en una
+ * sola pantalla. El paso abierto se queda con el ancho; el resto queda en un
+ * lomo angosto con su número y el título girado. Se abre al pasar el mouse
+ * o al tocar — no se ancla el scroll: Soluciones, justo arriba, ya es el
+ * tramo anclado de la página, y dos seguidos cansan.
+ *
+ * Cada paso lleva su dibujo de "las herramientas del oficio"
+ * (process/OficioDrawings): un objeto del periodismo y la radio con un solo
+ * detalle cyan. En los lomos el dibujo queda apagado y tenue (metic los
+ * pasa a blanco y negro); al abrirse, su detalle se enciende y se traza.
+ *
+ * Termina como el proceso de metic ("Your turn"): el último panel es "Tu
+ * turno", con el WhatsApp — el paso 1 es una charla.
+ *
+ * En celular, el mismo acordeón en vertical: encabezados con número, título
+ * y un "+", uno abierto por vez.
+ */
 
-   En desktop la sección se ancla (sticky) y el scroll abre los
-   pasos: mientras uno se angosta el siguiente se ensancha, de
-   forma continua. No hay salto de un panel al otro — en el medio
-   del recorrido los dos están medio abiertos. El usuario no mira
-   una animación: la maneja.
+// El último es el de "Tu turno": el micrófono de radio.
+const DRAWINGS = [Libreta, Pauta, Camara, Prueba, Consola, Microfono]
+const TURN = process.length // el índice del panel "Tu turno"
 
-   Por qué scroll y no un temporizador: un autoplay decide por vos
-   cuánto tarda cada paso, y siempre le erra (o corre y no llegás a
-   leer, o va lento y aburre). Atado al scroll, cada uno avanza al
-   ritmo que lee, y el gesto de "avanzar en el proceso" es
-   literalmente el gesto de avanzar en la página.
+/* "Una lectura clara…" → "una lectura clara…": el entregable se lee como
+   continuación de "Te llevás". */
+const lower = (s) => s.charAt(0).toLowerCase() + s.slice(1)
 
-   El panel abierto se queda con el ancho que sobra; el resto queda
-   en un "lomo" angosto con el número arriba y el título rotado
-   abajo.
-
-   Tres cosas lo separan de un carrusel de pestañas — las tres para
-   que se lea como PROCESO y no como menú:
-
-   1. Los lomos ya recorridos quedan en estado "hecho" (punto
-      lleno) y los que faltan atenuados → línea de tiempo.
-   2. El avance es continuo, no discreto: se ve el traspaso.
-   3. "Qué recibís" en cada paso: responde qué se lleva el cliente,
-      que es para lo que existe el sitio.
-
-   En mobile el gesto es el mismo — el scroll manda — pero la forma
-   cambia: las tarjetas suben desde abajo y se apilan una sobre otra,
-   dejando asomar el encabezado de las anteriores. Mientras leés el
-   paso 04 seguís viendo arriba "01 Diagnóstico · 02 Estrategia ·
-   03 Ejecución": el recorrido queda a la vista.
-
-   Un acordeón horizontal no entra en 400px, y pinnear la sección en un
-   teléfono se siente como que la página se colgó. El apilado no
-   secuestra el scroll: la página sigue corriendo normal, las tarjetas
-   sólo se quedan pegadas mientras la siguiente las tapa.
-   ─────────────────────────────────────────────────────────────── */
-
-/* Cuánto scroll cuesta cada paso, en viewports. La pista mide
-   100vh (lo que ocupa la sección anclada) + un tramo por paso. Más
-   alto = más lento y más control; más bajo = más ágil pero los pasos
-   se pisan. 60 es el punto donde se alcanza a leer sin que se sienta
-   que la página se trabó. */
-const STEP_VH = 60
-
-/* Ancho del lomo colapsado y separación entre paneles. Van como CSS
-   vars porque el ancho de cada panel se calcula a partir de ellas. */
-const SPINE = '4.5rem'
-const GAP = '0.5rem'
-
-/* Constante de tiempo del suavizado, en ms. El scroll llega a saltos
-   (sobre todo con rueda de mouse); esto lo convierte en una
-   interpolación continua. Es el equivalente al `useSpring` que usan
-   Parallax y ScrollProgress, hecho a mano porque acá hay que escribir
-   5 anchos por frame y un motion value por panel sería peor. */
-const SMOOTH_TAU = 70
-
-/* Mobile — alto de la fila de encabezado de cada tarjeta, que es también
-   el escalón del apilado: cada tarjeta se clava un encabezado más abajo
-   que la anterior, así lo que asoma de las ya recorridas es su número y
-   su título, legibles.
-   Con 5 pasos, las 4 tiras de arriba ocupan 4 × 3.5rem = 224px. Más alto
-   que eso y en un teléfono no queda lugar para leer la tarjeta abierta. */
-const STACK_HEADER = '3.5rem'
-
-/* Dónde se clava la primera tarjeta. Despeja el nav fijo. */
-const STACK_TOP = '5.5rem'
-
-const EASE_CSS = 'cubic-bezier(0.16,1,0.3,1)'
-
-/* Alterna cyan/violeta como las tarjetas de Soluciones. Es lo que en la
-   referencia hacían los paneles alternando navy y blanco: dar ritmo sin
-   que el color signifique nada. */
-const accentOf = (i) => (i % 2 === 0 ? 'var(--c-accent)' : 'var(--c-accent2)')
-
-const pad2 = (n) => String(n).padStart(2, '0')
-const clamp01 = (v) => (v < 0 ? 0 : v > 1 ? 1 : v)
-
-/* ─── el motor de scroll ────────────────────────────────────────── */
-
-/* Traduce la posición del scroll dentro de la pista a una posición
-   continua entre pasos (0 … count-1) y la pinta directo en el DOM.
-
-   Se escribe en el DOM y no en el estado de React a propósito: son 5
-   anchos por frame a 60fps. Por estado, cada frame re-renderizaría el
-   árbol entero de la sección. Lo único que sí va por estado es el paso
-   redondeado, que cambia 5 veces en todo el recorrido y es lo que
-   necesitan `aria-selected` y el contador. */
-function useScrollAccordion({ count }) {
-  const trackRef = useRef(null)
-  const listRef = useRef(null)
-  const panelsRef = useRef([])
-  const [active, setActive] = useState(0)
-
-  /* Posición objetivo (la que dicta el scroll) vs. la actual (la que se
-     dibuja). La distancia entre las dos es lo que da el deslizamiento. */
-  const target = useRef(0)
-  const current = useRef(0)
-
-  const readScroll = useCallback(() => {
-    const track = trackRef.current
-    if (!track) return 0
-    const rect = track.getBoundingClientRect()
-    // Recorrido útil = alto de la pista menos la ventana, que es
-    // justamente el tramo en que el panel anclado permanece quieto.
-    const total = rect.height - window.innerHeight
-    if (total <= 0) return 0
-    return clamp01(-rect.top / total) * (count - 1)
-  }, [count])
-
-  const paint = useCallback(
-    (pos) => {
-      /* Apertura de cada panel: 1 si el scroll está justo en él, 0 si
-         está a un paso o más. Los dos vecinos de un tramo suman
-         siempre 1, así que el ancho total se conserva y no hay
-         reflow del contenedor mientras se abre. */
-      const share = []
-      let sum = 0
-      for (let i = 0; i < count; i++) {
-        const o = Math.max(0, 1 - Math.abs(pos - i))
-        // smoothstep: sin esto el traspaso es lineal y se nota "mecánico"
-        const s = o * o * (3 - 2 * o)
-        share.push(s)
-        sum += s
-      }
-      if (sum <= 0) sum = 1
-
-      for (let i = 0; i < count; i++) {
-        const el = panelsRef.current[i]
-        if (!el) continue
-        const k = (share[i] / sum).toFixed(4)
-        /* Una sola var por panel: el ancho, la opacidad del contenido,
-           el desplazamiento y el color del título salen todos de acá. */
-        el.style.setProperty('--open', k)
-        el.style.width = `calc(var(--spine) + var(--extra) * ${k})`
-      }
-    },
-    [count]
-  )
-
-  useEffect(() => {
-    const track = trackRef.current
-    if (!track) return
-
-    let raf = 0
-    let last = performance.now()
-    let running = true
-
-    const tick = (now) => {
-      /* Acotado a [0, 100]. Negativo no es teórico: si el cuadro llega con
-         una marca de tiempo anterior a `last` (pestaña en segundo plano,
-         ventana congelada), el factor de abajo se vuelve negativo y enorme,
-         la posición se dispara fuera de 0…n−1 y `steps[active]` deja de
-         existir — y con él, la página entera. */
-      const dt = Math.min(Math.max(now - last, 0), 100)
-      last = now
-
-      target.current = readScroll()
-
-      /* Suavizado exponencial: independiente de los fps, a diferencia
-         del clásico `cur += (target - cur) * 0.2`, que en una pantalla
-         de 120Hz corre al doble de velocidad. */
-      const k = 1 - Math.exp(-dt / SMOOTH_TAU)
-      current.current += (target.current - current.current) * k
-
-      // Cerca del final, clavarlo: si no, queda oscilando en el decimal.
-      if (Math.abs(target.current - current.current) < 0.0005) {
-        current.current = target.current
-      }
-
-      // Y la posición, siempre adentro del recorrido.
-      current.current = Math.min(Math.max(current.current, 0), count - 1)
-      paint(current.current)
-
-      const rounded = Math.round(current.current)
-      setActive((prev) => (prev === rounded ? prev : rounded))
-
-      if (running) raf = requestAnimationFrame(tick)
-    }
-
-    /* El loop corre sólo mientras la sección está cerca de la ventana.
-       Fuera de eso no hay nada que dibujar y sería quemar frames. */
-    let io = null
-    const start = () => {
-      if (raf) return
-      last = performance.now()
-      raf = requestAnimationFrame(tick)
-    }
-    const stop = () => {
-      cancelAnimationFrame(raf)
-      raf = 0
-    }
-
-    if (typeof IntersectionObserver === 'undefined') {
-      // jsdom: se pinta una vez el estado inicial y se corta.
-      paint(0)
-      return
-    }
-
-    io = new IntersectionObserver(
-      ([entry]) => (entry.isIntersecting ? start() : stop()),
-      { rootMargin: '100px 0px' }
-    )
-    io.observe(track)
-
-    return () => {
-      running = false
-      stop()
-      io?.disconnect()
-    }
-  }, [paint, readScroll, count])
-
-  /* Click / teclado no cambian el paso a mano: llevan el scroll hasta
-     donde ese paso está abierto. Si el paso se pudiera fijar por un
-     lado y el scroll lo moviera por otro, las dos fuentes pelearían. */
-  const scrollToStep = useCallback(
-    (i) => {
-      const track = trackRef.current
-      if (!track) return
-      const rect = track.getBoundingClientRect()
-      const total = rect.height - window.innerHeight
-      if (total <= 0) return
-      const idx = Math.max(0, Math.min(count - 1, i))
-      window.scrollTo({
-        top: window.scrollY + rect.top + (idx / (count - 1)) * total,
-        behavior: 'smooth',
-      })
-    },
-    [count]
-  )
-
-  const registerPanel = useCallback((i) => (el) => {
-    panelsRef.current[i] = el
-  }, [])
-
-  return { trackRef, listRef, active, scrollToStep, registerPanel }
-}
-
-/* Flechas / Home / End sobre el tablist: mueven el scroll al paso. */
-function useArrowKeys({ count, active, onGo }) {
-  return useCallback(
-    (e) => {
-      const delta =
-        e.key === 'ArrowRight' || e.key === 'ArrowDown'
-          ? 1
-          : e.key === 'ArrowLeft' || e.key === 'ArrowUp'
-            ? -1
-            : 0
-
-      let target = null
-      if (delta !== 0) target = active + delta
-      else if (e.key === 'Home') target = 0
-      else if (e.key === 'End') target = count - 1
-      if (target === null) return
-
-      e.preventDefault()
-      onGo(Math.max(0, Math.min(count - 1, target)))
-    },
-    [active, count, onGo]
+function Header() {
+  return (
+    <div className="mb-10 max-w-2xl md:mb-12">
+      <h2
+        id="proceso-title"
+        className="text-balance font-display text-[clamp(2rem,1.3rem+2.4vw,3.25rem)] font-bold leading-[1.04] tracking-tight text-fg"
+      >
+        Cómo trabajo, paso a paso.
+      </h2>
+      <p className="mt-4 text-base text-muted md:text-lg">
+        Cinco pasos, de la primera charla a los ajustes de cada mes.
+      </p>
+    </div>
   )
 }
 
-/* Enter / Espacio activan el panel: al no ser <button>, el teclado no
-   viene gratis. */
-function activationKeys(onActivate) {
-  return (e) => {
-    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
-      e.preventDefault()
-      e.stopPropagation()
-      onActivate()
-    }
-  }
-}
-
-/* ─── piezas compartidas ────────────────────────────────────────── */
-
-function StepHead({ step, index, count }) {
-  const accent = accentOf(index)
+/* El texto de un paso: título, qué hago y qué te llevás. */
+function StepCopy({ step }) {
   return (
     <>
-      <p
-        className="font-display text-[11px] font-semibold uppercase tracking-[0.22em]"
-        style={{ color: accent }}
-      >
-        Paso {step.n} <span className="text-muted">/ {pad2(count)}</span>
+      <h3 className="font-display text-[2rem] font-semibold leading-tight tracking-tight text-fg">{step.title}</h3>
+      <p className="mt-2 text-[0.98rem] leading-relaxed text-muted">{step.desc}</p>
+      <p className="mt-4 text-[0.98rem] leading-relaxed text-fg/85">
+        <span className="text-fg/55">Te llevás </span>
+        {lower(step.deliver)}
       </p>
-      <h3 className="mt-2 font-display text-xl font-bold text-fg sm:text-2xl lg:text-3xl">
-        {step.title}
-      </h3>
     </>
   )
 }
 
-/* Descripción + el entregable del paso. "Qué recibís" es el agregado
-   sobre la referencia: ahí el pie del panel era un link de contexto;
-   acá responde la pregunta comercial ("¿y yo qué me llevo?"). */
-function StepDetail({ step, index }) {
-  const accent = accentOf(index)
+/* "Tu turno": el cierre. */
+function TurnCopy({ heading = true }) {
   return (
     <>
-      <p className="max-w-md text-sm leading-relaxed text-muted sm:text-base">
-        {step.desc}
-      </p>
-      <div className="mt-5 max-w-md border-t border-glassborder pt-4">
-        <p className="font-display text-[10px] font-semibold uppercase tracking-[0.2em] text-muted">
-          Qué recibís
-        </p>
-        <p
-          className="mt-1.5 text-sm font-medium leading-relaxed"
-          style={{ color: accent }}
-        >
-          {step.deliver}
-        </p>
-      </div>
-    </>
-  )
-}
-
-/* El número gigante translúcido detrás del texto. Ocupa el lugar que en
-   la referencia ocupaba una foto — que acá no existe, y meter una de
-   stock sería peor que no poner nada. */
-function GhostNumber({ n, className = '', style }) {
-  return (
-    <span
-      aria-hidden="true"
-      style={style}
-      className={`pointer-events-none absolute select-none font-display font-black leading-none text-fg/[0.04] ${className}`}
-    >
-      {n}
-    </span>
-  )
-}
-
-/* El lomo: número arriba, punto de estado, título rotado abajo.
-   El punto lleno = paso ya recorrido. Es lo que convierte el acordeón
-   en una línea de tiempo y no en un menú de pestañas. */
-/* `done` y `current` llegan explícitos y no derivados de un índice
-   activo: en el acordeón hay un paso actual, pero en la pila de mobile
-   están los 5 abiertos a la vez y ninguno es "el actual". */
-function Spine({ step, index, done, current = false, vertical = false }) {
-  const accent = accentOf(index)
-  return (
-    <div
-      className={
-        vertical
-          ? 'flex w-[var(--spine)] flex-none flex-col items-center gap-3 self-stretch py-5'
-          : 'absolute inset-y-0 left-0 flex w-[var(--spine)] flex-col items-center justify-between py-5'
-      }
-    >
-      <span
-        className="font-mono text-[11px] tracking-widest transition-colors duration-500"
-        style={{ color: done ? accent : 'var(--c-muted)' }}
-      >
-        {step.n}
-      </span>
-
-      <span
-        aria-hidden="true"
-        className="h-1.5 w-1.5 flex-none rounded-full transition-all duration-500"
-        style={{
-          background: done ? accent : 'transparent',
-          border: done ? 'none' : '1px solid var(--c-glass-border)',
-          boxShadow: current ? `0 0 10px ${accent}` : 'none',
-        }}
-      />
-
-      {/* El título rotado es la firma visual del patrón. Se aclara con
-          `--open`, así acompaña la apertura en vez de cambiar de golpe.
-          En vertical no va: el lomo mide 72px de alto, no entra. */}
-      {!vertical && (
-        <span
-          aria-hidden="true"
-          className="font-display text-[11px] font-semibold uppercase tracking-[0.18em]"
-          style={{
-            writingMode: 'vertical-rl',
-            transform: 'rotate(180deg)',
-            color:
-              'color-mix(in srgb, var(--c-fg) calc(var(--open, 0) * 100%), var(--c-muted))',
-          }}
-        >
-          {step.title}
-        </span>
+      {heading && (
+        <h3 className="font-display text-[2rem] font-semibold leading-tight tracking-tight text-fg">Tu turno.</h3>
       )}
-    </div>
-  )
-}
-
-/* ─── desktop: acordeón anclado, manejado por el scroll ─────────── */
-
-function ScrollAccordion({ steps }) {
-  const count = steps.length
-  const { trackRef, active, scrollToStep, registerPanel } = useScrollAccordion({ count })
-  const onKeyDown = useArrowKeys({ count, active, onGo: scrollToStep })
-
-  return (
-    <div
-      ref={trackRef}
-      data-process-track=""
-      className="relative hidden lg:block"
-      style={{ height: `calc(100vh + ${(count - 1) * STEP_VH}vh)` }}
-    >
-      {/* pt-24 despeja el nav fijo; el contenido queda centrado en lo que sobra */}
-      <div className="sticky top-0 flex h-screen flex-col justify-center pt-24">
-        <div className="mx-auto w-full max-w-6xl px-8">
-          <SectionHeading eyebrow="Proceso" title="Cómo trabajo, paso a paso." />
-
-          <div className="mb-4 flex items-center justify-between gap-4">
-            <p className="font-mono text-xs text-muted">
-              <span className="text-fg">{steps[active].n}</span> / {pad2(count)}
-            </p>
-            <p className="font-display text-[10px] font-semibold uppercase tracking-[0.2em] text-muted">
-              Scrolleá para avanzar
-            </p>
-          </div>
-
-          <div
-            role="tablist"
-            aria-label="Pasos del proceso"
-            data-accordion="horizontal"
-            onKeyDown={onKeyDown}
-            className="flex h-[24rem] gap-[var(--gap)]"
-            style={{
-              '--spine': SPINE,
-              '--gap': GAP,
-              /* Lo que se reparten los paneles según cuán abiertos estén.
-                 El 100% resuelve contra este contenedor, que es el bloque
-                 contenedor de los paneles. */
-              '--extra': `calc(100% - ${count} * var(--spine) - ${count - 1} * var(--gap))`,
-            }}
-          >
-            {steps.map((step, i) => {
-              const open = i === active
-              const accent = accentOf(i)
-              return (
-                <div
-                  key={step.n}
-                  ref={registerPanel(i)}
-                  role="tab"
-                  aria-selected={open}
-                  tabIndex={open ? 0 : -1}
-                  aria-label={`Paso ${step.n}: ${step.title}`}
-                  onClick={() => scrollToStep(i)}
-                  onKeyDown={activationKeys(() => scrollToStep(i))}
-                  className="group relative flex-none cursor-pointer overflow-hidden rounded-2xl border backdrop-blur-md"
-                  style={{
-                    /* Ancho inicial antes del primer frame del rAF. */
-                    width: `calc(var(--spine) + var(--extra) * ${i === 0 ? 1 : 0})`,
-                    '--open': i === 0 ? 1 : 0,
-                    /* Sin transición de ancho: acá manda el scroll. Una
-                       transición encima pelearía con el rAF y llegaría
-                       siempre tarde. Los colores sí transicionan, porque
-                       dependen del paso redondeado. */
-                    borderColor: `color-mix(in srgb, ${accent} calc(var(--open) * 45%), var(--c-glass-border))`,
-                    background: `linear-gradient(135deg, color-mix(in srgb, ${accent} calc(var(--open) * 9%), var(--c-glass)), var(--c-glass))`,
-                    boxShadow: `0 0 60px -22px color-mix(in srgb, ${accent} calc(var(--open) * 100%), transparent), inset 0 1px 0 0 rgba(255,255,255,0.06)`,
-                  }}
-                >
-                  <Spine
-                    step={step}
-                    index={i}
-                    done={i <= active}
-                    current={i === active}
-                  />
-
-                  {/* Ancho fijo: al angostarse el panel el texto se recorta
-                      en vez de reflowear. Si se re-acomodara mientras el
-                      panel cambia de ancho, la apertura se vería sucia.
-                      La opacidad y el corrimiento salen de `--open`, así
-                      el contenido entra junto con el ancho y no después. */}
-                  <div
-                    aria-hidden={!open}
-                    className="absolute inset-y-0 left-[var(--spine)] flex w-[30rem] flex-col justify-center pr-8"
-                    style={{
-                      opacity: 'calc((var(--open) - 0.35) * 2.4)',
-                      transform: 'translateX(calc((1 - var(--open)) * -14px))',
-                    }}
-                  >
-                    <StepHead step={step} index={i} count={count} />
-                    <div className="mt-3">
-                      <StepDetail step={step} index={i} />
-                    </div>
-                  </div>
-
-                  <GhostNumber
-                    n={step.n}
-                    className="bottom-2 right-4 text-[11rem]"
-                    style={{ opacity: 'calc((var(--open) - 0.5) * 2)' }}
-                  />
-                </div>
-              )
-            })}
-          </div>
-
-          {/* Progreso del recorrido completo, no del paso: dice cuánto
-              falta para que la sección suelte el scroll. */}
-          <div
-            aria-hidden="true"
-            className="mt-6 h-[2px] overflow-hidden rounded-full bg-glassborder"
-          >
-            <div
-              className="h-full origin-left bg-accent"
-              style={{
-                transform: `scaleX(${count > 1 ? active / (count - 1) : 1})`,
-                transition: `transform 0.5s ${EASE_CSS}`,
-                boxShadow: '0 0 10px color-mix(in srgb, var(--c-accent) 60%, transparent)',
-              }}
-            />
-          </div>
-        </div>
+      <p className={`max-w-[30ch] text-[0.98rem] leading-relaxed text-muted ${heading ? 'mt-2' : ''}`}>
+        El paso 1 es una charla: contame de tu marca y vemos por dónde empezar.
+      </p>
+      <div className="mt-6">
+        <Button href={siteConfig.whatsappUrlWithMsg} target="_blank" rel="noopener" icon={<MessageIcon />}>
+          Escribirme por WhatsApp
+        </Button>
       </div>
-    </div>
+    </>
   )
 }
 
-/* ─── mobile: tarjetas que suben y se apilan con el scroll ──────── */
+const TURN_SURFACE =
+  'radial-gradient(90% 70% at 100% 0%, color-mix(in srgb, var(--c-accent) 22%, transparent), transparent 70%), var(--c-bg2)'
 
-/* Cada tarjeta se clava un encabezado más abajo que la anterior, así lo
-   que queda a la vista de las ya recorridas no es un borde sino su fila
-   de encabezado entera: número y título legibles, apilados arriba.
+const panelsOf = () => [...process.map((step, i) => ({ step, i })), { turn: true, i: TURN }]
 
-   Ese detalle es el que hace que el patrón sirva para un proceso y no
-   sólo para una galería. Mientras leés el paso 04 seguís viendo, arriba,
-   "01 Diagnóstico · 02 Estrategia · 03 Ejecución": el recorrido queda a
-   la vista en vez de haber que recordarlo.
+/* ─── escritorio: la fila ─────────────────────────────────────────────── */
 
-   Es CSS puro, sin un solo frame de JS. Se probó una versión con rAF que
-   achicaba y apagaba las tapadas para dar profundidad, y se descartó:
-   escalar una tarjeta clavada le cambia el ancho a su tira de encabezado
-   y la pila deja de alinearse. La profundidad ya la dan el borde, la
-   sombra y el fondo propio de cada tarjeta. */
-function StackedCards({ steps }) {
-  const count = steps.length
-
+function Row({ active, setActive }) {
   return (
-    <div className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8 lg:hidden">
-      {/* El riel va en un contenedor interno y no en este: `absolute` se
-          posiciona contra la caja del borde, así que colgado del wrapper
-          ignoraría su padding horizontal y la línea caería 20px a la
-          izquierda de la de Soluciones. Tienen que coincidir o el eje se
-          quiebra en el pase. */}
-      <div className={`relative ${RAIL_PAD}`}>
-      <StackRail />
-      <Reveal>
-        <SectionHeading eyebrow="Proceso" title="Cómo trabajo, paso a paso." />
-      </Reveal>
-
-      {/* `ol` y no tablist: acá no hay nada que elegir. Los 5 pasos están
-          abiertos y se leen en orden, que es justo lo que la sección
-          quiere contar — y deja el marcado más simple.
-          El padding de abajo le da a la última tarjeta su momento clavada
-          antes de que la pila se suelte. */}
-      <ol data-stack="proceso" className="relative pb-[25vh]">
-        {steps.map((step, i) => {
-          const accent = accentOf(i)
-          return (
-            <li
-              key={step.n}
-              className="sticky"
-              style={{
-                top: `calc(${STACK_TOP} + ${i} * ${STACK_HEADER})`,
-                zIndex: i + 1,
-              }}
-            >
-              <article
-                style={{
-                  borderColor: `color-mix(in srgb, ${accent} 45%, transparent)`,
-                  /* Fondo opaco, no `bg-glass`: son tarjetas que se tapan
-                     entre sí. Con fondo translúcido se transparentarían las
-                     de abajo y la pila se leería como un borrón. */
-                  background: `linear-gradient(160deg, color-mix(in srgb, ${accent} 12%, var(--c-bg2)), var(--c-bg))`,
-                  boxShadow: `0 -8px 40px -12px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.03)`,
-                }}
-                className="relative flex min-h-[17rem] flex-col overflow-hidden rounded-2xl border"
+    <div className="process-row hidden h-[34rem] gap-2 lg:flex">
+      {panelsOf().map(({ step, i, turn }) => {
+        const open = active === i
+        const Drawing = DRAWINGS[i]
+        return (
+          <div
+            key={i}
+            data-step={i}
+            className={`process-panel relative min-w-0 overflow-hidden rounded-xl ${open ? 'is-open' : ''}`}
+            style={{ flex: open ? 3.4 : 1, background: turn ? TURN_SURFACE : 'var(--c-bg2)' }}
+            onMouseEnter={() => setActive(i)}
+          >
+            {/* el dibujo: grande arriba en el abierto; apagado y tenue en el lomo */}
+            {Drawing && (
+              <div
+                aria-hidden="true"
+                className="process-panel__art pointer-events-none absolute inset-x-0 top-0 flex h-[58%] items-center justify-center"
               >
-                {/* La tira que queda asomando cuando la tapa la siguiente.
-                    Su alto es exactamente el escalón del apilado. */}
-                <div
-                  className="flex flex-none items-center gap-3 px-5"
-                  style={{ height: STACK_HEADER }}
-                >
-                  <span
-                    className="font-mono text-[11px] tracking-widest"
-                    style={{ color: accent }}
-                  >
-                    {step.n}
-                  </span>
-                  <span
-                    aria-hidden="true"
-                    className="h-1.5 w-1.5 flex-none rounded-full"
-                    style={{ background: accent, boxShadow: `0 0 10px ${accent}` }}
-                  />
-                  <h3 className="font-display text-base font-bold text-fg">
-                    {step.title}
-                  </h3>
-                  <span className="ml-auto font-mono text-[10px] text-muted">
-                    {step.n}/{pad2(count)}
-                  </span>
-                </div>
+                <Drawing lit={open} className="w-[26rem] max-w-none shrink-0" />
+              </div>
+            )}
 
-                <div className="relative flex-1 px-5 pb-6">
-                  <StepDetail step={step} index={i} />
-                  <GhostNumber n={step.n} className="-top-6 right-2 text-[6rem]" />
-                </div>
-              </article>
-            </li>
-          )
-        })}
-      </ol>
-      </div>
-    </div>
-  )
-}
+            {/* el lomo: número arriba, título girado abajo */}
+            <span aria-hidden="true" className="process-panel__spine pointer-events-none absolute inset-y-7 left-6">
+              <span className="block font-display text-sm text-fg/55">{turn ? '→' : step.n}</span>
+              <span className="absolute bottom-0 left-0 whitespace-nowrap font-display text-[1.35rem] font-semibold text-fg/80 [writing-mode:vertical-rl] rotate-180">
+                {turn ? 'Tu turno' : step.title}
+              </span>
+            </span>
 
-/* ─── rama estática (reduced motion) ────────────────────────────── */
+            {/* El botón cubre el panel: abre con clic, tap o teclado. Abierto,
+                se corre abajo del contenido para que el WhatsApp y el texto
+                se puedan tocar y seleccionar. */}
+            <button
+              type="button"
+              aria-expanded={open}
+              aria-controls={`proceso-${i}`}
+              aria-label={turn ? 'Tu turno' : `${step.n}. ${step.title}`}
+              onClick={() => setActive(i)}
+              onFocus={() => setActive(i)}
+              className={`absolute inset-0 rounded-xl focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-accent ${
+                open ? 'z-0' : 'z-[3]'
+              }`}
+            />
 
-/* Sin anclaje ni scroll secuestrado: los 5 pasos abiertos, en grilla.
-   Misma información, cero movimiento. */
-function StaticSteps({ steps }) {
-  return (
-    <div className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8 md:py-28">
-      <SectionHeading eyebrow="Proceso" title="Cómo trabajo, paso a paso." />
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {steps.map((step, i) => (
-          <div
-            key={step.n}
-            className="relative overflow-hidden rounded-2xl border border-glassborder bg-glass p-6 backdrop-blur-md"
-          >
-            <StepHead step={step} index={i} count={steps.length} />
-            <div className="mt-3">
-              <StepDetail step={step} index={i} />
+            {/* el contenido del abierto, abajo a la izquierda */}
+            <div
+              id={`proceso-${i}`}
+              className="process-panel__copy relative z-[2] flex h-full w-[30rem] max-w-full flex-col justify-end p-7"
+              aria-hidden={!open}
+              inert={!open}
+            >
+              {!turn && <p className="mb-2 font-display text-sm text-fg/55">{step.n}</p>}
+              {turn ? <TurnCopy /> : <StepCopy step={step} />}
             </div>
-            <GhostNumber n={step.n} className="-bottom-4 right-2 text-[6rem]" />
           </div>
-        ))}
-      </div>
+        )
+      })}
     </div>
   )
 }
 
-/* ─── sección ───────────────────────────────────────────────────── */
+/* ─── celular: el acordeón vertical ───────────────────────────────────── */
+
+function Stack({ active, setActive }) {
+  return (
+    <ol className="space-y-2 lg:hidden">
+      {panelsOf().map(({ step, i, turn }) => {
+        const open = active === i
+        const Drawing = DRAWINGS[i]
+        return (
+          <li
+            key={i}
+            className="overflow-hidden rounded-xl"
+            style={{ background: turn ? TURN_SURFACE : 'var(--c-bg2)', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.07)' }}
+          >
+            <h3>
+              <button
+                type="button"
+                aria-expanded={open}
+                aria-controls={`proceso-m-${i}`}
+                onClick={() => setActive(open ? -1 : i)}
+                className="flex min-h-[4rem] w-full items-center gap-4 px-5 text-left focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-accent"
+              >
+                <span className="w-6 font-display text-sm text-fg/55">{turn ? '→' : step.n}</span>
+                <span className="flex-1 font-display text-[1.15rem] font-semibold text-fg">
+                  {turn ? 'Tu turno' : step.title}
+                </span>
+                <span
+                  aria-hidden="true"
+                  className={`process-plus flex h-8 w-8 items-center justify-center rounded-full border border-white/20 text-fg ${
+                    open ? 'is-open' : ''
+                  }`}
+                >
+                  <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none">
+                    <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+                  </svg>
+                </span>
+              </button>
+            </h3>
+            <div id={`proceso-m-${i}`} className={`process-fold ${open ? 'is-open' : ''}`} aria-hidden={!open} inert={!open}>
+              <div className="min-h-0 overflow-hidden">
+                <div className="px-5 pb-6">
+                  {Drawing && (
+                    <div aria-hidden="true" className="mb-4 flex justify-center">
+                      <Drawing lit={open} className="w-full max-w-[20rem]" />
+                    </div>
+                  )}
+                  {turn ? (
+                    <TurnCopy heading={false} />
+                  ) : (
+                    <>
+                      <p className="text-[0.98rem] leading-relaxed text-muted">{step.desc}</p>
+                      <p className="mt-3 text-[0.98rem] leading-relaxed text-fg/85">
+                        <span className="text-fg/55">Te llevás </span>
+                        {lower(step.deliver)}
+                      </p>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          </li>
+        )
+      })}
+    </ol>
+  )
+}
 
 export function ProcessTimeline() {
+  // El paso 1 abierto de entrada, en los dos anchos (como metic).
+  const [active, setActive] = useState(0)
   const reduce = useReducedMotion()
-  const steps = process
-
-  if (reduce) {
-    return (
-      <section id="proceso">
-        <StaticSteps steps={steps} />
-      </section>
-    )
-  }
 
   return (
-    <section id="proceso">
-      <ScrollAccordion steps={steps} />
-      <StackedCards steps={steps} />
+    <section
+      id="proceso"
+      aria-labelledby="proceso-title"
+      className={`mx-auto w-full max-w-6xl px-5 py-20 sm:px-8 md:py-28 ${reduce ? 'process-still' : ''}`}
+    >
+      <Header />
+      <Row active={active} setActive={setActive} />
+      <Stack active={active} setActive={setActive} />
     </section>
   )
 }
