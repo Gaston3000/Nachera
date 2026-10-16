@@ -1126,3 +1126,90 @@
   -webkit-mask: url('/logos/bloop.svg') no-repeat center / contain;
   mask: url('/logos/bloop.svg') no-repeat center / contain;
 }
+
+/* ── Soluciones: la tira de servicios ──────────────────────────────────────
+   (solutions/SolutionsTrack.jsx) La tira arranca alineada con el borde del
+   contenido del resto del sitio (max-w-6xl = 72rem) y termina con el mismo
+   aire a la derecha. */
+.solutions-track {
+  width: max-content;
+  padding-inline: max(2rem, calc((100vw - 72rem) / 2));
+}
+.solutions-progress {
+  left: max(2rem, calc((100vw - 72rem) / 2));
+  right: max(2rem, calc((100vw - 72rem) / 2));
+}
+
+/* La tarjeta: superficie sólida, sin vidrio. El borde se enciende apenas
+   al pasar el mouse — la tarjeta no salta. */
+.service-card {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--c-bg2) 100%, white 3%), var(--c-bg2) 60%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 30px 60px -36px rgba(0, 0, 0, 0.9);
+  transition: box-shadow 0.4s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .service-card:hover {
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, var(--c-accent) 35%, transparent),
+      0 30px 60px -36px rgba(0, 0, 0, 0.9);
+  }
+}
+
+/* El + de "Qué resuelve" gira con el rebote de los íconos de los botones. */
+.service-toggle__icon {
+  transition: transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.service-toggle[aria-expanded='true'] .service-toggle__icon {
+  transform: rotate(45deg);
+}
+
+/* El cursor "Ver qué resuelve": una pastilla que sigue al mouse sobre los
+   dibujos. La posición la escribe el componente; acá, solo aparecer. */
+.service-cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 30;
+  pointer-events: none;
+}
+.service-cursor > span {
+  display: block;
+  translate: 14px 14px;
+  scale: 0.6;
+  opacity: 0;
+  border-radius: 9999px;
+  background: var(--c-accent);
+  color: var(--c-bg);
+  padding: 0.45rem 0.85rem;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 10px 30px -10px color-mix(in srgb, var(--c-accent) 70%, transparent);
+  transition:
+    opacity 0.2s ease,
+    scale 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.service-cursor.is-on > span {
+  opacity: 1;
+  scale: 1;
+}
+
+/* La tira de celular: se desliza con el dedo, sin barra a la vista. */
+.service-swipe {
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.service-swipe::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .service-card,
+  .service-toggle__icon,
+  .service-cursor > span {
+    transition: none;
+  }
+}

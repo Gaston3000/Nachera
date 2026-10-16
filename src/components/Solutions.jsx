@@ -1,14 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion, useReducedMotion, useMotionValue, animate } from 'motion/react'
-import { GlassPanel } from './primitives/GlassPanel.jsx'
-import { SectionHeading } from './primitives/SectionHeading.jsx'
-import { Reveal } from './primitives/Reveal.jsx'
-import { Parallax } from './primitives/Parallax.jsx'
-import { RichText } from './primitives/RichText.jsx'
-import { SolutionsScroll } from './SolutionsScroll.jsx'
-import { SolutionsStack } from './SolutionsStack.jsx'
-import { SectionBridge } from './SectionBridge.jsx'
-import { useCanPin } from './solutions/useCanPin.js'
+import { SolutionsTrack } from './solutions/SolutionsTrack.jsx'
 
 /* ─── shared constants ───────────────────────────────────────────────────── */
 
@@ -22,11 +14,6 @@ const containerVariants = {
 const itemVariants = {
   hidden: { opacity: 0, y: 18 },
   show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: EASE } },
-}
-
-const itemVariantsLeft = {
-  hidden: { opacity: 0, x: -16 },
-  show: { opacity: 1, x: 0, transition: { duration: 0.55, ease: EASE } },
 }
 
 /* ─── count-up helper ────────────────────────────────────────────────────── */
@@ -107,12 +94,6 @@ function BarChartViz() {
           }}
         />
       </svg>
-      <motion.div
-        className="flex items-baseline gap-2"
-        variants={reduce ? {} : itemVariants}
-      >
-        <span className="font-display text-lg font-bold text-accent">Calendario sostenido</span>
-      </motion.div>
     </div>
   )
 }
@@ -361,7 +342,7 @@ function MediaViz() {
                 style={{ background: 'var(--c-accent)', filter: 'drop-shadow(0 0 3px var(--c-accent))' }}
               />
             )}
-            <span className="font-display text-[7px] font-bold tracking-wider text-fg">EN VIVO</span>
+            <span className="font-display text-[7px] font-bold tracking-wider text-fg">REC</span>
           </div>
 
           {/* timecode top-right */}
@@ -481,11 +462,14 @@ function FlowViz({ inView }) {
   const reduce = useReducedMotion()
   const openRate = useCountUp(31, { decimals: 0, suffix: '%', duration: 1.2, inView })
 
+  // Íconos en trazo, centrados en (0,0) y de ±6 de lado: un sobre, una
+  // apertura, un reenvío y una respuesta. Antes eran emojis (✉ ↗ 🔁 ★), que
+  // cada sistema dibuja distinto y no toman el color de la marca.
   const nodes = [
-    { label: '✉', color: 'var(--c-accent)', x: 20, y: 48 },
-    { label: '↗', color: 'var(--c-accent2)', x: 72, y: 24 },
-    { label: '🔁', color: 'var(--c-accent)', x: 72, y: 72 },
-    { label: '★', color: 'var(--c-accent2)', x: 120, y: 48 },
+    { icon: 'M-6 -4h12v8h-12z M-6 -4l6 4.5l6 -4.5', color: 'var(--c-accent)', x: 20, y: 48 },
+    { icon: 'M-4 4l8 -8 M-1 -4h5v5', color: 'var(--c-accent2)', x: 72, y: 24 },
+    { icon: 'M5 -1a5 5 0 1 1 -2 -4 M5 -6v5h-5', color: 'var(--c-accent)', x: 72, y: 72 },
+    { icon: 'M-6 -4h12v7h-7l-3 3v-3h-2z', color: 'var(--c-accent2)', x: 120, y: 48 },
   ]
 
   const connectors = [
@@ -524,14 +508,21 @@ function FlowViz({ inView }) {
           {nodes.map((n, i) => (
             <motion.g key={i} variants={reduce ? {} : nodeVariants}>
               <circle cx={n.x} cy={n.y} r="20" fill={n.color} fillOpacity="0.15" stroke={n.color} strokeOpacity="0.55" strokeWidth="1.5" />
-              <text x={n.x} y={n.y + 5} textAnchor="middle" fontSize="15" fill={n.color}>{n.label}</text>
+              <path
+                d={n.icon}
+                transform={`translate(${n.x} ${n.y})`}
+                stroke={n.color}
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </motion.g>
           ))}
         </svg>
       </div>
       <motion.div className="flex items-baseline gap-1" variants={reduce ? {} : itemVariants}>
         <span className="font-display text-xl font-bold text-accent2">{openRate}</span>
-        <span className="text-xs text-muted">open rate · real (LAE)</span>
+        <span className="text-xs text-muted">de apertura en las campañas de LAE</span>
       </motion.div>
     </div>
   )
@@ -566,8 +557,6 @@ function DashboardViz() {
     hidden: { opacity: 0, scale: 0 },
     show: { opacity: 1, scale: 1, transition: { duration: 0.35, ease: EASE, delay: 1.2 } },
   }
-  const liveDotPulse = reduce ? undefined : { opacity: [0.4, 1, 0.4], scale: [1, 1.3, 1] }
-  const liveDotTrans = reduce ? undefined : { duration: 1.6, repeat: Infinity, ease: 'easeInOut' }
 
   const kpis = [
     { icon: '↑', color: 'var(--c-accent)' },
@@ -578,29 +567,6 @@ function DashboardViz() {
 
   return (
     <div className="flex flex-col gap-2" aria-hidden="true">
-      {/* live monitor pill */}
-      <motion.div
-        className="flex items-center gap-1.5 self-start rounded-full border border-glassborder bg-glass px-1.5 py-0.5"
-        variants={reduce ? {} : itemVariants}
-      >
-        {!reduce ? (
-          <motion.div
-            className="h-1 w-1 rounded-full"
-            style={{ background: 'var(--c-accent)', filter: 'drop-shadow(0 0 3px var(--c-accent))' }}
-            animate={liveDotPulse}
-            transition={liveDotTrans}
-          />
-        ) : (
-          <div
-            className="h-1 w-1 rounded-full"
-            style={{ background: 'var(--c-accent)', filter: 'drop-shadow(0 0 3px var(--c-accent))' }}
-          />
-        )}
-        <span className="font-display text-[7px] font-bold uppercase tracking-widest text-muted">
-          monitoreo
-        </span>
-      </motion.div>
-
       {/* donut + sparkline */}
       <div className="flex items-center gap-3">
         {/* donut */}
@@ -697,10 +663,6 @@ function DashboardViz() {
         ))}
       </div>
 
-      {/* label */}
-      <motion.div variants={reduce ? {} : itemVariants} className="flex items-baseline gap-2">
-        <span className="font-display text-lg font-bold text-accent2">Datos que orientan</span>
-      </motion.div>
     </div>
   )
 }
@@ -945,447 +907,121 @@ function WebViz() {
   )
 }
 
-/* ─── tile data ─────────────────────────────────────────────────────────── */
+/* ─── los servicios ─────────────────────────────────────────────────────── */
 
+/* El copy de cada servicio. Sale del que ya estaba aprobado (la frase de
+   valor y el bloque Resuelve/Entrega/Resultado), dicho una sola vez y en
+   lenguaje llano:
+
+   - `line`      una frase: lo que se ve en la tarjeta, sin abrirla.
+   - `resuelve`  tres renglones, al abrir "Qué resuelve": el problema (como
+                 pregunta, para que el que lo tiene se reconozca), lo que
+                 hago, y en qué queda la marca.
+   - `waTopic`   cómo se nombra el servicio en el mensaje de WhatsApp que
+                 arma "Quiero esto para mi marca".
+   - `cover`     ancho del dibujo en la portada. FeedViz mide ~su ancho de
+                 alto (celdas cuadradas), así que va más angosto.
+
+   Voz: primera persona, salvo Experiencias digitales, que es capacidad de
+   equipo y va en plural (CLAUDE.md). */
 const tiles = [
   {
     id: 'estrategia',
-    title: 'Estrategia de Contenido',
-    value: 'Pilares, tono y calendario armados **a medida de tu marca y de tu público**.',
-    detail: {
-      resuelve: 'publicar **sin un norte claro** ni calendario',
-      entrega: 'estrategia, calendario y **línea editorial propia**',
-      resultado: 'una marca que **deja de improvisar** y comunica con intención',
-    },
+    title: 'Estrategia de contenido',
+    line: 'Pilares, tono y calendario a la medida de tu marca y de tu público.',
+    resuelve: [
+      '¿Publicás sin un norte claro ni calendario?',
+      'Armo la estrategia, el calendario y una línea editorial propia.',
+      'Tu marca deja de improvisar y comunica con intención.',
+    ],
+    waTopic: 'la estrategia de contenido',
     Viz: BarChartViz,
-    span: 'md:col-span-3 md:row-span-2',
-    accentBorder: true,
-    glowColor: 'var(--c-accent)',
+    cover: 'w-[72%]',
+    glow: 'var(--c-accent)',
   },
   {
     id: 'marca',
-    title: 'Marca, Voz & Contenido',
-    value: 'Una marca con **identidad clara y voz propia**, sostenida pieza por pieza — no un logo lindo y nada más.',
-    detail: {
-      resuelve: 'una marca que **se ve y suena distinta en cada pieza**',
-      entrega: 'branding, voz, sistema visual y contenido **a tono**',
-      resultado: 'una marca **deseable, coherente y reconocible**',
-    },
+    title: 'Marca, voz y contenido',
+    line: 'Identidad clara y voz propia, sostenidas pieza por pieza.',
+    resuelve: [
+      '¿Tu marca se ve y suena distinta en cada pieza?',
+      'Trabajo el branding, la voz, el sistema visual y el contenido, a tono.',
+      'Una marca deseable, coherente y reconocible.',
+    ],
+    waTopic: 'trabajar la marca, la voz y el contenido',
     Viz: FeedViz,
-    span: 'md:col-span-3 md:row-span-2',
-    accentBorder: false,
-    glowColor: 'var(--c-accent2)',
+    cover: 'w-[50%]',
+    glow: 'var(--c-accent2)',
   },
   {
     id: 'produccion',
-    title: 'Producción & Edición',
-    value: 'Reels, video, placas y carruseles. **De la idea al material listo para publicar**.',
-    detail: {
-      resuelve: '**piezas hechas a las apuradas** o material que falta',
-      entrega: 'reels, video, placas y carruseles **con tu identidad**',
-      resultado: 'contenido que **se nota que es tuyo**',
-    },
+    title: 'Producción y edición',
+    line: 'Reels, video, placas y carruseles: de la idea al material listo para publicar.',
+    resuelve: [
+      '¿Las piezas salen a las apuradas, o directamente faltan?',
+      'Produzco reels, video, placas y carruseles con tu identidad.',
+      'Contenido que se nota que es tuyo.',
+    ],
+    waTopic: 'la producción y edición de contenido',
     Viz: MediaViz,
-    span: 'md:col-span-2 md:row-span-1',
-    accentBorder: false,
-    glowColor: 'var(--c-accent)',
+    cover: 'w-[72%]',
+    glow: 'var(--c-accent)',
   },
   {
     id: 'email',
-    title: 'Email Marketing',
-    value: 'Campañas que **no terminan en spam ni en silencio**: planificación, segmentación y copy que respeta tu voz.',
-    detail: {
-      resuelve: 'una base de mails **abandonada** o que nunca arrancó',
-      entrega: 'flujos, segmentación y métricas **que se leen**',
-      resultado: '**conversaciones reales** y una audiencia que abre lo que mandás',
-    },
+    title: 'Email marketing',
+    line: 'Campañas que no terminan en spam ni en silencio.',
+    resuelve: [
+      '¿Tenés una base de mails abandonada, o nunca arrancaste?',
+      'Armo flujos, segmentación y un copy que respeta tu voz.',
+      'Conversaciones reales con una audiencia que abre lo que mandás.',
+    ],
+    waTopic: 'el email marketing',
     Viz: FlowViz,
-    span: 'md:col-span-2',
-    accentBorder: false,
-    glowColor: 'var(--c-accent2)',
+    cover: 'w-[72%]',
+    glow: 'var(--c-accent2)',
   },
   {
     id: 'analytics',
-    title: 'Análisis & decisiones',
-    value: '**Métricas que se leen** y se traducen en decisiones — no en un PDF que nadie abre.',
-    detail: {
-      resuelve: '**datos sueltos** que no orientan ninguna decisión',
-      entrega: 'lectura de métricas y **ajustes concretos**, no opiniones',
-      resultado: 'decisiones **basadas en números reales**, no en intuición',
-    },
+    title: 'Análisis y decisiones',
+    line: 'Métricas que se leen y se traducen en decisiones.',
+    resuelve: [
+      '¿Tenés datos sueltos que no orientan ninguna decisión?',
+      'Leo las métricas y te propongo ajustes concretos.',
+      'Decisiones basadas en números reales, no en intuición.',
+    ],
+    waTopic: 'el análisis de métricas',
     Viz: DashboardViz,
-    span: 'md:col-span-2',
-    accentBorder: false,
-    glowColor: 'var(--c-accent)',
+    cover: 'w-[72%]',
+    glow: 'var(--c-accent)',
   },
   {
-    // Capstone: capacidad de equipo. Texto reescrito según el PDF del
-    // cliente ("este apartado no me gusta mucho, lo siento ajeno") —
-    // pasamos a una declaración de posicionamiento + R/E/R nuevos.
+    // Capstone: capacidad de equipo (CLAUDE.md). Cierra la tira con una
+    // tarjeta más ancha. Los chips hacen que se LEA como sitio a primera
+    // vista sin usar "diseño web" como categoría.
     id: 'web',
     title: 'Experiencias digitales',
-    // Chips para que la tarjeta se LEA como diseño web a primera vista
-    // (CLAUDE.md: vocabulario "experiencias digitales", nunca "diseño web"
-    // como categoría — pero los chips concretos sí explicitan el entregable).
     chips: ['Sitio', 'Landing', 'Portfolio'],
-    value:
-      'Tu marca **merece estar en el mundo digital** de la misma forma en que la pensás — con **identidad, criterio y una presencia que genera confianza desde el primer clic**.',
-    detail: {
-      resuelve: '**tu ausencia** en el mundo digital',
-      entrega: 'un sitio, landing o portfolio que **representa tu marca con seriedad**',
-      resultado: 'presencia online **profesional y a la altura de tu negocio**',
-    },
+    line: 'Tu marca en el mundo digital como la pensás: con identidad, criterio y una presencia que da confianza.',
+    resuelve: [
+      '¿Tu marca todavía no tiene dónde mostrarse online?',
+      'Diseñamos y armamos un sitio, landing o portfolio que la representa con seriedad.',
+      'Una presencia online profesional, a la altura de tu negocio.',
+    ],
+    waTopic: 'un sitio, landing o portfolio',
     Viz: WebViz,
-    span: 'md:col-span-6 md:row-span-1',
-    accentBorder: true,
-    glowColor: 'var(--c-accent2)',
+    cover: 'w-[62%]',
+    glow: 'var(--c-accent2)',
+    wide: true,
   },
 ]
 
-/* ─── detail block ───────────────────────────────────────────────────────── */
-
-function DetailBlock({ detail }) {
-  // Negrita en accent dentro del bloque para que los puntos clave pinchen
-  // (parent es text-fg blanco; usar text-accent diferencia bien la jerarquía).
-  const strong = 'text-accent font-semibold'
-  return (
-    <motion.div
-      className="rounded-xl border border-glassborder bg-bg/60 p-3 text-xs leading-relaxed backdrop-blur-sm"
-      variants={itemVariants}
-    >
-      <div className="mb-1">
-        <span className="font-semibold text-muted uppercase tracking-wider">Resuelve</span>{' '}
-        <span className="text-fg">
-          <RichText text={detail.resuelve} strongClassName={strong} />
-        </span>
-      </div>
-      <div className="mb-1">
-        <span className="font-semibold text-muted uppercase tracking-wider">Entrega</span>{' '}
-        <span className="text-fg">
-          <RichText text={detail.entrega} strongClassName={strong} />
-        </span>
-      </div>
-      <div>
-        <span className="font-semibold text-accent uppercase tracking-wider">Resultado</span>{' '}
-        <span className="text-fg">
-          <RichText text={detail.resultado} strongClassName={strong} />
-        </span>
-      </div>
-    </motion.div>
-  )
-}
-
-/* ─── single tile ────────────────────────────────────────────────────────── */
-
-function SolutionTile({ tile, index, active = false, onActivate }) {
-  const reduce = useReducedMotion()
-  const [inView, setInView] = useState(false)
-  const [replayKey, setReplayKey] = useState(0)
-  const ref = useRef(null)
-  const isReplaying = useRef(false)
-  const replayTimer = useRef(null)
-
-  useEffect(() => {
-    const el = ref.current
-    if (!el || reduce) { setInView(true); return }
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { setInView(true); observer.disconnect() } },
-      { threshold: 0.25 }
-    )
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [reduce])
-
-  useEffect(() => () => clearTimeout(replayTimer.current), [])
-
-  const { Viz } = tile
-
-  const handleActivate = () => {
-    onActivate?.(tile.id)
-    if (reduce) return
-    if (isReplaying.current) return
-    isReplaying.current = true
-    setReplayKey((k) => k + 1)
-    clearTimeout(replayTimer.current)
-    replayTimer.current = setTimeout(() => {
-      isReplaying.current = false
-    }, 850)
-  }
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
-      e.preventDefault()
-      handleActivate()
-    }
-  }
-
-  const a11yProps = {
-    role: 'button',
-    tabIndex: 0,
-    'aria-label': `Reactivar la animación de ${tile.title}`,
-    'aria-pressed': active,
-    onClick: handleActivate,
-    onKeyDown: handleKeyDown,
-  }
-
-  if (reduce) {
-    return (
-      <div className={tile.span}>
-        <GlassPanel
-          className={`relative flex h-full flex-col overflow-hidden p-6 cursor-pointer select-none ${
-            tile.accentBorder ? 'border-accent/30' : ''
-          } ${active ? 'border-accent/60' : ''}`}
-          {...a11yProps}
-        >
-          {active && (
-            <div
-              className="pointer-events-none absolute inset-0"
-              aria-hidden="true"
-              style={{
-                background: `radial-gradient(circle at 30% 20%, color-mix(in srgb, ${tile.glowColor} 14%, transparent), transparent 60%)`,
-              }}
-            />
-          )}
-          <div className="relative flex h-44 shrink-0 items-center overflow-hidden md:h-52 [&>*]:w-full">
-            <Viz inView={true} />
-          </div>
-          <h3 className="relative mt-5 font-display text-lg font-bold text-fg sm:text-xl">{tile.title}</h3>
-          {tile.chips && (
-            <div className="relative mt-2 flex flex-wrap gap-1.5">
-              {tile.chips.map((c) => (
-                <span
-                  key={c}
-                  className="rounded-full border border-accent/30 bg-accent/10 px-2 py-0.5 font-display text-[10px] font-semibold uppercase tracking-[0.12em] text-accent"
-                >
-                  {c}
-                </span>
-              ))}
-            </div>
-          )}
-          <p className="relative mt-2 text-sm leading-relaxed text-muted">
-            <RichText text={tile.value} />
-          </p>
-          <div className="relative mt-auto pt-6">
-            <DetailBlock detail={tile.detail} />
-          </div>
-        </GlassPanel>
-      </div>
-    )
-  }
-
-  return (
-    <div ref={ref} className={`group ${tile.span}`}>
-      <GlassPanel
-        className={`relative flex h-full flex-col overflow-hidden p-6 cursor-pointer select-none transition-all duration-300 hover:-translate-y-1 hover:border-accent/50 ${
-          tile.accentBorder ? 'border-accent/30' : ''
-        } ${active ? 'border-accent/60 -translate-y-1 scale-[1.01]' : ''}`}
-        style={{
-          '--tile-glow': tile.glowColor,
-        }}
-        {...a11yProps}
-      >
-        <motion.div
-          className="pointer-events-none absolute inset-0"
-          aria-hidden="true"
-          initial={{ opacity: 0 }}
-          animate={inView ? { opacity: 1 } : { opacity: 0 }}
-          transition={{ duration: 0.8, ease: EASE }}
-          style={{
-            background: `radial-gradient(circle at 0% 0%, color-mix(in srgb, ${tile.glowColor} 6%, transparent), transparent 55%)`,
-          }}
-        />
-        <div
-          className={`pointer-events-none absolute inset-0 transition-opacity duration-300 group-hover:opacity-100 ${
-            active ? 'opacity-100' : 'opacity-0'
-          }`}
-          style={{
-            background: `radial-gradient(circle at 30% 20%, color-mix(in srgb, ${tile.glowColor} 14%, transparent), transparent 60%)`,
-          }}
-          aria-hidden="true"
-        />
-        <div
-          className={`pointer-events-none absolute inset-0 rounded-2xl transition-opacity duration-300 group-hover:opacity-100 ${
-            active ? 'opacity-100' : 'opacity-0'
-          }`}
-          style={{ boxShadow: `0 0 48px -12px ${tile.glowColor}` }}
-          aria-hidden="true"
-        />
-
-        <motion.div
-          key={replayKey}
-          className="flex flex-1 flex-col"
-          variants={containerVariants}
-          initial="hidden"
-          animate={inView ? 'show' : 'hidden'}
-        >
-          <motion.div
-            className="flex h-44 shrink-0 items-center overflow-hidden md:h-52 [&>*]:w-full"
-            variants={itemVariants}
-          >
-            <Viz inView={inView} />
-          </motion.div>
-
-          <motion.h3
-            className="mt-5 font-display text-lg font-bold text-fg sm:text-xl"
-            variants={itemVariants}
-          >
-            {tile.title}
-          </motion.h3>
-
-          {tile.chips && (
-            <motion.div
-              className="mt-2 flex flex-wrap gap-1.5"
-              variants={itemVariants}
-            >
-              {tile.chips.map((c) => (
-                <span
-                  key={c}
-                  className="rounded-full border border-accent/30 bg-accent/10 px-2 py-0.5 font-display text-[10px] font-semibold uppercase tracking-[0.12em] text-accent"
-                >
-                  {c}
-                </span>
-              ))}
-            </motion.div>
-          )}
-
-          <motion.p
-            className="mt-2 text-sm leading-relaxed text-muted"
-            variants={itemVariants}
-          >
-            <RichText text={tile.value} />
-          </motion.p>
-
-          <motion.div className="mt-auto pt-6" variants={itemVariants}>
-            <DetailBlock detail={tile.detail} />
-          </motion.div>
-        </motion.div>
-      </GlassPanel>
-    </div>
-  )
-}
-
-/* ─── recorrido anclado ──────────────────────────────────────────────────── */
-
-/* Lo único que el recorrido necesita y la grilla no. El copy NO se duplica:
-   sale de `tiles`, que sigue siendo la única fuente de verdad.
-
-   - `n`         número que se muestra arriba del título
-   - `vizBox`    alto MÍNIMO de la caja, nunca fijo, para que ninguna viz se
-                 pueda recortar
-   - `vizClass`  ancho + escala de la viz dentro del panel
-
-   `vizBox` y `vizClass` traen DOS tallas: la compacta por defecto y la
-   grande a partir de 800px de alto de ventana. Sin eso, el recorrido no
-   entra en un notebook y la sección entera se cae a la grilla.
-   - `fullBleed` el capstone abre a ancho completo en vez de partir en dos
-
-   Ojo con FeedViz: su grilla es de celdas `aspect-square`, así que su alto
-   sigue al ancho (mide ~ancho + 51). Por eso lleva menos ancho y menos escala
-   que el resto; con el 74% × 1.3 de las demás se iría a ~500px de alto. */
-/* Las clases van LITERALES y completas a propósito: Tailwind extrae mirando
-   el código fuente como texto, así que cualquier `${...}` las vuelve
-   invisibles y la regla nunca se genera. Verificado en el CSS compilado. */
-const PANEL_EXTRA = {
-  estrategia: {
-    n: '01',
-    vizBox: 'min-h-[15rem] [@media(min-height:800px)]:min-h-[19rem]',
-    vizClass: 'w-[74%] scale-[1.08] [@media(min-height:800px)]:scale-[1.3]',
-  },
-  marca: {
-    n: '02',
-    vizBox: 'min-h-[19rem] [@media(min-height:800px)]:min-h-[24rem]',
-    vizClass: 'w-[58%] scale-[1] [@media(min-height:800px)]:w-[68%] [@media(min-height:800px)]:scale-[1.12]',
-  },
-  produccion: {
-    n: '03',
-    vizBox: 'min-h-[15rem] [@media(min-height:800px)]:min-h-[19rem]',
-    vizClass: 'w-[74%] scale-[1.08] [@media(min-height:800px)]:scale-[1.3]',
-  },
-  email: {
-    n: '04',
-    vizBox: 'min-h-[15rem] [@media(min-height:800px)]:min-h-[19rem]',
-    vizClass: 'w-[74%] scale-[1.08] [@media(min-height:800px)]:scale-[1.3]',
-  },
-  analytics: {
-    n: '05',
-    vizBox: 'min-h-[15rem] [@media(min-height:800px)]:min-h-[19rem]',
-    vizClass: 'w-[74%] scale-[1.08] [@media(min-height:800px)]:scale-[1.3]',
-  },
-  // full-bleed: el panel es el doble de ancho, así que la viz se maqueta a la
-  // mitad y se escala fuerte — si no, sus detalles quedan minúsculos.
-  web: {
-    n: '06',
-    vizBox: 'min-h-[13rem] [@media(min-height:800px)]:min-h-[17rem]',
-    vizClass: 'w-[56%] scale-[1.3] [@media(min-height:800px)]:scale-[1.7]',
-    fullBleed: true,
-  },
-}
-
-
-const panels = tiles.map((tile) => ({ ...tile, ...PANEL_EXTRA[tile.id] }))
-
 /* ─── section ────────────────────────────────────────────────────────────── */
 
-/* La sección tiene dos formas de la misma lista de 6 tiles:
-
-   - ventana lo bastante grande (ancho Y alto, ver useCanPin) y motion activo
-     → recorrido anclado: un panel por vez, y su viz corre desde cero al
-     activarse.
-   - ventana chica y motion activo → las tarjetas suben y se apilan con el
-     scroll, mismo patrón que Proceso en celular.
-   - reduced-motion → la grilla de siempre, todo visible y quieto, con el
-     clic/tap para repetir la animación.
-
-   Nunca las dos: si se montaran juntas, cada viz arrancaría por duplicado. */
-
+/* Los seis servicios en una tira que se recorre de costado
+   (SolutionsTrack). Reemplaza al recorrido anclado de un panel por vez, que
+   ocupaba ~6,5 pantallas y obligaba a pasar por todo: ahora se ven dos o
+   tres a la vez, y un índice lleva directo al que se busca. */
 export function Solutions() {
-  const [activeId, setActiveId] = useState(null)
-  const reduce = useReducedMotion()
-  const canPin = useCanPin()
-  const pinned = canPin && !reduce
-
-  return (
-    <section id="soluciones" className="relative mx-auto w-full max-w-6xl px-5 py-20 sm:px-8 md:py-28">
-      {/* el glow se clipea en su propia caja: la sección NO puede llevar
-          overflow-hidden o el sticky del recorrido deja de pegarse */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-        <Parallax speed={-50} className="absolute -right-32 top-0 h-96 w-96 rounded-full blur-3xl opacity-20">
-          <div
-            className="h-full w-full rounded-full"
-            style={{ background: 'radial-gradient(circle, var(--c-accent2), transparent 70%)' }}
-            aria-hidden="true"
-          />
-        </Parallax>
-      </div>
-      <Reveal>
-        <SectionHeading eyebrow="SOLUCIONES" title="Lo que puedo resolver por tu marca." wide />
-      </Reveal>
-      {pinned ? (
-        <SolutionsScroll panels={panels} DetailBlock={DetailBlock} />
-      ) : !reduce ? (
-        <>
-          <SolutionsStack panels={panels} DetailBlock={DetailBlock} />
-          {/* el pase a Proceso: cierra el qué y abre el cómo. Sin esto el
-              hueco entre las dos no dice nada y, como usan el mismo
-              mecanismo, se leen como lo mismo dos veces. */}
-          <SectionBridge
-            desde="Eso es lo que puedo resolver."
-            hasta="Ahora, cómo lo trabajo."
-          />
-        </>
-      ) : (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-6 md:auto-rows-[minmax(200px,auto)]">
-          {tiles.map((tile, i) => (
-            <SolutionTile
-              key={tile.id}
-              tile={tile}
-              index={i}
-              active={activeId === tile.id}
-              onActivate={() => setActiveId(tile.id)}
-            />
-          ))}
-        </div>
-      )}
-    </section>
-  )
+  return <SolutionsTrack services={tiles} vizVariants={containerVariants} />
 }

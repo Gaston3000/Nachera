@@ -84,13 +84,15 @@ describe('App smoke', () => {
     ).toBe(true)
   })
 
-  it('renders all 6 solution tile titles', () => {
-    expect(screen.getByText('Estrategia de Contenido')).toBeInTheDocument()
-    expect(screen.getByText('Marca, Voz & Contenido')).toBeInTheDocument()
-    expect(screen.getByText('Producción & Edición')).toBeInTheDocument()
-    expect(screen.getByText('Email Marketing')).toBeInTheDocument()
-    expect(screen.getByText('Análisis & decisiones')).toBeInTheDocument()
-    expect(screen.getByText('Experiencias digitales')).toBeInTheDocument()
+  it('renders all 6 solution titles', () => {
+    ;[
+      'Estrategia de contenido',
+      'Marca, voz y contenido',
+      'Producción y edición',
+      'Email marketing',
+      'Análisis y decisiones',
+      'Experiencias digitales',
+    ].forEach((t) => expect(screen.getByRole('heading', { level: 3, name: t })).toBeInTheDocument())
   })
 
   it('renders all 4 case brands (real clients; Only Wines removido)', () => {
@@ -145,14 +147,10 @@ describe('App smoke', () => {
     })
   })
 
-  it('renders solutions detail (Resuelve/Entrega/Resultado) in DOM without hover', () => {
-    // Detail is now always in the DOM, not hidden behind hover
-    const resolveLabels = screen.getAllByText(/Resuelve/i)
-    const entregaLabels = screen.getAllByText(/Entrega/i)
-    const resultadoLabels = screen.getAllByText(/Resultado/i)
-    expect(resolveLabels.length).toBeGreaterThanOrEqual(5)
-    expect(entregaLabels.length).toBeGreaterThanOrEqual(5)
-    expect(resultadoLabels.length).toBeGreaterThanOrEqual(5)
+  it('renders the six services, each with its "Qué resuelve" control', () => {
+    const soluciones = document.getElementById('soluciones')
+    expect(within(soluciones).getAllByRole('heading', { level: 3 })).toHaveLength(6)
+    expect(within(soluciones).getAllByRole('button', { name: /Qué resuelve/ })).toHaveLength(6)
   })
 
   it('renders the about lead in the section (moved to LEFT col per cliente)', () => {

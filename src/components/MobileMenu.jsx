@@ -11,7 +11,7 @@ import { siteConfig } from '../data/siteConfig.js'
 const NAV_LINKS = [
   { index: '01', label: 'Inicio',       desc: 'Visión general',        href: '#hero' },
   { index: '02', label: 'Formación',    desc: 'El camino recorrido',   href: '#formacion' },
-  { index: '03', label: 'Servicios',    desc: 'Lo que puedo resolver', href: '#soluciones' },
+  { index: '03', label: 'Servicios',    desc: 'Lo que puedo hacer', href: '#soluciones' },
   { index: '04', label: 'Proceso',      desc: 'Cómo trabajo',          href: '#proceso' },
   { index: '05', label: 'Casos',        desc: 'Resultados y ejemplos', href: '#casos' },
   { index: '06', label: 'Herramientas', desc: 'Stack profesional',     href: '#herramientas' },
