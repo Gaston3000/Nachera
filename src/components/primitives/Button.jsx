@@ -13,6 +13,9 @@ export function Button({
   const variants = {
     primary: 'bg-accent text-bg',
     ghost: 'border border-glassborder bg-glass text-fg backdrop-blur-md',
+    // Para superficies de color pleno (la franja de Bloop): tinta oscura,
+    // porque el primario cyan desaparece sobre un cyan.
+    ink: 'bg-[#161616] text-white focus-visible:!outline-[#161616]',
   }
   const launch =
     iconNudge === 'y'

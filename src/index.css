@@ -221,6 +221,11 @@
 .btn-premium[data-variant='primary']:focus-visible {
   box-shadow: 0 12px 36px -8px color-mix(in srgb, var(--c-accent) 70%, transparent);
 }
+/* Sobre un color pleno el glow cyan no se ve: la sombra va oscura. */
+.btn-premium[data-variant='ink']:hover,
+.btn-premium[data-variant='ink']:focus-visible {
+  box-shadow: 0 14px 34px -12px rgba(0, 0, 0, 0.55);
+}
 
 /* specular sheen — una luz diagonal barre el botón al hover/foco */
 .btn-sheen {
@@ -1114,4 +1119,33 @@
   .case-story:focus-visible .case-cover__art {
     transform: none;
   }
+}
+
+/* ── Bloop: la franja de color ─────────────────────────────────────────────
+   El wordmark gigante asoma por el borde de abajo, cortado, y es MÁS ANCHO
+   que la pantalla: con el scroll se desliza de costado y recorre lo que le
+   sobra (BloopAgency.jsx), como el OKAYDEV de la franja social de okaydev.co.
+   Su ancho manda: el alto del logo es el 22,36 % del ancho (130 × 29), y de
+   ese alto se ve el 55 %. El padding de abajo de la franja sale del mismo
+   número, así el botón nunca queda encima del wordmark, mida lo que mida la
+   pantalla. */
+.bloop-band {
+  --mark-w: 135vw;
+  padding-bottom: calc(var(--mark-w) * 0.2236 * 0.55 + clamp(3rem, 6vw, 5rem));
+}
+.bloop-band__mark {
+  width: var(--mark-w);
+  max-width: none;
+  /* translate (la propiedad) y no transform: transform lo escribe el
+     deslizamiento. */
+  translate: 0 45%;
+  opacity: 0.3;
+}
+/* Reduced-motion: no se desliza. Entra entero a lo ancho, centrado. */
+.bloop-band--static {
+  --mark-w: min(94vw, 80rem);
+}
+.bloop-band--static .bloop-band__mark {
+  left: 50%;
+  translate: -50% 45%;
 }

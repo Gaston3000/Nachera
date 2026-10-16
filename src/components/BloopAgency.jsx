@@ -1,164 +1,172 @@
-import { motion, useReducedMotion } from 'motion/react'
-import { Reveal } from './primitives/Reveal.jsx'
-import { GlassPanel } from './primitives/GlassPanel.jsx'
-import { RichText } from './primitives/RichText.jsx'
+import { Fragment, useLayoutEffect, useRef, useState } from 'react'
+import { motion, useReducedMotion, useScroll, useSpring, useTransform } from 'motion/react'
+import { Button } from './primitives/Button.jsx'
+import { ArrowRight } from './primitives/icons.jsx'
+import { BloopPanel } from './bloop/BloopPanel.jsx'
+import { BLOOP } from './bloop/bloopBrand.js'
 import { bloopAgency } from '../data/content.js'
 
 const EASE = [0.16, 1, 0.3, 1]
 
-/**
- * Sección "Lo que hago en Bloop Agency" — separada de Casos propios.
- * Uso accent2 (violeta) en el rail/details para distinguir visualmente
- * trabajo bajo paraguas de agencia vs trabajo personal (accent cyan).
+/* ── Bloop Agency, en franja ───────────────────────────────────────────────
  *
- * Layout:
- * - Intro: 3 párrafos full-width (texto hasta el margen, pedido del
- *   cliente — antes estaba limitado a max-w-3xl y dejaba mucho aire
- *   a la derecha).
- * - Cuentas: grid de cards SIN dropdown — toda la info visible directo,
- *   con name + descripción de qué hace en cada una.
+ * Inspirada en la franja "A social feed that doesn't manipulate you" de
+ * okaydev.co: a todo el ancho, de un color plano, con un titular grande
+ * centrado cuyos renglones suben desde una máscara, una bajada corta, un
+ * remate, UN botón y el wordmark gigante asomando por el borde de abajo —
+ * más ancho que la pantalla, y se desliza de costado con el scroll.
+ *
+ * Reemplaza a ~1.400px de texto tipo CV (tres párrafos y una tarjeta de
+ * vidrio por cuenta, con negritas cada pocas palabras). La franja dice lo
+ * esencial — que hoy trabaja en el equipo de Bloop y qué hace ahí — y el
+ * detalle (el rol y las cuatro cuentas) vive en el panel, como los casos.
+ *
+ * El color es el de Bloop (medido en bloop.agency): el trabajo bajo paraguas
+ * de la agencia se distingue del propio, que va en los colores de cada
+ * cliente. Bloop no es un caso propio (CLAUDE.md): el framing es "lo que
+ * hago EN Bloop".
  */
 export function BloopAgency() {
-  const { eyebrow, title, paragraphs, clients = [] } = bloopAgency
+  const { titleLines, lead, tagline, cta } = bloopAgency
   const reduce = useReducedMotion()
+  const [open, setOpen] = useState(false)
+  const sectionRef = useRef(null)
+  const markRef = useRef(null)
+  // Cuánto le sobra al wordmark respecto de la franja (px). Se mide, y se
+  // vuelve a medir con cada resize: el recorrido es exactamente lo que
+  // sobra, así llega a la otra punta y no se pasa.
+  const overflowRef = useRef(0)
+
+  useLayoutEffect(() => {
+    if (reduce) return undefined
+    const measure = () => {
+      const section = sectionRef.current
+      const mark = markRef.current
+      if (section && mark) overflowRef.current = Math.max(0, mark.offsetWidth - section.offsetWidth)
+    }
+    measure()
+    window.addEventListener('resize', measure)
+    return () => window.removeEventListener('resize', measure)
+  }, [reduce])
+
+  // El wordmark se desliza de costado mientras la franja cruza la pantalla,
+  // como el OKAYDEV de la referencia: desde que asoma por abajo hasta que se
+  // va por arriba, recorre todo lo que le sobra. El resorte es el `scrub`
+  // de okaydev: lo sigue con un arrastre corto, no pegado al dedo.
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start end', 'end start'],
+  })
+  const smooth = useSpring(scrollYProgress, { stiffness: 140, damping: 30, mass: 0.6 })
+  const markX = useTransform(smooth, (p) => -p * overflowRef.current)
+
+  // Lo que entra después del titular: sube apenas y aparece, en orden.
+  const rise = (delay) =>
+    reduce
+      ? {}
+      : {
+          initial: { opacity: 0, y: 18 },
+          whileInView: { opacity: 1, y: 0 },
+          viewport: { once: true, amount: 0.6 },
+          transition: { duration: 0.8, ease: EASE, delay },
+        }
 
   return (
-    <section id="bloop" className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8 md:py-28">
-      <Reveal>
-        {/* Logo de Bloop, tomado de bloop.agency (img/logo.svg, el de su
-            header). Es la variante blanca oficial que usan sobre su fondo
-            negro, así que va tal cual sobre el oscuro de este sitio: sin tile
-            y sin recolorear. alt vacío: el eyebrow de abajo ya dice
-            "Bloop Agency". */}
-        <img
+    <>
+      <section
+        id="bloop"
+        ref={sectionRef}
+        className={`bloop-band relative isolate overflow-hidden ${reduce ? 'bloop-band--static' : ''}`}
+        style={{ background: BLOOP.color, color: BLOOP.ink }}
+      >
+        <div className="relative z-10 mx-auto flex max-w-4xl flex-col items-center px-5 pt-24 text-center sm:px-8 md:pt-32">
+          {/* Cada renglón vive en una máscara (overflow hidden) y sube desde
+            abajo de su propio borde. El padding de la máscara deja lugar a
+            los descendentes sin que se corten en reposo. */}
+          <motion.h2
+            className="text-balance font-display text-[clamp(2.15rem,1.2rem+4.4vw,5rem)] font-bold leading-[1.02] tracking-[-0.03em]"
+            {...(reduce
+              ? {}
+              : {
+                  initial: 'hidden',
+                  whileInView: 'show',
+                  viewport: { once: true, amount: 0.6 },
+                })}
+          >
+            {/* El espacio entre renglones va como texto suelto ENTRE las
+                máscaras: adentro de una, el lector de pantalla lo recortaba
+                y leía "equipode". */}
+            {titleLines.map((line, i) => (
+              <Fragment key={line}>
+                {i > 0 && ' '}
+                <span className="-mb-[0.1em] block overflow-hidden pb-[0.1em]">
+                  <motion.span
+                    className="block"
+                    variants={{
+                      hidden: { y: '110%' },
+                      show: {
+                        y: '0%',
+                        transition: {
+                          duration: 0.95,
+                          ease: EASE,
+                          delay: i * 0.1,
+                        },
+                      },
+                    }}
+                  >
+                    {line}
+                  </motion.span>
+                </span>
+              </Fragment>
+            ))}
+          </motion.h2>
+
+          <motion.p
+            className="mt-7 max-w-[38rem] text-balance text-lg leading-snug md:text-xl"
+            style={{ color: BLOOP.inkSoft }}
+            {...rise(0.25)}
+          >
+            {lead}
+          </motion.p>
+          <motion.p className="mt-4 font-display text-lg font-semibold md:text-xl" {...rise(0.35)}>
+            {tagline}
+          </motion.p>
+
+          <motion.div className="mt-9" {...rise(0.45)}>
+            <Button
+              as="button"
+              type="button"
+              variant="ink"
+              icon={<ArrowRight />}
+              onClick={() => setOpen(true)}
+              aria-haspopup="dialog"
+            >
+              {cta}
+            </Button>
+          </motion.div>
+        </div>
+
+        {/* El wordmark gigante, cortado por el borde de abajo. Es el logo
+          oficial (blanco), translúcido sobre el color: se lee como un tono
+          más claro de la franja, no como un segundo logo que compite con el
+          titular. Decorativo: la marca ya la dice el titular. Con
+          reduced-motion no se desliza: queda quieto y entero a lo ancho. */}
+        <motion.img
+          ref={markRef}
           src="/logos/bloop.svg"
           alt=""
+          aria-hidden="true"
           width={130}
           height={29}
-          className="mb-6 h-7 w-auto"
           decoding="async"
+          className="bloop-band__mark pointer-events-none absolute bottom-0 left-0 select-none"
+          style={reduce ? undefined : { x: markX }}
         />
-        {/* Sin título visible: con el logo arriba y el eyebrow "Bloop Agency",
-            "Lo que hago en Bloop Agency" repetía la marca por tercera vez.
-            El h2 queda para lectores de pantalla — si no, la sección no
-            tiene encabezado en el esquema del documento. */}
-        <div className="mb-12">
-          <p className="font-display text-sm font-semibold uppercase tracking-[0.2em] text-accent md:text-base">
-            {eyebrow}
-          </p>
-          <h2 className="sr-only">{title}</h2>
-        </div>
-      </Reveal>
+      </section>
 
-      {/* Intro — texto hasta el margen (sin max-w interno) */}
-      <div className="flex gap-5">
-        <div
-          className="hidden flex-shrink-0 sm:block w-1 rounded-full self-stretch"
-          style={{
-            background:
-              'linear-gradient(180deg, var(--c-accent2), var(--c-accent))',
-          }}
-          aria-hidden="true"
-        />
-        <div className="flex min-w-0 flex-1 flex-col gap-6">
-          {paragraphs.map((p, i) => (
-            <Reveal key={i} delay={i * 0.08}>
-              <p className="text-sm leading-relaxed text-muted md:text-base lg:text-[17px]">
-                <RichText text={p} />
-              </p>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-
-      {/* Cuentas que trabaja en Bloop — cards directos sin dropdown */}
-      {clients.length > 0 && (
-        <div className="mt-16 sm:mt-20 md:mt-24">
-          <Reveal>
-            <div className="mb-8">
-              <p className="font-display text-xs font-semibold uppercase tracking-[0.2em] text-accent2">
-                Cuentas
-              </p>
-              <h3 className="mt-2 font-display text-xl font-bold text-fg sm:text-2xl">
-                Lo que hago en cada una.
-              </h3>
-            </div>
-          </Reveal>
-
-          {/* Grid con perspective para que rotateY de cada card se sienta 3D */}
-          <div
-            className="grid gap-5 md:grid-cols-2"
-            style={{ perspective: '1200px' }}
-          >
-            {clients.map((c, i) => {
-              // Alterno color + posición del borde para romper la monotonía
-              // violeta.
-              // Identidad accent2 mantenida via rail del intro + cards pares.
-              const isViolet = i % 2 === 0
-              const cardAccent = isViolet
-                ? 'var(--c-accent2)'
-                : 'var(--c-accent)'
-              const borderClass = isViolet
-                ? 'border-t-2 border-t-accent2/40 hover:border-t-accent2'
-                : 'border-l-2 border-l-accent/40 hover:border-l-accent'
-
-              // Las cards entran desde su lado: col izq desde la izquierda,
-              // col der desde la derecha. Suma scale + rotateY sutil para
-              // que se sienta dimensional, no un slide plano.
-              const isLeftCol = i % 2 === 0
-              const enterInitial = reduce
-                ? { opacity: 1, x: 0, scale: 1, rotateY: 0 }
-                : {
-                    opacity: 0,
-                    x: isLeftCol ? -90 : 90,
-                    scale: 0.92,
-                    rotateY: isLeftCol ? -8 : 8,
-                  }
-              const enterShow = { opacity: 1, x: 0, scale: 1, rotateY: 0 }
-
-              return (
-                <motion.div
-                  key={c.name}
-                  initial={enterInitial}
-                  whileInView={enterShow}
-                  viewport={{
-                    once: true,
-                    amount: 0.2,
-                    margin: '0px 0px -10% 0px',
-                  }}
-                  transition={
-                    reduce
-                      ? { duration: 0 }
-                      : { duration: 0.85, delay: i * 0.12, ease: EASE }
-                  }
-                  style={{ transformStyle: 'preserve-3d' }}
-                >
-                  <GlassPanel
-                    className={`group h-full p-6 ${borderClass} transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_40px_-12px_var(--card-glow)]`}
-                    style={{ '--card-glow': cardAccent }}
-                  >
-                    <div className="flex items-baseline gap-2.5">
-                      <span
-                        className="font-display text-xs font-bold"
-                        style={{ color: cardAccent }}
-                        aria-hidden="true"
-                      >
-                        0{i + 1}
-                      </span>
-                      <h4 className="font-display text-lg font-bold text-fg sm:text-xl">
-                        {c.name}
-                      </h4>
-                    </div>
-                    <p className="mt-3 text-sm leading-relaxed text-muted lg:text-[15px]">
-                      <RichText text={c.desc} />
-                    </p>
-                  </GlassPanel>
-                </motion.div>
-              )
-            })}
-          </div>
-        </div>
-      )}
-    </section>
+      {/* Fuera de la franja: la franja aísla su apilado (isolate) y el panel
+        tiene que quedar por encima de toda la página. */}
+      {open && <BloopPanel onClose={() => setOpen(false)} />}
+    </>
   )
 }

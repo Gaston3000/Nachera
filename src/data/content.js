@@ -285,37 +285,51 @@ export const toolCategories = [
   },
 ]
 
-// Sección "Lo que hago en Bloop Agency" — pedido del cliente.
+// Sección Bloop Agency — pedido del cliente.
 // CLAUDE.md: trabajo bajo paraguas de la agencia, NO se presenta como
-// caso propio. Framing "lo que hago EN Bloop" — descripción del rol
-// sin claimear los clientes de Bloop como portfolio personal.
-// Copy 100% del cliente (3 párrafos, versión larga), bolds preservados.
+// caso propio. Framing "lo que hago EN Bloop": el rol dentro del equipo,
+// sin claimear las cuentas de Bloop como portfolio personal.
+//
+// Todo sale del copy del Word del cliente (3 párrafos + una descripción por
+// cuenta), condensado: misma información, menos palabras. No se agregó
+// ningún dato. En la franja va lo mínimo (titular, bajada, remate); el rol y
+// las cuentas, en el panel que abre el botón.
 export const bloopAgency = {
-  eyebrow: 'Bloop Agency',
-  title: 'Lo que hago en Bloop Agency',
-  paragraphs: [
-    'Participación dentro del equipo de comunicación y marketing digital de Bloop Agency, colaborando en el desarrollo de **estrategias de contenido**, **planificación y calendarización de publicaciones**, **copywriting**, análisis de métricas y elaboración de informes para distintas marcas y empresas de diversos rubros.',
-    'Mi trabajo se desarrolla de manera conjunta con los equipos de **diseño**, **contenido** y **paid media**, acompañando la ejecución de campañas y acciones digitales alineadas con los objetivos de comunicación de cada cliente. Dentro de este proceso, participo en la organización y seguimiento de tareas, aportando en la coordinación de contenidos y en la adaptación de la comunicación según las necesidades de cada marca.',
-    'También participo activamente en la **gestión diaria de la comunicación con clientes**, acompañando procesos de **planificación**, **seguimiento** y toma de decisiones vinculadas a la presencia digital de cada marca, manteniendo un contacto constante para asegurar una comunicación clara, organizada y alineada con las estrategias trabajadas por el equipo.',
-  ],
-  // Cuentas que trabaja dentro de Bloop, copy textual del Word del cliente.
-  // Orden y bolds preservados tal cual el documento.
+  // El titular va en renglones: cada uno sube desde su máscara al entrar.
+  titleLines: ['Hoy, parte del equipo', 'de Bloop Agency.'],
+  // Párrafos 1 y 2 del Word: estrategia de contenido, planificación y copy
+  // para distintas marcas, en conjunto con diseño, contenido y paid media.
+  lead: 'Estrategia de contenido, planificación y copy para las marcas del estudio, codo a codo con diseño y paid media.',
+  // Párrafo 3 del Word: la gestión diaria de la comunicación con clientes.
+  tagline: 'Y el contacto diario con cada cliente.',
+  cta: 'Conocer mi trabajo en Bloop',
+  // ── Panel ──
+  panelTitle: 'Lo que hago en Bloop Agency',
+  panelLead: 'Comunicación y marketing digital, en equipo, para marcas de rubros muy distintos.',
+  // Los tres párrafos del Word en uno.
+  role: 'Formo parte del equipo de comunicación y marketing digital del estudio: estrategia de contenido, planificación de publicaciones, copy, métricas e informes, junto a diseño, contenido y paid media. Y acompaño el día a día con cada cliente.',
+  // Cuentas que trabaja dentro de Bloop, en el orden del Word. `rubro` y
+  // `desc` condensan su descripción: qué es la marca y qué hace ahí.
   clients: [
     {
       name: 'M&M',
-      desc: 'Participación en el desarrollo de comunicación digital para una marca orientada a soluciones integrales para el hogar, especializada en ventilación, iluminación y equipamiento doméstico. Trabajo enfocado en **planificación de contenido**, **desarrollo de estrategias de comunicación**, **copywriting**, análisis de métricas y coordinación con equipos internos para la ejecución de campañas y contenido digital alineado con la identidad de marca.',
+      rubro: 'Ventilación, iluminación y equipamiento para el hogar',
+      desc: 'Planificación de contenido, estrategia de comunicación, copy y métricas, coordinado con los equipos internos.',
     },
     {
       name: 'Climatización HD',
-      desc: 'Desarrollo de estrategias de comunicación digital para una empresa especializada en sistemas de climatización, calefacción y confort térmico integral. Participación en la **planificación de contenido**, desarrollo de copys, análisis de métricas y coordinación con equipos de diseño y paid media para comunicar soluciones técnicas de manera clara, profesional y orientada al cliente final.',
+      rubro: 'Climatización, calefacción y confort térmico',
+      desc: 'Contenido y copy para comunicar soluciones técnicas de forma clara, junto a diseño y paid media.',
     },
     {
       name: 'Tecnología de Negocios',
-      desc: 'Participación en la estrategia de comunicación digital para una empresa orientada a soluciones tecnológicas y software de gestión empresarial. Trabajo enfocado en **planificación de contenido**, desarrollo de comunicación corporativa, copywriting estratégico y coordinación con equipos internos para fortalecer el posicionamiento digital de la marca dentro del sector tecnológico y empresarial.',
+      rubro: 'Software de gestión empresarial',
+      desc: 'Comunicación corporativa y copy estratégico para posicionar la marca en su sector.',
     },
     {
       name: 'Selection Partners',
-      desc: 'Desarrollo de comunicación digital para una agencia especializada en reclutamiento internacional y oportunidades laborales en compañías de cruceros. Participación en **planificación de contenido**, estrategia de comunicación, copywriting y seguimiento de acciones digitales orientadas a transmitir profesionalismo, transparencia y acompañamiento en procesos de selección internacional.',
+      rubro: 'Reclutamiento internacional para compañías de cruceros',
+      desc: 'Contenido y copy que transmiten profesionalismo, transparencia y acompañamiento.',
     },
   ],
 }
