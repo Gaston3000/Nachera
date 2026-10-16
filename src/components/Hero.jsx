@@ -303,18 +303,17 @@ export function Hero() {
           className="relative mx-auto max-w-2xl shrink-0 lg:pointer-events-auto lg:mt-[6vh]"
           style={reduce ? undefined : { y: copyY, opacity: copyOpacity }}
         >
-          {/* Sombra central (solo escritorio): un pozo de noche detrás del
-              texto, macizo en el medio y que se abre recién lejos de las
-              palabras, como el fade de okaydev. Las fotos pueden pasar por
-              debajo en la entrada o con el parallax, pero nunca le compiten
-              al titular. Entra con el titular, no antes: durante la pila no
-              tapa nada. */}
+          {/* Sombra central (solo escritorio): un velo apenas más oscuro
+              detrás del texto, como el fade de okaydev. Sutil a propósito
+              (pedido del cliente): las fotos casi nunca pasan por ahí, y un
+              pozo negro macizo se comía el fondo del hero. Entra con el
+              titular, no antes: durante la pila no tapa nada. */}
           <span
             aria-hidden="true"
             className="hero-halo pointer-events-none absolute left-1/2 top-1/2 -z-10 hidden h-[clamp(30rem,92vh,44rem)] w-[clamp(36rem,74vw,64rem)] -translate-x-1/2 -translate-y-1/2 lg:block"
             style={{
               background:
-                'radial-gradient(closest-side, var(--c-bg) 0%, color-mix(in srgb, var(--c-bg) 96%, transparent) 42%, color-mix(in srgb, var(--c-bg) 70%, transparent) 66%, transparent 100%)',
+                'radial-gradient(closest-side, color-mix(in srgb, var(--c-bg) 55%, transparent) 0%, color-mix(in srgb, var(--c-bg) 38%, transparent) 45%, color-mix(in srgb, var(--c-bg) 14%, transparent) 75%, transparent 100%)',
             }}
           />
 
