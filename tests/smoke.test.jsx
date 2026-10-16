@@ -127,6 +127,16 @@ describe('App smoke', () => {
     expect(within(screen.getByRole('dialog')).getAllByText(/Dominga/i).length).toBeGreaterThan(0)
   })
 
+  /* El hover solo no alcanza en el celular: cada caso lleva la pista en
+     texto, oculta para el lector (el aria-label del ítem ya la dice). */
+  it('every case shows a "Ver el caso" cue without changing its accessible name', () => {
+    const casos = document.getElementById('casos')
+    const cues = within(casos).getAllByText('Ver el caso')
+    expect(cues).toHaveLength(4)
+    cues.forEach((cue) => expect(cue.closest('[aria-hidden="true"]')).not.toBeNull())
+    expect(screen.getAllByRole('button', { name: /^ver caso:/i })).toHaveLength(4)
+  })
+
   it('the case cards only show the one real number (31%), no disguised metrics', () => {
     const casos = document.getElementById('casos')
     expect(within(casos).getByText('31%')).toBeInTheDocument()

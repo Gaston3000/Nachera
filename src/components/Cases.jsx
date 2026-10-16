@@ -5,6 +5,7 @@ import { CaseModal } from './CaseModal.jsx'
 import { CaseCover } from './cases/CaseCover.jsx'
 import { brandInk, brandPanel } from './cases/brand.js'
 import { Tags } from './cases/Tags.jsx'
+import { ArrowRight } from './primitives/icons.jsx'
 import { cases } from '../data/cases.js'
 
 /* ── Casos, en formato editorial ───────────────────────────────────────────
@@ -21,11 +22,29 @@ import { cases } from '../data/cases.js'
  * destacado suma ese único número real. Todo lo demás (problema, enfoque,
  * servicios, resultados) vive en el modal: la tarjeta invita, el modal
  * cuenta. Y todo el ítem es el link — no hay botones repetidos.
+ *
+ * Lo único que se suma es la pista "Ver el caso →", en texto: el hover solo
+ * no alcanzaba, porque en el celular no existe y ahí nada decía que la
+ * tarjeta se abría.
  */
 
 /* Las bajadas traen ** para el modal; en el formato editorial el título va
    parejo, sin negrita adentro. */
 const plain = (text) => text.replace(/\*\*/g, '')
+
+/* La pista de que el caso se abre. Es texto dentro del botón, no otro botón:
+   el nombre accesible lo pone el aria-label del ítem ("Ver caso: …"), así
+   que la pista va oculta para el lector de pantalla y no se lee dos veces.
+   La flecha se corre con el mismo rebote que los íconos de los botones
+   (.case-cue__arrow en index.css). */
+function CaseCue({ className = '' }) {
+  return (
+    <span className={`inline-flex items-center gap-1.5 text-sm font-medium ${className}`} aria-hidden="true">
+      Ver el caso
+      <ArrowRight className="case-cue__arrow" />
+    </span>
+  )
+}
 
 /* La historia grande: a un lado el texto sobre el color de marca, al otro
    la portada. Las etiquetas van sobre la portada, como en e2. */
@@ -45,16 +64,22 @@ function FeaturedStory({ caseData, onOpen }) {
         <h3 className="font-display text-[clamp(1.75rem,1.1rem+1.9vw,2.7rem)] font-bold leading-[1.05] tracking-tight text-white">
           {plain(caseData.tagline)}
         </h3>
-        {caseData.highlight ? (
-          <p className="flex items-baseline gap-2.5">
-            <span className="font-display text-4xl font-bold leading-none text-white md:text-5xl">
-              {caseData.highlight.value}
-            </span>
-            <span className="text-sm text-white/75">{caseData.highlight.label}</span>
-          </p>
-        ) : (
-          <span />
-        )}
+        {/* El número y la pista comparten el renglón de cierre: el 31% a la
+            izquierda manda, la pista a la derecha no le compite. Si no entran
+            juntos, la pista baja pero sigue contra el borde derecho. */}
+        <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
+          {caseData.highlight ? (
+            <p className="flex items-baseline gap-2.5">
+              <span className="font-display text-4xl font-bold leading-none text-white md:text-5xl">
+                {caseData.highlight.value}
+              </span>
+              <span className="text-sm text-white/75">{caseData.highlight.label}</span>
+            </p>
+          ) : (
+            <span />
+          )}
+          <CaseCue className="ml-auto text-white/80 transition-colors duration-300 group-hover:text-white group-focus-visible:text-white" />
+        </div>
       </div>
 
       <div className="relative order-1 sm:order-2">
@@ -88,6 +113,7 @@ function StoryRow({ caseData, onOpen }) {
         <h3 className="mt-3 font-display text-lg font-semibold leading-snug text-fg/65 transition-colors duration-300 group-hover:text-fg group-focus-visible:text-fg md:text-xl">
           {plain(caseData.tagline)}
         </h3>
+        <CaseCue className="mt-3 text-fg/45 transition-colors duration-300 group-hover:text-fg group-focus-visible:text-fg" />
       </div>
     </button>
   )
