@@ -156,7 +156,12 @@ function useScrollAccordion({ count }) {
     let running = true
 
     const tick = (now) => {
-      const dt = Math.min(now - last, 100)
+      /* Acotado a [0, 100]. Negativo no es teórico: si el cuadro llega con
+         una marca de tiempo anterior a `last` (pestaña en segundo plano,
+         ventana congelada), el factor de abajo se vuelve negativo y enorme,
+         la posición se dispara fuera de 0…n−1 y `steps[active]` deja de
+         existir — y con él, la página entera. */
+      const dt = Math.min(Math.max(now - last, 0), 100)
       last = now
 
       target.current = readScroll()
@@ -172,6 +177,8 @@ function useScrollAccordion({ count }) {
         current.current = target.current
       }
 
+      // Y la posición, siempre adentro del recorrido.
+      current.current = Math.min(Math.max(current.current, 0), count - 1)
       paint(current.current)
 
       const rounded = Math.round(current.current)
@@ -210,7 +217,7 @@ function useScrollAccordion({ count }) {
       stop()
       io?.disconnect()
     }
-  }, [paint, readScroll])
+  }, [paint, readScroll, count])
 
   /* Click / teclado no cambian el paso a mano: llevan el scroll hasta
      donde ese paso está abierto. Si el paso se pudiera fijar por un
