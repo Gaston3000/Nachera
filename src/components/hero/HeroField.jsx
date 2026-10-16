@@ -12,8 +12,9 @@ import { HeroCartel, HeroPhoto } from './HeroPhoto.jsx'
  *   mouse      se corre EN CONTRA del puntero, más cuanto más cerca está su
  *              plano. Lee las variables --pnx/--pny que escribe el hero.
  *   vuelta     al bajar, la foto vuelve al montón del centro; al subir,
- *              sale de nuevo (como en okaydev). CSS: la dispara el hero con
- *              data-hero-exit, y sus variables las escribe al medir.
+ *              sale de nuevo (como en okaydev), de a poco con el scroll.
+ *              CSS: el hero escribe el avance en --exit-p, y las variables
+ *              de cada foto al medir.
  *   entrada    la pila → despliegue, en CSS. A su vez son dos capas
  *              (`.hero-deploy` se despliega, `.hero-deploy__in` aparece):
  *              ED tiene dos tiempos con escalonados distintos. Las variables

@@ -12,8 +12,7 @@ import {
   deployOffsets,
   deployTimeline,
   exitCluster,
-  exitThresholds,
-  nextExitState,
+  exitProgress,
   pileScale,
 } from './hero/heroDeploy.js'
 import { hero } from '../data/content.js'
@@ -30,7 +29,7 @@ import { siteConfig } from '../data/siteConfig.js'
  * mezclada en planos (heroGeometry.js), la firma de cada imagen solo al
  * hover, la sombra que aparta las fotos del texto, la barra apoyada sobre
  * una palabra del titular y la vuelta: al bajar, las fotos vuelven al centro
- * (heroDeploy.js → exitCluster). Lo que es de Nachera: la cascada palabra por
+ * — acá atada al scroll, para que tarden en irse (heroDeploy.js → EXIT). Lo que es de Nachera: la cascada palabra por
  * palabra, la barra en el cyan del sitio, la firma de periodista, los dos
  * botones.
  *
@@ -162,8 +161,7 @@ function armExit(root) {
     layer.style.setProperty('--exit-x', `${c.x}px`)
     layer.style.setProperty('--exit-y', `${c.y}px`)
     layer.style.setProperty('--exit-rot', `${c.rot}deg`)
-    layer.style.setProperty('--exit-out-delay', `${c.outDelay}s`)
-    layer.style.setProperty('--exit-in-delay', `${c.inDelay}s`)
+    layer.style.setProperty('--exit-at', String(c.at))
   })
   return true
 }
@@ -212,40 +210,37 @@ export function Hero() {
     const timeline = armDeploy(root)
     if (timeline) root.dataset.heroState = 'go'
 
-    // La vuelta (solo donde se ve el campo). Recién se habilita cuando la
-    // entrada terminó, como en okaydev: antes, un scroll cortaría el
-    // despliegue a la mitad. Al habilitarse se sincroniza con el scroll que
-    // haya, por si se bajó durante la entrada.
-    let out = false
+    // La vuelta (solo donde se ve el campo), atada al scroll: cada scroll
+    // escribe el avance en --exit-p y el CSS hace el resto (.hero-exit). Un
+    // solo requestAnimationFrame por cuadro, por más eventos que lleguen.
+    // Recién se habilita cuando la entrada terminó, como en okaydev: antes,
+    // un scroll cortaría el despliegue a la mitad. Al habilitarse toma el
+    // scroll que haya, por si se bajó durante la entrada (y la transición
+    // de .hero-exit lo lleva ahí sin salto).
     let ready = false
-    let lastY = Math.max(0, window.scrollY)
-    let settleTimer = 0
-    const thresholds = () => exitThresholds(root.offsetHeight)
-    const apply = (next) => {
-      if (next === out) return
-      out = next
-      if (out) root.dataset.heroExit = ''
-      else delete root.dataset.heroExit
-    }
-    const sync = (delta, settled) => {
-      if (!ready) return
-      apply(nextExitState(out, { y: lastY, delta, settled }, thresholds()))
+    let frame = 0
+    // También el scroll en sí (--exit-scroll): el montón sigue el centro de
+    // la PANTALLA, no el del hero, que sube con la página. Si no, las fotos
+    // se juntaban arriba, fuera de vista, y abajo quedaba el hueco.
+    const write = () => {
+      frame = 0
+      const y = Math.max(0, window.scrollY)
+      root.style.setProperty('--exit-p', String(exitProgress(y, root.offsetHeight)))
+      root.style.setProperty('--exit-scroll', `${Math.round(y)}px`)
     }
     const onScroll = () => {
-      const y = Math.max(0, window.scrollY)
-      const delta = y - lastY
-      lastY = y
-      clearTimeout(settleTimer)
-      settleTimer = setTimeout(() => sync(0, true), 150)
-      sync(delta, false)
+      if (ready && !frame) frame = requestAnimationFrame(write)
     }
-    const onResize = () => armExit(root)
+    const onResize = () => {
+      armExit(root)
+      onScroll()
+    }
 
     let readyTimer = 0
     if (timeline && armExit(root)) {
       readyTimer = setTimeout(() => {
         ready = true
-        sync(0, true)
+        onScroll()
       }, timeline.end * 1000 + 100)
       window.addEventListener('scroll', onScroll, { passive: true })
       window.addEventListener('resize', onResize)
@@ -253,11 +248,12 @@ export function Hero() {
 
     return () => {
       clearTimeout(readyTimer)
-      clearTimeout(settleTimer)
+      if (frame) cancelAnimationFrame(frame)
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('resize', onResize)
       delete root.dataset.heroState
-      delete root.dataset.heroExit
+      root.style.removeProperty('--exit-p')
+      root.style.removeProperty('--exit-scroll')
     }
   }, [reduce])
 

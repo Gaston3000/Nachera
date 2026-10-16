@@ -129,25 +129,29 @@ export function deployTimeline(count, { mobile = false } = {}) {
 
 /* ── La vuelta: al bajar, las fotos se vuelven al centro ─────────────────────
  *
- * Copiado del hero de okaydev.co (home-renderer, `buildMediaExit`): terminada
- * la entrada, apenas se baja un poco cada foto vuelve volando a un montón en
- * el centro del hero — corrida un poco al azar, girada, a 0.55 y
- * desvaneciéndose — en un orden mezclado. Al volver arriba, se despliegan
- * otra vez, más rápido. No está atada al scroll cuadro a cuadro: el scroll
- * la DISPARA, y corre sola (en CSS, con transiciones). Solo escritorio: en
- * celular las fotos van en el flujo, y okaydev tampoco la hace ahí.
+ * Tomado del hero de okaydev.co (home-renderer, `buildMediaExit`): cada foto
+ * vuelve a un montón en el centro del hero — corrida un poco al azar,
+ * girada, más chica y desvaneciéndose — en un orden mezclado.
+ *
+ * Con una diferencia de fondo: en okaydev el scroll la DISPARA y corre sola
+ * en menos de un segundo. Acá, con el hero más alto, eso dejaba ~1.000px de
+ * scroll vacío (pedido del cliente: que tarden más en irse). Así que va
+ * ATADA al scroll: cada foto se va de a poco mientras se baja, y la última
+ * termina recién cuando el hero ya casi salió de pantalla. También es más
+ * suave que la original: gira hasta ±8° (no ±14°) y se achica al 70 % (no
+ * al 55 %). Solo escritorio: en celular las fotos van en el flujo.
  *
  * El azar es sembrado: mismas posiciones en cada carga y en los tests.
  */
 
-/* Tempos de okaydev: 0.85 s con power2.in y 30 ms entre foto y foto, a 1.35×
- * de velocidad al irse y 1.85× al volver. */
 export const EXIT = {
-  duration: 0.85 / 1.35,
-  step: 0.03 / 1.35,
-  backDuration: 0.85 / 1.85,
-  backStep: 0.03 / 1.85,
-  scale: 0.55,
+  // A qué fracción del alto del hero de scroll terminan de irse todas.
+  end: 0.9,
+  // Cuánto se reparten los arranques: la primera arranca en 0, la última
+  // en el 30 % del recorrido. Cada una tarda el resto (70 %).
+  spread: 0.3,
+  scale: 0.7,
+  rot: 8,
 }
 
 /* Generador sembrado (mulberry32): pseudoazar estable. */
@@ -163,12 +167,14 @@ function seeded(seed) {
 }
 
 /**
- * Adónde vuelve cada foto y cuándo. El montón está en el centro del hero, un
- * poco arriba del medio (45 % del alto, como okaydev), con cada foto corrida
- * hasta ±50/±36 px y girada hasta ±14°.
+ * Adónde vuelve cada foto y en qué punto del recorrido arranca. El montón
+ * está en el centro del hero, un poco arriba del medio (45 % del alto, como
+ * okaydev), con cada foto corrida hasta ±50/±36 px y girada hasta ±EXIT.rot.
+ * Es el montón con la página arriba de todo; al bajar, el CSS le suma lo
+ * scrolleado para que siga el centro de la pantalla (.hero-exit).
  * @param {{left:number, top:number, width:number, height:number}[]} rects  las fotos
  * @param {{left:number, top:number, width:number, height:number}} hero
- * @returns {{x:number, y:number, rot:number, outDelay:number, inDelay:number}[]}
+ * @returns {{x:number, y:number, rot:number, at:number}[]}  `at`: arranque, de 0 a EXIT.spread
  */
 export function exitCluster(rects, hero, { seed = 7 } = {}) {
   const rand = seeded(seed)
@@ -185,40 +191,22 @@ export function exitCluster(rects, hero, { seed = 7 } = {}) {
   order.forEach((card, k) => {
     slot[card] = k
   })
-  const last = rects.length - 1
+  const last = Math.max(1, rects.length - 1)
   return rects.map((r, i) => ({
     x: round(cx - (r.left + r.width / 2) + between(-50, 50)),
     y: round(cy - (r.top + r.height / 2) + between(-36, 36)),
-    rot: round(between(-14, 14)),
-    outDelay: round(slot[i] * EXIT.step),
-    // Al volver se invierte el orden: la última en irse es la primera en volver.
-    inDelay: round((last - slot[i]) * EXIT.backStep),
+    rot: round(between(-EXIT.rot, EXIT.rot)),
+    at: round((slot[i] / last) * EXIT.spread),
   }))
 }
 
-/** Desde qué scroll se van y hasta cuál vuelven (px), según el alto del hero. */
-export function exitThresholds(heroHeight) {
-  return { forward: Math.max(8, 0.015 * heroHeight), reverse: Math.max(160, 0.28 * heroHeight) }
+/** El avance de la vuelta (0–1) para un scroll dado: 1 al EXIT.end del alto del hero. */
+export function exitProgress(scrollY, heroHeight) {
+  if (!heroHeight) return 0
+  return round(Math.min(Math.max(scrollY / (heroHeight * EXIT.end), 0), 1))
 }
 
-/**
- * ¿Las fotos tienen que estar afuera (en el montón)? La regla de okaydev, con
- * histéresis para que no titile:
- *   - bajando, pasado el umbral chico → se van (si recién se pasa y el gesto
- *     es mínimo, espera a que sea un scroll de verdad).
- *   - subiendo con decisión, antes del umbral grande → vuelven.
- *   - cuando el scroll se asienta: afuera se quedan afuera salvo arriba de
- *     todo; adentro se quedan adentro salvo pasado el umbral grande.
- * @param {boolean} out  el estado actual
- * @param {{y:number, delta:number, settled:boolean}} scroll
- * @param {{forward:number, reverse:number}} t
- */
-export function nextExitState(out, { y, delta, settled }, t) {
-  if (settled) return out ? y >= t.forward : y >= t.reverse
-  if (delta > 0.5 && y >= t.forward) {
-    if (!out && y < t.reverse && delta < 3) return out
-    return true
-  }
-  if (delta < -6 && out && y < t.reverse) return false
-  return out
+/** El avance de UNA foto, según su arranque (`at`): mismo cálculo que el CSS. */
+export function cardExitProgress(progress, at) {
+  return Math.min(Math.max((progress - at) / (1 - EXIT.spread), 0), 1)
 }
