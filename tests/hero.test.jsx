@@ -95,16 +95,13 @@ describe('Hero — campo de fotos', () => {
   })
 })
 
-describe('Sobre mí — con la cara', () => {
-  it('la cara se mudó acá, con su órbita propia', () => {
+describe('Sobre mí — sin la cara', () => {
+  /* El avatar 3D quedó sólo en el cierre (FinalCTA) hasta que lleguen las
+     fotos reales; la bio va sola. */
+  it('la cara ya no está en Sobre mí', () => {
     const { container } = render(<About />)
-    expect(screen.getByAltText(/Ignacio Costa/i)).toBeInTheDocument()
-    expect(container.querySelector('.orbit-scene')).not.toBeNull()
-    about.orbit.forEach((word) => expect(screen.getByText(word)).toBeInTheDocument())
-  })
-
-  it('la órbita no repite los chips del hero (esos van en los carteles)', () => {
-    about.orbit.forEach((word) => expect(hero.chips).not.toContain(word))
+    expect(container.querySelector('.orbit-scene')).toBeNull()
+    expect(screen.queryByAltText(/Ignacio Costa/i)).toBeNull()
   })
 
   it('el apodo es el título de la sección y la lista de instituciones no se repite', () => {

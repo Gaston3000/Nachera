@@ -23,11 +23,12 @@ describe('siteConfig', () => {
 })
 
 describe('about', () => {
-  it('has lead, kinetic title and orbit', () => {
+  it('has lead and kinetic title', () => {
     expect(about.lead).toBeTruthy()
     expect(about.kinetic.text).toMatch(/me dicen Nachera/i)
     expect(about.kinetic.text).toContain(about.kinetic.accent)
-    expect(about.orbit.length).toBeGreaterThan(0)
+    // la cara salió de Sobre mí: ya no hay palabras orbitando
+    expect(about.orbit).toBeUndefined()
     // los puntos sueltos se fueron: el camino lo cuenta Formación
     expect(about.beats).toBeUndefined()
     // las Credenciales clave se fueron: las cubre Formación

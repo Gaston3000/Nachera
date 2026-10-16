@@ -94,11 +94,6 @@ export const about = {
   // que evita que ~50 palabras grandes se lean como una pared.
   // El "Me dicen Nachera" ya no va acá: lo dice el título cinético.
   lead: 'Soy Ignacio Costa, **Licenciado en Ciencias de la Comunicación**, **periodista** y con formación profesional en **edición de video y marketing digital**. Trabajo junto a marcas y emprendimientos que quieren **crecer y comunicar lo que realmente son**.',
-  // Las palabras que giran alrededor de la cara en esta sección. NO son los
-  // chips del hero (esos ya van en los carteles de las fotos): acá la cara
-  // presenta a la persona, así que la órbita refuerza el diferencial que
-  // CLAUDE.md manda usar de ancla — el oficio de periodista y de radio.
-  orbit: ['Periodista', 'Radio', 'Narrativa', 'Cámara', 'Criterio'],
 }
 
 export const services = [
