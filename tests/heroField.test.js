@@ -8,10 +8,14 @@ import {
   HERO_HEIGHT_VW,
 } from '../src/components/hero/heroGeometry.js'
 import {
+  EXIT,
   TEMPOS,
   centerRanks,
   deployOffsets,
   deployTimeline,
+  exitCluster,
+  exitThresholds,
+  nextExitState,
   pileScale,
 } from '../src/components/hero/heroDeploy.js'
 import { hero } from '../src/data/content.js'
@@ -214,5 +218,70 @@ describe('entrada: la pila', () => {
     const [jittered] = deployOffsets(centered, { width: 375, height: 812 }, { jitter: true })
     expect(Math.abs(jittered.x)).toBeGreaterThan(0)
     expect(Math.abs(jittered.x)).toBeLessThan(15)
+  })
+})
+
+/* La vuelta de okaydev: al bajar, las fotos vuelven al montón del centro. */
+describe('vuelta: al bajar, las fotos se vuelven al centro', () => {
+  const hero = { left: 0, top: 0, width: 1440, height: 1008 }
+  const rects = [
+    { left: 40, top: 100, width: 240, height: 300 },
+    { left: 1150, top: 120, width: 200, height: 160 },
+    { left: 300, top: 700, width: 320, height: 240 },
+    { left: 900, top: 720, width: 280, height: 220 },
+  ]
+
+  it('cada foto termina cerca del centro del hero (45 % del alto), corrida y girada como mucho lo de okaydev', () => {
+    exitCluster(rects, hero).forEach((c, i) => {
+      const r = rects[i]
+      const dx = r.left + r.width / 2 + c.x - 720
+      const dy = r.top + r.height / 2 + c.y - 1008 * 0.45
+      expect(Math.abs(dx)).toBeLessThanOrEqual(50)
+      expect(Math.abs(dy)).toBeLessThanOrEqual(36)
+      expect(Math.abs(c.rot)).toBeLessThanOrEqual(14)
+    })
+  })
+
+  it('el azar es sembrado: las mismas posiciones en cada carga', () => {
+    expect(exitCluster(rects, hero)).toEqual(exitCluster(rects, hero))
+  })
+
+  it('se van en orden mezclado y vuelven en el orden inverso', () => {
+    const c = exitCluster(rects, hero)
+    const out = c.map((x) => x.outDelay)
+    expect([...out].sort((a, b) => a - b)).toEqual([0, 1, 2, 3].map((k) => Number((k * EXIT.step).toFixed(3))))
+    c.forEach((x) => {
+      const slot = Math.round(x.outDelay / EXIT.step)
+      expect(x.inDelay).toBeCloseTo((3 - slot) * EXIT.backStep, 3)
+    })
+  })
+
+  it('umbrales: se van apenas se baja, vuelven recién cerca de arriba', () => {
+    expect(exitThresholds(1000)).toEqual({ forward: 15, reverse: 280 })
+    expect(exitThresholds(100)).toEqual({ forward: 8, reverse: 160 })
+  })
+
+  describe('el estado, con histéresis', () => {
+    const t = { forward: 15, reverse: 280 }
+    it('bajando con decisión pasado el umbral chico, se van', () => {
+      expect(nextExitState(false, { y: 40, delta: 12, settled: false }, t)).toBe(true)
+    })
+    it('un roce mínimo no las saca', () => {
+      expect(nextExitState(false, { y: 20, delta: 1, settled: false }, t)).toBe(false)
+    })
+    it('subiendo con decisión antes del umbral grande, vuelven', () => {
+      expect(nextExitState(true, { y: 200, delta: -20, settled: false }, t)).toBe(false)
+    })
+    it('subiendo pero todavía lejos de arriba, siguen afuera', () => {
+      expect(nextExitState(true, { y: 600, delta: -20, settled: false }, t)).toBe(true)
+    })
+    it('al asentarse: afuera se quedan afuera salvo arriba de todo', () => {
+      expect(nextExitState(true, { y: 100, delta: 0, settled: true }, t)).toBe(true)
+      expect(nextExitState(true, { y: 5, delta: 0, settled: true }, t)).toBe(false)
+    })
+    it('al asentarse: adentro se quedan adentro salvo pasado el umbral grande', () => {
+      expect(nextExitState(false, { y: 100, delta: 0, settled: true }, t)).toBe(false)
+      expect(nextExitState(false, { y: 400, delta: 0, settled: true }, t)).toBe(true)
+    })
   })
 })

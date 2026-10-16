@@ -126,3 +126,99 @@ export function deployTimeline(count, { mobile = false } = {}) {
     titleStart: round(end - TITLE_LEAD),
   }
 }
+
+/* ── La vuelta: al bajar, las fotos se vuelven al centro ─────────────────────
+ *
+ * Copiado del hero de okaydev.co (home-renderer, `buildMediaExit`): terminada
+ * la entrada, apenas se baja un poco cada foto vuelve volando a un montón en
+ * el centro del hero — corrida un poco al azar, girada, a 0.55 y
+ * desvaneciéndose — en un orden mezclado. Al volver arriba, se despliegan
+ * otra vez, más rápido. No está atada al scroll cuadro a cuadro: el scroll
+ * la DISPARA, y corre sola (en CSS, con transiciones). Solo escritorio: en
+ * celular las fotos van en el flujo, y okaydev tampoco la hace ahí.
+ *
+ * El azar es sembrado: mismas posiciones en cada carga y en los tests.
+ */
+
+/* Tempos de okaydev: 0.85 s con power2.in y 30 ms entre foto y foto, a 1.35×
+ * de velocidad al irse y 1.85× al volver. */
+export const EXIT = {
+  duration: 0.85 / 1.35,
+  step: 0.03 / 1.35,
+  backDuration: 0.85 / 1.85,
+  backStep: 0.03 / 1.85,
+  scale: 0.55,
+}
+
+/* Generador sembrado (mulberry32): pseudoazar estable. */
+function seeded(seed) {
+  let a = seed >>> 0
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0
+    let t = a
+    t = Math.imul(t ^ (t >>> 15), t | 1)
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+}
+
+/**
+ * Adónde vuelve cada foto y cuándo. El montón está en el centro del hero, un
+ * poco arriba del medio (45 % del alto, como okaydev), con cada foto corrida
+ * hasta ±50/±36 px y girada hasta ±14°.
+ * @param {{left:number, top:number, width:number, height:number}[]} rects  las fotos
+ * @param {{left:number, top:number, width:number, height:number}} hero
+ * @returns {{x:number, y:number, rot:number, outDelay:number, inDelay:number}[]}
+ */
+export function exitCluster(rects, hero, { seed = 7 } = {}) {
+  const rand = seeded(seed)
+  const between = (a, b) => a + (b - a) * rand()
+  const cx = hero.left + hero.width * 0.5
+  const cy = hero.top + hero.height * 0.45
+  // Orden mezclado (Fisher–Yates): okaydev las manda en desorden.
+  const order = rects.map((_, i) => i)
+  for (let i = order.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(rand() * (i + 1))
+    ;[order[i], order[j]] = [order[j], order[i]]
+  }
+  const slot = new Array(rects.length)
+  order.forEach((card, k) => {
+    slot[card] = k
+  })
+  const last = rects.length - 1
+  return rects.map((r, i) => ({
+    x: round(cx - (r.left + r.width / 2) + between(-50, 50)),
+    y: round(cy - (r.top + r.height / 2) + between(-36, 36)),
+    rot: round(between(-14, 14)),
+    outDelay: round(slot[i] * EXIT.step),
+    // Al volver se invierte el orden: la última en irse es la primera en volver.
+    inDelay: round((last - slot[i]) * EXIT.backStep),
+  }))
+}
+
+/** Desde qué scroll se van y hasta cuál vuelven (px), según el alto del hero. */
+export function exitThresholds(heroHeight) {
+  return { forward: Math.max(8, 0.015 * heroHeight), reverse: Math.max(160, 0.28 * heroHeight) }
+}
+
+/**
+ * ¿Las fotos tienen que estar afuera (en el montón)? La regla de okaydev, con
+ * histéresis para que no titile:
+ *   - bajando, pasado el umbral chico → se van (si recién se pasa y el gesto
+ *     es mínimo, espera a que sea un scroll de verdad).
+ *   - subiendo con decisión, antes del umbral grande → vuelven.
+ *   - cuando el scroll se asienta: afuera se quedan afuera salvo arriba de
+ *     todo; adentro se quedan adentro salvo pasado el umbral grande.
+ * @param {boolean} out  el estado actual
+ * @param {{y:number, delta:number, settled:boolean}} scroll
+ * @param {{forward:number, reverse:number}} t
+ */
+export function nextExitState(out, { y, delta, settled }, t) {
+  if (settled) return out ? y >= t.forward : y >= t.reverse
+  if (delta > 0.5 && y >= t.forward) {
+    if (!out && y < t.reverse && delta < 3) return out
+    return true
+  }
+  if (delta < -6 && out && y < t.reverse) return false
+  return out
+}

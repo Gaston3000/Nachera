@@ -1014,6 +1014,32 @@
   }
 }
 
+/* La vuelta: al bajar, cada foto del campo vuelve al montón del centro —
+   corrida, girada, a 0.55 y desvaneciéndose — y al subir sale otra vez.
+   Copiada del hero de okaydev.co, con sus tempos (heroDeploy.js → EXIT):
+   se va en 0.63 s con power2.in de GSAP (cúbica de entrada) y vuelve en
+   0.46 s con la misma curva al revés (cúbica de salida), que es lo que hace
+   GSAP al revertir. Hero.jsx pone data-hero-exit y escribe las variables;
+   cada foto tiene su retraso, de ida y de vuelta en orden inverso.
+
+   Es 2D a propósito (sin translateZ), así la opacidad se puede animar sin
+   romper nada en Safari de iOS. */
+.hero-exit {
+  transition:
+    transform 0.46s cubic-bezier(0.33, 1, 0.68, 1),
+    opacity 0.46s cubic-bezier(0.33, 1, 0.68, 1);
+  transition-delay: var(--exit-in-delay, 0s);
+}
+[data-hero-exit] .hero-exit {
+  transform: translate(var(--exit-x, 0px), var(--exit-y, 0px)) rotate(var(--exit-rot, 0deg))
+    scale(0.55);
+  opacity: 0;
+  pointer-events: none;
+  transition-duration: 0.63s;
+  transition-timing-function: cubic-bezier(0.32, 0, 0.67, 0);
+  transition-delay: var(--exit-out-delay, 0s);
+}
+
 /* La sombra central detrás del texto entra con el titular: durante la pila
    no tapa nada, y cuando el texto aparece ya tiene su pozo de noche. */
 [data-hero-state='go'] .hero-halo {
@@ -1040,7 +1066,8 @@
     animation: none;
     opacity: 1;
   }
-  .hero-cartel {
+  .hero-cartel,
+  .hero-exit {
     transition: none;
   }
 }
