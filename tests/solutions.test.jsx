@@ -147,6 +147,32 @@ describe('Soluciones — Qué resuelve', () => {
     expect(decodeURIComponent(cta.getAttribute('href'))).toContain('me interesa el email marketing')
   })
 
+  /* Si la tarjeta que se abre asoma a medias, la tira la trae entera a la
+     vista — DESPUÉS del clic, nunca en el mousedown (suave; directo con
+     reduced-motion, que es la rama de estos tests). */
+  it('al abrir una tarjeta que asoma a medias, la tira la trae a la vista', () => {
+    const calls = []
+    const orig = HTMLElement.prototype.scrollTo
+    HTMLElement.prototype.scrollTo = function (o) {
+      calls.push({ el: this, ...o })
+    }
+    try {
+      render(<Solutions />)
+      const art = card('Email marketing')
+      const strip = art.parentElement
+      Object.defineProperty(strip, 'clientWidth', { configurable: true, value: 375 })
+      Object.defineProperty(art, 'offsetLeft', { configurable: true, value: 1359 })
+      Object.defineProperty(art, 'offsetWidth', { configurable: true, value: 319 })
+      fireEvent.click(toggleOf('Email marketing'))
+      const call = calls.find((c) => c.el === strip)
+      expect(call).toBeDefined()
+      expect(call.left).toBe(1359)
+      expect(call.behavior).toBe('auto')
+    } finally {
+      HTMLElement.prototype.scrollTo = orig
+    }
+  })
+
   it('se abre uno por vez', () => {
     render(<Solutions />)
     fireEvent.click(toggleOf('Estrategia de contenido'))

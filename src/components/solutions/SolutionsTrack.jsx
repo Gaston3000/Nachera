@@ -377,6 +377,8 @@ function PinnedTrack({ services, vizVariants, reduce, openId, setOpenId }) {
   const pinRef = useRef(null)
   const trackRef = useRef(null)
   const cursorRef = useRef(null)
+  // ¿El último foco llegó por un toque o un clic? (ver onFocus)
+  const pointerFocus = useRef(false)
   const distRef = useRef(0)
   const [dist, setDist] = useState(0)
   const [active, setActive] = useState(0)
@@ -443,15 +445,24 @@ function PinnedTrack({ services, vizVariants, reduce, openId, setOpenId }) {
     window.scrollTo({ top: pinTop + target, behavior })
   }
 
-  // Con teclado: si el foco cae en una tarjeta que está fuera de pantalla,
-  // la página scrollea hasta mostrarla. Con la tira movida por transform el
-  // navegador no lo hace solo (y el contenedor es `overflow: clip`, así que
-  // tampoco puede scrollearse por su cuenta y desarmar la cuenta).
-  const onFocus = (e) => {
-    const card = e.target.closest?.('[data-service]')
-    if (!card) return
+  const offscreen = (card) => {
     const r = card.getBoundingClientRect()
-    if (r.left < 0 || r.right > window.innerWidth) scrollToCard(cards().indexOf(card), 'instant')
+    return r.left < 0 || r.right > window.innerWidth
+  }
+
+  // SOLO con teclado: si el foco cae en una tarjeta que está fuera de
+  // pantalla, la página scrollea hasta mostrarla. Con la tira movida por
+  // transform el navegador no lo hace solo (y el contenedor es
+  // `overflow: clip`, así que tampoco puede scrollearse por su cuenta).
+  //
+  // Con el mouse NO: el navegador mueve el foco al botón en el mousedown, y
+  // saltar ahí corría la tira debajo del puntero — el mouseup caía en otra
+  // parte, el clic se perdía y "Qué resuelve" no abría. Abrir la tarjeta
+  // que asoma a medias la trae a la vista, pero después del clic (onToggle).
+  const onFocus = (e) => {
+    if (pointerFocus.current) return
+    const card = e.target.closest?.('[data-service]')
+    if (card && offscreen(card)) scrollToCard(cards().indexOf(card), 'instant')
   }
 
   // El cursor "Ver qué resuelve": un solo elemento, movido por el DOM (sin
@@ -479,6 +490,12 @@ function PinnedTrack({ services, vizVariants, reduce, openId, setOpenId }) {
           className="solutions-track relative flex items-stretch gap-5"
           style={{ x }}
           onFocusCapture={onFocus}
+          onPointerDownCapture={() => {
+            pointerFocus.current = true
+          }}
+          onKeyDownCapture={() => {
+            pointerFocus.current = false
+          }}
         >
           <div className="w-[clamp(18rem,24vw,22rem)] shrink-0 self-center pr-6">
             <Intro services={services} active={active} onJump={(i) => scrollToCard(i)} />
@@ -492,6 +509,9 @@ function PinnedTrack({ services, vizVariants, reduce, openId, setOpenId }) {
               onToggle={(v) => {
                 cursor?.hide()
                 setOpenId(v ? s.id : null)
+                // Abierta y a medias en pantalla: se trae al centro, suave.
+                const card = cards()[i]
+                if (v && card && offscreen(card)) scrollToCard(i, 'smooth')
               }}
               vizVariants={vizVariants}
               reduce={reduce}
@@ -596,6 +616,17 @@ function SwipeTrack({ services, vizVariants, reduce, openId, setOpenId }) {
     el.scrollTo?.({ left: card.offsetLeft - pad, behavior: reduce ? 'auto' : 'smooth' })
   }
 
+  // Al abrir una tarjeta que asoma a medias (la de la derecha, que sólo
+  // muestra su borde), la tira la trae entera: si no, el panel "Qué
+  // resuelve" quedaba cortado.
+  const reveal = (i) => {
+    const el = scrollerRef.current
+    const card = cards()[i]
+    if (!el || !card) return
+    const left = card.offsetLeft - el.scrollLeft
+    if (left < 0 || left + card.offsetWidth > el.clientWidth) jump(i)
+  }
+
   const size = 'h-[27rem] w-[85vw] max-w-[23rem] snap-start'
 
   return (
@@ -624,7 +655,10 @@ function SwipeTrack({ services, vizVariants, reduce, openId, setOpenId }) {
             s={s}
             seen={seen[i]}
             open={openId === s.id}
-            onToggle={(v) => setOpenId(v ? s.id : null)}
+            onToggle={(v) => {
+              setOpenId(v ? s.id : null)
+              if (v) reveal(i)
+            }}
             vizVariants={vizVariants}
             reduce={reduce}
             className={size}
